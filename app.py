@@ -48,7 +48,7 @@ if selected_disease == "Diabetes":
     
     diabetes_prediction = ""
     
-    if st.button("Diabetes Prediction"):
+    if st.button("Diabetes Predict"):
         diabetes_prediction = diabetes_model.predict([[pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, diabetes_pedigree_function, age]])
         if diabetes_prediction[0] == 1:
             st.error("Person have Diabetes")
@@ -58,6 +58,58 @@ if selected_disease == "Diabetes":
         
 elif selected_disease == "Heart Disease":
     st.title("Heart Disease Prediction using ML")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        age = st.number_input("Age")
+    
+    with col2:
+        gender = st.number_input("Gender")
+    
+    with col3:
+        chest_pain = st.number_input("Chest Pain")
 
+    with col1:
+        tresbps = st.number_input("Tresbps")
+    
+    with col2:
+        cholesterol =  st.number_input("Cholesterol")
+    
+    with col3:
+        fbs = st.number_input("FBS")
+    
+    with col1:
+        restecg = st.number_input("Restecg")
+    
+    with col2:
+        thalach = st.number_input("Thalach")
+    
+    with col3:
+        exang = st.number_input("Exang")
+    
+    with col1:
+        oldpeak = st.number_input("Oldpeak")
+    
+    with col2:
+        slope = st.number_input("Slope")
+    
+    with col3:
+        ca = st.number_input("Ca")
+    
+    with col1:
+        thal = st.number_input("Thal")
+        
+    heart_disease_prediction = ""
+    
+    if st.button("Heart Disease Predict"):
+        heart_disease_prediction = heart_disease_model.predict([[age, gender, chest_pain, tresbps, cholesterol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]])
+        
+        if heart_disease_prediction[0] == 1:
+            st.error("Person have Heart Disease")
+        else:
+            st.success("Person don't have Heart Disease")
+        
+    
 elif selected_disease == "Parkinson":
     st.title("Parkinson Prediction using ML")
