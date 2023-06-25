@@ -5,9 +5,21 @@ import os
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
 
-all_files = os.listdir(disease_models_path)
+diabetes_model = pickle.load(open(os.path.join(disease_models_path, "diabetes_prediction.sav"), 'rb'))
+heart_disease_model = pickle.load(open(os.path.join(disease_models_path, "heart_disease_model.sav"), 'rb'))
+parkinson_model = pickle.load(open(os.path.join(disease_models_path, "parkinson_model.sav"), 'rb'))
 
-diabetes_model = pickle.load(open(os.path.join(disease_models_path, all_files[0]), 'rb'))
 
+with st.sidebar:
+    st.title("Disease Prediction")
+    st.write("Select the disease you want to predict")
+    selected_disease = option_menu("Select Disease", ["Diabetes", "Heart Disease", "Parkinson"], default_index=0)
 
-print(diabetes_model.predict([[8,183,64,0,0,23.3,0.672,32]]))
+if selected_disease == "Diabetes":
+    st.title("Diabetes Prediction using ML")
+
+elif selected_disease == "Heart Disease":
+    st.title("Heart Disease Prediction using ML")
+
+elif selected_disease == "Parkinson":
+    st.title("Parkinson Prediction using ML")
