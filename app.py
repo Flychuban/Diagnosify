@@ -13,7 +13,9 @@ parkinson_model = pickle.load(open(os.path.join(disease_models_path, "parkinson_
 with st.sidebar:
     st.title("Disease Prediction")
     st.write("Select the disease you want to predict")
-    selected_disease = option_menu("Select Disease", ["Diabetes", "Heart Disease", "Parkinson"], default_index=0)
+    selected_disease = option_menu("Select Disease", ["Diabetes", "Heart Disease", "Parkinson"],
+    icons=['droplet', 'heart', 'person'],
+    default_index=0)
 
 if selected_disease == "Diabetes":
     st.title("Diabetes Prediction using ML")
