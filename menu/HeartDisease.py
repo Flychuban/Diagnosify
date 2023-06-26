@@ -15,7 +15,7 @@ def heart_disease_menu():
         age = st.number_input("Age", min_value=0, value=0, step=1)
     
     with col2:
-        gender = st.number_input("Gender", min_value=0, value=0, step=1)
+        gender = st.number_input("Gender", min_value=0, value=0, max_value=1, step=1)
     
     with col3:
         chest_pain = st.number_input("Chest Pain", min_value=0, value=0, step=1)
