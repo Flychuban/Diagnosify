@@ -1,0 +1,40 @@
+Age: Age is a significant risk factor for heart disease, with the risk increasing as individuals get older.
+
+Gender: Gender (male or female) can influence the risk profile for heart disease. Men tend to have a higher risk of heart disease at a younger age, while women's risk increases after menopause.
+
+Chest Pain (CP): The type of chest pain experienced by an individual can provide important information for heart disease diagnosis. Certain types of chest pain, such as angina, may indicate a higher likelihood of heart disease.
+
+Resting Blood Pressure (trestbps): High blood pressure (hypertension) is a major risk factor for heart disease. Monitoring resting blood pressure levels is crucial in assessing the risk of developing heart disease.
+
+Cholesterol Levels (chol): Elevated levels of LDL cholesterol (often referred to as "bad" cholesterol) and low levels of HDL cholesterol ("good" cholesterol) are associated with an increased risk of heart disease.
+
+Fasting Blood Sugar (fbs): High fasting blood sugar levels can indicate the presence of diabetes, which is a risk factor for heart disease.
+
+Resting Electrocardiographic Results (restecg): The resting electrocardiogram (ECG) results can provide insights into the electrical activity of the heart and help identify abnormalities that may be indicative of heart disease.
+
+Maximum Heart Rate Achieved (thalach): The maximum heart rate achieved during exercise can provide valuable information about cardiovascular fitness and potential heart disease risks.
+
+Exercise-Induced Angina (exang): The presence of angina (chest pain) during exercise can indicate underlying heart disease.
+
+ST Depression Induced by Exercise Relative to Rest (oldpeak): The amount of ST segment depression observed on an ECG during exercise can indicate the presence of myocardial ischemia, which is a sign of impaired blood flow to the heart.
+
+Slope of the Peak Exercise ST Segment (slope): The slope of the ST segment during exercise can provide additional information about the severity and progression of heart disease.
+
+Number of Major Vessels Colored by Fluoroscopy (ca): The number of major blood vessels showing blockages or narrowing, as determined by fluoroscopy, can help assess the extent of coronary artery disease.
+
+Thalassemia (thal): Thalassemia is an inherited blood disorder that can affect the oxygen-carrying capacity of red blood cells. Certain types of thalassemia may be associated with an increased risk of heart disease.
+
+
+age
+gender
+chest pain type (4 values)
+resting blood pressure
+serum cholestoral in mg/dl
+fasting blood sugar > 120 mg/dl
+resting electrocardiographic results (values 0,1,2)
+maximum heart rate achieved
+exercise induced angina
+oldpeak = ST depression induced by exercise relative to rest
+the slope of the peak exercise ST segment
+number of major vessels (0-3) colored by flourosopy
+thal: 0 = normal; 1 = fixed defect; 2 = reversable defect

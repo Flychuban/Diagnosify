@@ -18,25 +18,25 @@ def heart_disease_menu():
         gender = st.number_input("Gender", min_value=0, value=0, max_value=1, step=1)
     
     with col3:
-        chest_pain = st.number_input("Chest Pain", min_value=0, value=0, step=1)
+        chest_pain = st.number_input("Chest Pain", min_value=0, value=0, step=1, max_value=3)
 
     with col1:
-        tresbps = st.number_input("Tresbps", min_value=0, value=0, step=1)
+        tresbps = st.number_input("Resting Blood Pressure", min_value=0, value=0, step=1)
     
     with col2:
         cholesterol =  st.number_input("Cholesterol", min_value=0, value=0, step=1)
     
     with col3:
-        fbs = st.number_input("FBS", min_value=0, value=0, step=1)
+        fbs = st.number_input("Fasting Blood Sugar", min_value=0, value=0, step=1)
     
     with col1:
-        restecg = st.number_input("Restecg", min_value=0, value=0, step=1)
+        restecg = st.number_input("Resting Electrocardiographic", min_value=0, value=0, step=1)
     
     with col2:
-        thalach = st.number_input("Thalach", min_value=0, value=0, step=1)
+        thalach = st.number_input("Maximum Heart Rate Achieved", min_value=0, value=0, step=1)
     
     with col3:
-        exang = st.number_input("Exang", min_value=0, value=0, step=1)
+        exang = st.number_input("Exercise-Induced Angina", min_value=0, value=0, step=1)
     
     with col1:
         oldpeak = st.number_input("Oldpeak", min_value=0.00, value=0.00, step=0.01, format="%.2f")
@@ -48,7 +48,7 @@ def heart_disease_menu():
         ca = st.number_input("Ca", min_value=0, value=0, step=1)
     
     with col1:
-        thal = st.number_input("Thal", min_value=0, value=0, step=1)
+        thal = st.number_input("Thalassemia", min_value=0, value=0, step=1)
         
     heart_disease_prediction = ""
     

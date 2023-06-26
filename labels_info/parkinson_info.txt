@@ -1,0 +1,48 @@
+MDVP stands for "Multidimensional Voice Program" and Fo represents the fundamental frequency of the voice.
+MDVP:Fo(Hz) refers to the average vocal fundamental frequency in Hertz.
+It represents the average pitch of the voice.
+
+MDVP:Fhi(Hz) represents the maximum vocal fundamental frequency in Hertz.
+It indicates the highest pitch achieved during vocalization.
+
+MDVP:Flo(Hz) represents the minimum vocal fundamental frequency in Hertz.
+It indicates the lowest pitch reached during vocalization.
+
+MDVP:Jitter(%) measures the variation in vocal fold cycle length.
+It quantifies the irregularity or jitteriness in the timing of vocal fold vibrations.
+
+MDVP:Jitter(Abs) represents the absolute value of jitter.
+It measures the average difference between consecutive periods of the fundamental frequency.
+
+MDVP:RAP stands for Relative Average Perturbation.
+It measures the variation in vocal fold cycle length within consecutive periods.
+
+MDVP:PPQ stands for Five-point Period Perturbation Quotient.
+It is a measure of the perturbation in the fundamental frequency, calculated based on five consecutive periods.
+
+Jitter:DDP represents Jitter: Difference, Average Difference between consecutive periods.
+It is calculated as the average absolute difference of differences between consecutive cycles of the fundamental frequency.
+
+MDVP:Shimmer measures the variation in amplitude of the vocal fold vibrations.
+It quantifies the irregularities in the magnitude or strength of the voice signal.
+
+MDVP:Shimmer(dB) represents Shimmer measured in decibels.
+It quantifies the variation in amplitude on a logarithmic scale.
+
+Shimmer:APQ3 stands for Amplitude Perturbation Quotient (APQ3).
+It calculates the average absolute difference between consecutive amplitude peaks within 3 consecutive periods.
+
+Shimmer:APQ5 represents Amplitude Perturbation Quotient (APQ5).
+It calculates the average absolute difference between consecutive amplitude peaks within 5 consecutive periods.
+
+MDVP:APQ represents Amplitude Perturbation Quotient (APQ).
+It calculates the average absolute difference between consecutive amplitude peaks within the entire phonation period.
+
+Shimmer:DDA stands for Shimmer: Difference, Average Difference between consecutive periods.
+It calculates the average absolute differences between consecutive amplitude peaks within the entire phonation period.
+
+NHR stands for Noise-to-Harmonics Ratio.
+It represents the ratio of noise to tonal components in the voice signal.
+
+HNR stands for Harmonic-to-Noise Ratio.
+It represents the ratio of tonal components to noise in the voice signal.
