@@ -12,43 +12,43 @@ def heart_disease_menu():
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        age = st.number_input("Age")
+        age = st.number_input("Age", min_value=0, value=0, step=1)
     
     with col2:
-        gender = st.number_input("Gender")
+        gender = st.number_input("Gender", min_value=0, value=0, step=1)
     
     with col3:
-        chest_pain = st.number_input("Chest Pain")
+        chest_pain = st.number_input("Chest Pain", min_value=0, value=0, step=1)
 
     with col1:
-        tresbps = st.number_input("Tresbps")
+        tresbps = st.number_input("Tresbps", min_value=0, value=0, step=1)
     
     with col2:
-        cholesterol =  st.number_input("Cholesterol")
+        cholesterol =  st.number_input("Cholesterol", min_value=0, value=0, step=1)
     
     with col3:
-        fbs = st.number_input("FBS")
+        fbs = st.number_input("FBS", min_value=0, value=0, step=1)
     
     with col1:
-        restecg = st.number_input("Restecg")
+        restecg = st.number_input("Restecg", min_value=0, value=0, step=1)
     
     with col2:
-        thalach = st.number_input("Thalach")
+        thalach = st.number_input("Thalach", min_value=0, value=0, step=1)
     
     with col3:
-        exang = st.number_input("Exang")
+        exang = st.number_input("Exang", min_value=0, value=0, step=1)
     
     with col1:
-        oldpeak = st.number_input("Oldpeak")
+        oldpeak = st.number_input("Oldpeak", min_value=0.00, value=0.00, step=0.01, format="%.2f")
     
     with col2:
-        slope = st.number_input("Slope")
+        slope = st.number_input("Slope", min_value=0, value=0, step=1)
     
     with col3:
-        ca = st.number_input("Ca")
+        ca = st.number_input("Ca", min_value=0, value=0, step=1)
     
     with col1:
-        thal = st.number_input("Thal")
+        thal = st.number_input("Thal", min_value=0, value=0, step=1)
         
     heart_disease_prediction = ""
     
