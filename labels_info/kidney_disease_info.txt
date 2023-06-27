@@ -1,0 +1,15 @@
+SG (Specific Gravity): It represents the density of urine compared to the density of water. It is an important parameter to assess the kidney's ability to concentrate urine. Abnormal values of specific gravity may indicate kidney dysfunction.
+
+AL (Albumin): It indicates the presence of protein (albumin) in the urine. Elevated levels of albumin in urine, known as albuminuria or proteinuria, can be a sign of kidney damage or disease.
+
+SC (Serum Creatinine): It measures the level of creatinine in the blood. Creatinine is a waste product that is filtered out by the kidneys. High levels of serum creatinine can indicate impaired kidney function.
+
+Hemo (Hemoglobin): It measures the level of hemoglobin in the blood, which is responsible for carrying oxygen. Abnormal hemoglobin levels can be indicative of anemia, which can be related to kidney disease.
+
+PCV (Packed Cell Volume): It refers to the volume of red blood cells in the blood. Abnormal PCV levels can be associated with anemia or other blood-related disorders, which may be related to kidney dysfunction.
+
+WBCC (White Blood Cell Count): It measures the number of white blood cells in the blood. Elevated white blood cell count can be an indicator of infection or inflammation, which can affect the kidneys.
+
+RBCC (Red Blood Cell Count): It measures the number of red blood cells in the blood. Abnormal red blood cell count can be associated with various conditions, including anemia or kidney-related disorders.
+
+HTN (Hypertension): It indicates the presence of hypertension or high blood pressure. Hypertension is a risk factor for kidney disease, as it can damage the blood vessels in the kidneys and impair their function.

@@ -11,7 +11,7 @@ def kidney_menu():
     col1, col2 = st.columns(2)
     
     with col1:
-        sugar = st.number_input("Sugar", min_value=0.000, value=0.000, step=0.0001, format="%.4f")
+        specific_gravity = st.number_input("Specific Gravity", min_value=0.000, value=0.000, step=0.0001, format="%.4f")
     
     with col2:
         albumin = st.number_input("Albumin", min_value=0, value=0, step=1)
@@ -31,7 +31,7 @@ def kidney_menu():
     kidney_prediction = ""
     
     if st.button("Kidney Disease Predict"):
-        kidney_prediction = diabetes_model.predict([[sugar, albumin, serum_creatinine, hemoglobin, PCV, hypertension]])
+        kidney_prediction = diabetes_model.predict([[specific_gravity, albumin, serum_creatinine, hemoglobin, PCV, hypertension]])
         if kidney_prediction[0] == 1:
             st.error("Person have Kidney Disease")
         else:
