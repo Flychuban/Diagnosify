@@ -1,0 +1,15 @@
+radius_mean: Mean of distances from the center to points on the perimeter of the tumor.
+perimeter_mean: Perimeter of the tumor, which is the total length of the boundary.
+area_mean: Area of the tumor, calculated using mathematical formulas.
+compactness_mean: Measure of how compact the tumor is, calculated as perimeter^2 / (4 * pi * area).
+concavity_mean: Measure of the severity of concave portions of the tumor.
+concave points_mean: Number of concave portions of the tumor.
+radius_se: Standard error of the mean of distances from the center to points on the perimeter.
+perimeter_se: Standard error of the perimeter.
+area_se: Standard error of the area.
+radius_worst: Worst (largest) value of the mean of distances from the center to points on the perimeter.
+perimeter_worst: Worst value of the perimeter.
+area_worst: Worst value of the area.
+compactness_worst: Worst value of compactness.
+concavity_worst: Worst value of concavity.
+concave points_worst: Worst value of the number of concave portions.
