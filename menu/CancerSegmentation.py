@@ -87,31 +87,16 @@ def cancer_segmentation_menu():
         # To read file as bytes:
         bytes_data = uploaded_file.getvalue()
         
-        # url = "http://127.0.0.1:8000/"
-
-        # payload = {}
-        # files=[('data', bytes_data)]
-        # headers = {
-        # 'accept': 'application/json'
-        # }
-
-        # response = requests.request("POST", url, headers=headers, data=payload, files=files)
-        
         image = tf.io.decode_image(bytes_data) 
         yhat = model.predict(tf.expand_dims(image, axis=0))
         
-        print(f"Yhat: {yhat}")
+        yhat = np.squeeze(np.where(yhat > 0.3, 1.0, 0.0))
         
-        # prediction = json.loads(response.text)
+        result_image = read_image(bytes_data)
         
-        # yhat = np.array(json.loads(prediction['prediction']))
-        # yhat = np.squeeze(np.where(yhat > 0.3, 1.0, 0.0))
-        
-        # result_image = read_image(bytes_data)
-        
-        # fig, ax = plt.subplots(1, 7, figsize=(20, 10))
-        # ax[0].imshow(result_image) 
-        # for i in range(6):
-        #     ax[i+1].imshow(yhat[:,:,i])
-        # st.pyplot(fig)
+        fig, ax = plt.subplots(1, 7, figsize=(20, 10))
+        ax[0].imshow(result_image) 
+        for i in range(6):
+            ax[i+1].imshow(yhat[:,:,i])
+        st.pyplot(fig)
         
