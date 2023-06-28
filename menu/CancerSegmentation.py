@@ -1,11 +1,13 @@
 import streamlit as st
 import numpy as np
 import tensorflow as tf
-import cv2 as cv
+import cv2
 from matplotlib import pyplot as plt
 import os
+from PIL import Image
+import io
 
-# This is the model structure of neural network
+# This is imports are for the model structure of neural network
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.losses import Loss
 from tensorflow.keras.layers import Input, Conv2D, Conv2DTranspose, MaxPooling2D, Concatenate, Cropping2D, Dropout
@@ -59,6 +61,10 @@ disease_models_path = os.path.join(os.getcwd(), "disease_models")
 model = SegmentationModel().model
 model.load_weights(os.path.join(disease_models_path, "cancer_weights.h5"))
 
+# Function to resize the image
+def resize_image(image, size):
+    resized_image = image.resize(size)
+    return resized_image
 
 def read_image(content: bytes) -> np.ndarray:
     """
@@ -71,7 +77,7 @@ def read_image(content: bytes) -> np.ndarray:
     """
     if not isinstance(content, bytes):
         raise TypeError(f"Expected 'content' to be bytes, received: {type(content)}")
-    image = cv.imdecode(np.frombuffer(content, dtype=np.uint8), cv.IMREAD_COLOR)
+    image = cv2.imdecode(np.frombuffer(content, dtype=np.uint8), cv2.IMREAD_COLOR)
     if image is None:
         raise ValueError(f"Expected 'content' to be image bytes")
     return image
@@ -79,21 +85,34 @@ def read_image(content: bytes) -> np.ndarray:
 
 def cancer_segmentation_menu():
     st.title('Cancer Segmentation using ML')
-    st.info('This is a simple example of using a trained ML model to make predictions for cancer segmentation on images.')
+    st.info('This is a example of using a trained ML model to make predictions for cancer segmentation on images.')
     
     
     uploaded_file = st.file_uploader("Choose a file")
     if uploaded_file is not None:
-        # To read file as bytes:
-        bytes_data = uploaded_file.getvalue()
         
-        image = tf.io.decode_image(bytes_data) 
-        yhat = model.predict(tf.expand_dims(image, axis=0))
+        # Read the image file
+        image = Image.open(uploaded_file)
         
-        yhat = np.squeeze(np.where(yhat > 0.3, 1.0, 0.0))
+        # Resize the image
+        resized_image = resize_image(image, (256, 256))
+        print(type(resized_image))
         
-        result_image = read_image(bytes_data)
+        image_stream = io.BytesIO()
+        resized_image.save(image_stream, format="JPEG", quality=95)
+        image_stream.seek(0)
         
+        # Convert image to bytes
+        bytes_data = image_stream.getvalue()
+                
+        image = tf.io.decode_image(bytes_data) # Decode the image from bytes to tensors for prediction
+        yhat = model.predict(tf.expand_dims(image, axis=0)) # Predict the image
+        
+        yhat = np.squeeze(np.where(yhat > 0.5, 1.0, 0.0)) # Threshold the prediction
+        
+        result_image = read_image(bytes_data) # Read the image again to show the result
+        
+        # Plot the result image and the prediction
         fig, ax = plt.subplots(1, 7, figsize=(20, 10))
         ax[0].imshow(result_image) 
         for i in range(6):
