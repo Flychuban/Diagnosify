@@ -3,7 +3,7 @@ from tensorflow.keras.models import load_model
 import os
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
-diabetes_model = load_model(os.path.join(disease_models_path, "kidney_model.h5"))
+kidney_model = load_model(os.path.join(disease_models_path, "kidney_model.h5"))
 
 def kidney_menu():
     st.title("Kidney Disease Prediction using ML")
@@ -31,7 +31,7 @@ def kidney_menu():
     kidney_prediction = ""
     
     if st.button("Kidney Disease Predict"):
-        kidney_prediction = diabetes_model.predict([[specific_gravity, albumin, serum_creatinine, hemoglobin, PCV, hypertension]])
+        kidney_prediction = kidney_model.predict([[specific_gravity, albumin, serum_creatinine, hemoglobin, PCV, hypertension]])
         if kidney_prediction[0] == 1:
             st.error("Person have Kidney Disease")
         else:
