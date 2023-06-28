@@ -88,7 +88,11 @@ def cancer_segmentation_menu():
     st.info('This is a example of using a trained ML model to make predictions for cancer segmentation on images.')
     
     
-    uploaded_file = st.file_uploader("Choose a file")
+    uploaded_file = st.file_uploader("Choose a file", type=["jpg", "jpeg", "jfif","png"])
+    
+    # Choose the output format
+    # output_format = st.selectbox("Choose Output Format", ("JPG, JFIF, JPEG", "PNG"))
+    
     if uploaded_file is not None:
         
         # Read the image file
@@ -96,10 +100,13 @@ def cancer_segmentation_menu():
         
         # Resize the image
         resized_image = resize_image(image, (256, 256))
-        print(type(resized_image))
         
         image_stream = io.BytesIO()
-        resized_image.save(image_stream, format="JPEG", quality=95)
+        # if output_format.lower() == "jpg":
+        #     resized_image.save(image_stream, format="JPEG", quality=95)
+        # else:
+        resized_image.save(image_stream, format="PNG")
+        
         image_stream.seek(0)
         
         # Convert image to bytes
