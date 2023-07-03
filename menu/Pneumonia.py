@@ -60,4 +60,9 @@ def pneumonia_menu():
         img_data = preprocess_input(x)
         prediction = pneumonia_model.predict(img_data)
         
-        st.title(f"Prediction: {prediction[0][1]}")
+        if prediction[0][0] == 0:
+            st.success("Person DON'T have Pneumonia!")
+        
+        else:
+            st.error("Person have Pneumonia!")
+            
