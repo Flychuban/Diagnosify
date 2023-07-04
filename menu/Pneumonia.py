@@ -33,7 +33,9 @@ def pneumonia_menu():
         img_data = preprocess_input(x)
         prediction = pneumonia_model.predict(img_data)
         
-        if prediction[0][0] == 0:
+        print(f"Prediction: {prediction}")
+        
+        if prediction[0][1] < 0.5:
             st.success("Person DON'T have Pneumonia!")
         
         else:
