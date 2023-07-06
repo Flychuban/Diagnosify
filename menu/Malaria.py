@@ -12,7 +12,7 @@ import keras.utils as image
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
 malaria_model = load_model(os.path.join(disease_models_path, "pneumonia_model.h5"))
 
-def model_menu():
+def malaria_menu():
     st.title("Disease Prediction using ML")
     st.info('This is a example of using a trained ML model to make predictions for malaria classification on images.')
     
