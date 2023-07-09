@@ -10,7 +10,7 @@ from keras.applications.vgg19 import preprocess_input
 import keras.utils as image
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
-malaria_model = load_model(os.path.join(disease_models_path, "pneumonia_model.h5"))
+malaria_model = load_model(os.path.join(disease_models_path, "malaria_model3.h5"))
 
 def malaria_menu():
     st.title("Disease Prediction using ML")
