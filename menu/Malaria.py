@@ -10,7 +10,7 @@ from keras.applications.vgg19 import preprocess_input
 import keras.utils as image
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
-malaria_model = load_model(os.path.join(disease_models_path, "malaria_model3.h5"))
+malaria_model = load_model(os.path.join(disease_models_path, "malaria_model_cnn.h5"))
 
 def malaria_menu():
     st.title("Disease Prediction using ML")
@@ -21,7 +21,7 @@ def malaria_menu():
     
     if uploaded_file is not None:
                             
-        img = image.load_img(uploaded_file, target_size=(224, 224))
+        img = image.load_img(uploaded_file, target_size=(128, 128))
         x = image.img_to_array(img)
         x = np.expand_dims(x, axis=0)
         img_data = preprocess_input(x)
@@ -29,7 +29,7 @@ def malaria_menu():
         
         print(f"Prediction: {prediction}")
         
-        if prediction[0][1] < 0.5:
+        if prediction[0] > 0.5:
             st.success("Person DON'T have Malaria!")
         
         else:
