@@ -8,7 +8,7 @@ from PIL import Image
 import keras.utils as image
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
-alzheimer_model = load_model(os.path.join(disease_models_path, "malaria_model_cnn.h5"))
+alzheimer_model = load_model(os.path.join(disease_models_path, "alzheimer_model.h5"))
 
 
 def alzheimer_menu():
