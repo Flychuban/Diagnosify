@@ -16,20 +16,38 @@ def alzheimer_menu():
     st.info('This is a example of using a trained ML model to make predictions for alzheimer classification on images.')
     
     uploaded_file = st.file_uploader("Choose a file", type=["jpg", "jpeg", "jfif","png"])
+    CLASSES = ['MildDemented', 'ModerateDemented', 'NonDemented', 'VeryMildDemented']
     
     if uploaded_file is not None:
-        img = image.load_img(uploaded_file, target_size=(128, 128))
+        img = image.load_img(uploaded_file, target_size=(176, 208))
         img_data = image.img_to_array(img)
         img_data = np.expand_dims(img_data, axis=0)
         
         prediction = alzheimer_model.predict(img_data)
         
         print(f"Prediction: {prediction}")
+        max_index = None
+        max_value = 0
+        for i in range(len(CLASSES)):
+            if prediction[0][i] > max_value:
+                max_value = prediction[0][i]
+                max_index = i
         
-        if prediction[0][1] > 0.5:
-            st.success("Person DON'T have Alzheimer!")
+        if max_value > 0.3:
+            if max_index == 0:
+                st.error("Person is Mild Demented!")
+            
+            elif max_index == 1:
+                st.error("Person is Moderate Demented!")
+            
+            elif max_index == 2:
+                st.success("Person is Non Demented!")
+            
+            else:
+                st.error("Person is Very Mild Demented!")
+        
         else:
-            st.error("Person have Alzheimer!")
+            st.warning("Prediction is not confident enough!")
             
         image_plot = Image.open(uploaded_file)
         st.image(image_plot, caption='Uploaded Image', use_column_width=True)
