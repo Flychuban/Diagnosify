@@ -16,7 +16,7 @@ def alzheimer_menu():
     st.info('This is a example of using a trained ML model to make predictions for alzheimer classification on images.')
     
     uploaded_file = st.file_uploader("Choose a file", type=["jpg", "jpeg", "jfif","png"])
-    CLASSES = ['MildDemented', 'ModerateDemented', 'NonDemented', 'VeryMildDemented']
+    CLASSES = ["Demented", 'NonDemented']
     
     if uploaded_file is not None:
         img = image.load_img(uploaded_file, target_size=(176, 208))
@@ -24,28 +24,25 @@ def alzheimer_menu():
         img_data = np.expand_dims(img_data, axis=0)
         
         prediction = alzheimer_model.predict(img_data)
+        fixed_prediction = [prediction[0][0] + prediction[0][1] + prediction[0][3], prediction[0][2]]
+        
+        print(f"Fixed Prediction: {fixed_prediction}")
         
         print(f"Prediction: {prediction}")
         max_index = None
         max_value = 0
         for i in range(len(CLASSES)):
-            if prediction[0][i] > max_value:
-                max_value = prediction[0][i]
+            if fixed_prediction[i] > max_value:
+                max_value = fixed_prediction[i]
                 max_index = i
         
-        if max_value > 0.3:
+        if max_value > 0.6:
             if max_index == 0:
-                st.error("Person is Mild Demented!")
+                st.error("Person is Demented!")
             
             elif max_index == 1:
-                st.error("Person is Moderate Demented!")
-            
-            elif max_index == 2:
                 st.success("Person is Non Demented!")
             
-            else:
-                st.error("Person is Very Mild Demented!")
-        
         else:
             st.warning("Prediction is not confident enough!")
             
