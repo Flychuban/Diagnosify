@@ -10,14 +10,15 @@ from menu.CancerSegmentation import cancer_segmentation_menu
 from menu.Pneumonia import pneumonia_menu
 from menu.Malaria import malaria_menu
 from menu.Alzheimer import alzheimer_menu
+from menu.LiverDisease import liver_disease_menu
 import os
 
 
 with st.sidebar:
     st.title("Disease Prediction")
     st.write("Select the disease you want to predict")
-    selected_disease = option_menu("Select Disease", ["Diabetes", "Heart Disease", "Parkinson", "Kidney Disease", "Breast Cancer", "Cancer Segmentation", "Pneumonia", "Malaria", "Alzheimer"],
-    icons=['droplet', 'heart', 'person', 'clipboard2-heart', 'award', 'zoom-in', 'lungs', 'globe-europe-africa', 'person-bounding-box'],
+    selected_disease = option_menu("Select Disease", ["Diabetes", "Heart Disease", "Parkinson", "Kidney Disease", "Breast Cancer", "Cancer Segmentation", "Pneumonia", "Malaria", "Alzheimer", 'Liver Disease'],
+    icons=['droplet', 'heart', 'person', 'clipboard2-heart', 'award', 'zoom-in', 'lungs', 'globe-europe-africa', 'person-bounding-box', 'moisture'],
     default_index=0)
 
 if selected_disease == "Diabetes":
@@ -47,3 +48,6 @@ elif selected_disease == "Malaria":
 
 elif selected_disease == "Alzheimer":
     alzheimer_menu()
+
+elif selected_disease == "Liver Disease":
+    liver_disease_menu()

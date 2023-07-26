@@ -36,7 +36,7 @@ def alzheimer_menu():
                 max_value = fixed_prediction[i]
                 max_index = i
         
-        if max_value > 0.6:
+        if max_value > 0.62:
             if max_index == 0:
                 st.error("Person is Demented!")
             
