@@ -14,7 +14,7 @@ def liver_disease_menu():
     
     with col2:
         gender = st.selectbox(
-        'How would you like to be contacted?',
+        'Gender',
         ('Female', 'Male'))
         
         if gender == "Female":
