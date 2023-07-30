@@ -11,7 +11,7 @@ disease_models_path = os.path.join(os.getcwd(), "disease_models")
 malaria_model = load_model(os.path.join(disease_models_path, "malaria_model_cnn.h5"))
 
 def malaria_menu():
-    st.title("Disease Prediction using ML")
+    st.title("Malaria Disease Prediction using ML")
     st.info('This is a example of using a trained ML model to make predictions for malaria classification on images.')
     
     
