@@ -8,9 +8,10 @@ from PIL import Image
 import io
 
 # This is imports are for the model structure of neural network
-from tensorflow.keras.models import Model, load_model
-from tensorflow.keras.losses import Loss
-from tensorflow.keras.layers import Input, Conv2D, Conv2DTranspose, MaxPooling2D, Concatenate, Cropping2D, Dropout
+from keras.models import Model, load_model
+from keras.losses import Loss
+from keras.layers import Input, Conv2D, Conv2DTranspose, MaxPooling2D, Concatenate, Cropping2D, Dropout
+
 
 class SegmentationModel(): 
     def __init__(self): 

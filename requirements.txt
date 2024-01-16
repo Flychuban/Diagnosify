@@ -1,0 +1,10 @@
+keras==2.15.0
+matplotlib==3.8.2
+numpy==1.26.3
+opencv_python==4.9.0.80
+opencv_python_headless==4.8.1.78
+Pillow==10.1.0
+streamlit==1.30.0
+streamlit_option_menu==0.3.6
+tensorflow_macos==2.15.0
+scikit-learn==1.2.2
