@@ -10,14 +10,15 @@ from menu.Pneumonia import pneumonia_menu
 from menu.Malaria import malaria_menu
 from menu.Alzheimer import alzheimer_menu
 from menu.LiverDisease import liver_disease_menu
+from menu.BodyFatPercentage import body_fat_menu
 import os
 
 
 with st.sidebar:
     st.title("Disease Prediction")
     st.write("Select the disease you want to predict")
-    selected_disease = option_menu("Select Disease", ["Diabetes", "Heart Disease", "Parkinson", "Kidney Disease", "Breast Cancer", "Cancer Segmentation", "Pneumonia", "Malaria", 'Liver Disease'],
-    icons=['droplet', 'heart', 'person', 'clipboard2-heart', 'award', 'zoom-in', 'lungs', 'globe-europe-africa', 'moisture'],
+    selected_disease = option_menu("Select Disease", ["Diabetes", "Heart Disease", "Parkinson", "Kidney Disease", "Breast Cancer", "Cancer Segmentation", "Pneumonia", "Malaria", 'Liver Disease', 'Body Fat Percentage'],
+    icons=['droplet', 'heart', 'person', 'clipboard2-heart', 'award', 'zoom-in', 'lungs', 'globe-europe-africa', 'moisture', 'percent'],
     default_index=0)
 
 if selected_disease == "Diabetes":
@@ -45,8 +46,12 @@ elif selected_disease == "Pneumonia":
 elif selected_disease == "Malaria":
     malaria_menu()
 
+
 # elif selected_disease == "Alzheimer":
 #     alzheimer_menu()
 
 elif selected_disease == "Liver Disease":
     liver_disease_menu()
+
+elif selected_disease == "Body Fat Percentage":
+    body_fat_menu()
