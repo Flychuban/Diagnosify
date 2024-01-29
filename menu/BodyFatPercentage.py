@@ -1,6 +1,13 @@
 import streamlit as st
 import pickle
 import os
+import joblib
+import pandas as pd
+
+
+scaler_path = os.path.join(os.getcwd(), "scalers")
+scaler = joblib.load(os.path.join(scaler_path, "body_fat_scaler.save"))
+
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
 diabetes_model = pickle.load(open(os.path.join(disease_models_path, "body_fat_linreg.sav"), 'rb'))
@@ -49,11 +56,17 @@ def body_fat_menu():
     with col1:
         wrist = st.number_input("Wrist (cm)", min_value=0.00, value=0.00, max_value=100.00, step=0.01, format="%.2f")
     
+    
+    # Combine all the features into a list and then scale them
+    data = [[age, weight, height, neck, chest, abdomen, hip, thigh, knee, ankle, biceps, forearm, wrist]]
+    df_dummies = pd.DataFrame(data, columns=["Age", "Weight", "Height", "Neck", "Chest", "Abdomen", "Hip", "Thigh", "Knee", "Ankle", "Biceps", "Forearm", "Wrist"])
+    column_names = df_dummies.columns
+    df_dummies[column_names] = scaler.transform(df_dummies[column_names])
 
     body_fat_prediction = ""
 
     if st.button("Body Fat Predict"):
-        body_fat_prediction = diabetes_model.predict([[age, weight, height, neck, chest, abdomen, hip, thigh, knee, ankle, biceps, forearm, wrist]])
+        body_fat_prediction = diabetes_model.predict(df_dummies[['Age', 'Weight', 'Height', 'Neck', 'Chest', 'Abdomen', 'Hip', 'Thigh', 'Knee', 'Ankle', 'Biceps', 'Forearm', 'Wrist']])
         if body_fat_prediction[0]:
             st.success(f"Body Fat Percentage: {body_fat_prediction[0]}")
         else:
