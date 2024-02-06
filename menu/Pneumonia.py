@@ -34,10 +34,10 @@ def pneumonia_menu():
         print(f"Prediction: {prediction}")
         
         if prediction[0][1] < 0.5:
-            st.success("Person DON'T have Pneumonia!")
+            st.success("Person DON'T have Pneumonia! Percentage of having Pneumonia: " + str(prediction[0][1]*100) + "%")
         
         else:
-            st.error("Person have Pneumonia!")
+            st.error("Person have Pneumonia! Percentage of having Pneumonia: " + str(prediction[0][1]*100) + "%")
             
         image_plot = Image.open(uploaded_file)
         st.image(image_plot, caption='Uploaded Image', use_column_width=True)

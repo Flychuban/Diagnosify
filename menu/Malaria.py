@@ -27,10 +27,10 @@ def malaria_menu():
         print(f"Prediction: {prediction}")
         
         if prediction[0] > 0.5:
-            st.success("Person DON'T have Malaria!")
+            st.success("Person DON'T have Malaria! Percentage of having Malaria: " + str((1-prediction[0][0])*100) + "%")
         
         else:
-            st.error("Person have Malaria!")
+            st.error("Person have Malaria! Percentage of having Malaria: " + str((1-prediction[0][0])*100) + "%")
             
         image_plot = Image.open(uploaded_file)
         st.image(image_plot, caption='Uploaded Image', use_column_width=True)
