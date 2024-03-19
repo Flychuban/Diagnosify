@@ -1,0 +1,8 @@
+{
+  "auth": {
+    "redirect_url": "http://localhost:8080"
+  },
+  "ml": {
+    "redirect_url": "http://localhost:5000"
+  }
+}
