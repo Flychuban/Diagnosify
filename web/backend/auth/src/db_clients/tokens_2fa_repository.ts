@@ -1,8 +1,9 @@
 import Redis from 'ioredis';
 
 export interface TwoFADB {
-  get(key: string): Promise<string | null>;
-  set(key: string, value: string): Promise<void>;
+  getToken(key: string): Promise<string | null>;
+  setToken(key: string, value: string): Promise<void>;
+  deleteToken(key: string): void;
 }
 
 export class redis implements TwoFADB {
@@ -24,15 +25,19 @@ export class redis implements TwoFADB {
     this.client.expire(key, seconds);
   }
 
-  async get(key: string): Promise<string | null> {
+  async getToken(key: string): Promise<string | null> {
     const data = this.client.get(key);
     return data;
   }
 
-  async set(key: string, value: string): Promise<void> {
+  async setToken(key: string, value: string): Promise<void> {
     //! Potential bug if you want to get the value from set since its not awaited
     this.client.set(key, value);
     const EVERY_30_MINUTES = 1 * 60 * 30;
     this.setExpire(key, EVERY_30_MINUTES);
+  }
+
+  deleteToken(key: string) {
+    this.client.del(key);
   }
 }

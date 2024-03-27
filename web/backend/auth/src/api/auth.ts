@@ -27,14 +27,14 @@ app.post('/auth/login', async (req: Request, res: Response) => {
       return res.status(404).json({ err: 'User not found' });
     }
 
-    // const isPasswordValid = hasher.validate_password(password, User.password);
-    // if (!isPasswordValid) {
-    //   return res
-    //     .status(401)
-    //     .json({ error: 'User not found or invalid credentials' });
-    // }
+    const isPasswordValid = hasher.validate_password(password, User.password);
+    if (!isPasswordValid) {
+      return res
+        .status(401)
+        .json({ error: 'User not found or invalid credentials' });
+    }
     // twofa.createCode(User.username); // npt awaiting since we just need to fire an event
-    // res.status(201).json("sent 2fa")
+    //return  res.status(201).json('sent 2fa');
 
     const token = jwt.sign({ username }, JWT_SECRET_KEY);
     return res.status(200).json({ token });
@@ -64,5 +64,18 @@ app.post('/testing_route', (req: Request, res: Response) => {
   return res.status(201).json(jwt.verify(req.body.token, JWT_SECRET_KEY));
 });
 
-//app.post;
+app.post('/auth/twofa/create', (req: Request, res: Response) => {
+  const { username } = req.body;
+  twofa.createUserCodePair(username);
+  res.status(200).json('hihi');
+});
 
+app.post('/auth/twofa/check', async (req: Request, res: Response) => {
+  const { username, code } = req.body;
+  const result = await twofa.checkUserCodePair(username, code);
+  return res.status(200).json(result);
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

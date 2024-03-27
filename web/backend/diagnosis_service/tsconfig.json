@@ -8,14 +8,15 @@
     "outDir": "./build",
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "strict": true,
+    "strict": false,
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+
   },
   "include": ["src/**/*", "__tests__/**/*"]
 }
