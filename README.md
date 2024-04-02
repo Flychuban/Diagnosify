@@ -9,31 +9,46 @@ An important aspect of our system is the created communication network between d
 
 # Diagnosify -> Cancer Segmentation
 ![image info](./readme_images/test_cancer_segmentation_true.jpeg)
+![image info](./readme_images/website_cancer_1.png)
 
 # Diagnosify -> Cancer Segmentation
 ![image info](./readme_images/test_cancer_segmenation2_true.jpeg)
+![image info](./readme_images/website_cancer_2.png)
 
 # Diagnosify -> Pneumonia Detection Positive
 ![image info](./readme_images/test_pneumonia_true.jpeg)
+![image info](./readme_images/website_pneumonia_true.png)
 
 # Diagnosify -> Pneumonia Detection Negative
 ![image info](./readme_images/test_pneumonia_false.jpeg)
+![image info](./readme_images/website_pneumonia_false.png)
 
 ## How it works
 
 There are multiple disease categories in which you submit certain readings and they get posted into a feed where other doctors can later review. Where does ML come to play? - well 
 each time you submit thr form with the readings a prediction from the model is made and it shows the prediction from which the doctor could directly submit feedback whether its true or false or 
-send it to the ffed where after a trigger has been accomplished ( for example certain numbers of votes or 1 vote) the sender will be notified and the labeled data will be sent.
+send it to the feed where after a trigger has been accomplished ( for example certain numbers of votes or 1 vote) the sender will be notified and the labeled data will be sent.
 
 # Benefits of the system 
 
  - Easy data gathering -> Since ml could help a lot in the medical field ( as it is used now ) but it suffers from lack of labeled and organized data, Diagnosify makes the process easy but essentially running it in the background
- - Saving time -> a lot of the times we are redirected from doctor to doctor the only thing they do is look at a piece of paper without making a checkup and like that wasting us multiple days but with Diagnosify the sharing of docs happens seamlessly 
+ - Saving time -> a lot of the times we are redirected from doctor to doctor the only thing they do is look at a piece of paper without making a checkup and like that wasting us multiple days but with Diagnosify the sharing of docs happens seamlessly
+
+## Diagnosify against DISEASES:
+- Diabetes
+- Heart Disease
+- Parkinson
+- Kidney Disease
+- Breast Cancer
+- Cancer Segmentation
+- Malaria
+- Liver Disease
+- Body Fat Percentage
 
 # Tech Stack
 
  - DBs: Redis for cache, MongoDB for auth and postgre for general data storage
- - ML: Tensorflow, keras
+ - ML: Python, SciKit Learn, Tensorflow, keras, Pandas
  - Backend: FastApi ( for exposing the ml as a server ), NodeJS and ts for general backend
  - Frontend: NextJS 
  - Deplyment: AWS, K8S, Docker 
