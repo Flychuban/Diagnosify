@@ -1,15 +1,45 @@
-radius_mean: Mean of distances from the center to points on the perimeter of the tumor.
-perimeter_mean: Perimeter of the tumor, which is the total length of the boundary.
-area_mean: Area of the tumor, calculated using mathematical formulas.
-compactness_mean: Measure of how compact the tumor is, calculated as perimeter^2 / (4 * pi * area).
-concavity_mean: Measure of the severity of concave portions of the tumor.
-concave points_mean: Number of concave portions of the tumor.
-radius_se: Standard error of the mean of distances from the center to points on the perimeter.
-perimeter_se: Standard error of the perimeter.
-area_se: Standard error of the area.
-radius_worst: Worst (largest) value of the mean of distances from the center to points on the perimeter.
-perimeter_worst: Worst value of the perimeter.
-area_worst: Worst value of the area.
-compactness_worst: Worst value of compactness.
-concavity_worst: Worst value of concavity.
-concave points_worst: Worst value of the number of concave portions.
+Radius Mean: This is the average distance from the center of the nucleus to its perimeter. 
+Larger mean radius values may indicate tumors that are more likely to be malignant due to their size and growth behavior.
+
+
+Perimeter Mean: This measures the average length of the outline of the nucleus. Similar to radius, a larger perimeter could suggest a more aggressive or advanced tumor.
+
+
+Area Mean: The average area covered by the nucleus. Larger nuclei areas are often associated with malignant tumors, reflecting rapid growth and potential aggressiveness of the cancer.
+
+
+Compactness Mean: This is calculated as the perimeter squared divided by the area. It provides a measure of how compact the shape of the nucleus is. 
+Higher compactness may indicate malignancy, as cancer cells often have irregular and compact shapes.
+
+
+Concavity Mean: The average concavity in the contour of the nucleus. Tumors with higher concavity values may have more irregular shapes, which is a characteristic often associated with malignancy.
+
+
+Concave Points Mean: This is the average number of concave portions of the contour of the nucleus. Nuclei with more concave points are generally more irregular and can indicate a higher likelihood of breast cancer.
+
+
+Radius SE: The standard error of the radius measurements. A higher standard error could suggest variability in the tumor size, potentially indicating malignancy.
+
+
+Perimeter SE: The standard error for the perimeter measurements. Like radius SE, a higher value may reflect irregularity and heterogeneity in tumor shape, often seen in malignant tumors.
+
+
+Area SE: The standard error of the area measurements. Variability in the area can be an indicator of aggressive growth patterns typical of malignant tumors.
+
+
+Radius Worst: The largest mean radius value recorded. Larger maximum radius values are strongly indicative of malignancy, reflecting the aggressive expansion of cancerous tumors.
+
+
+Perimeter Worst: The largest perimeter measurement observed. This indicates the potential aggressiveness of the tumor; larger perimeters are often seen in malignant cases.
+
+
+Area Worst: The largest area of the nucleus among the samples. A larger maximum area is a critical indicator of malignancy due to rapid tumor growth.
+
+
+Compactness Worst: The worst case (highest) of the compactness measurements. Higher values indicate a denser, more irregular tumor, which is a common characteristic of malignant breast cancer.
+
+
+Concavity Worst: The highest concavity observed. Significant concavity suggests a highly irregular and potentially aggressive tumor, which is characteristic of malignant breast cancer.
+
+
+Concave Points Worst: The maximum number of concave points measured. An increased number of concave points in the worst case suggests a high level of tumor irregularity and is associated with a higher likelihood of breast cancer.

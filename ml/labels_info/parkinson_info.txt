@@ -1,48 +1,57 @@
-MDVP stands for "Multidimensional Voice Program" and Fo represents the fundamental frequency of the voice.
-MDVP:Fo(Hz) refers to the average vocal fundamental frequency in Hertz.
-It represents the average pitch of the voice.
+MDVP:Jitter(%): Measures the variation in the frequency or pitch of the voice signal, expressed as a percentage. 
+Higher values may indicate greater vocal instability, which is common in Parkinson's disease due to impaired vocal cord control.
 
-MDVP:Fhi(Hz) represents the maximum vocal fundamental frequency in Hertz.
-It indicates the highest pitch achieved during vocalization.
 
-MDVP:Flo(Hz) represents the minimum vocal fundamental frequency in Hertz.
-It indicates the lowest pitch reached during vocalization.
+MDVP:Jitter(Abs): The absolute difference in consecutive periods of the vocal frequency, indicating pitch variation. 
+Smaller values are typical in healthy speech, while larger values suggest more pronounced vocal tremor or instability.
 
-MDVP:Jitter(%) measures the variation in vocal fold cycle length.
-It quantifies the irregularity or jitteriness in the timing of vocal fold vibrations.
 
-MDVP:Jitter(Abs) represents the absolute value of jitter.
-It measures the average difference between consecutive periods of the fundamental frequency.
+MDVP:RAP: The Relative Amplitude Perturbation measures the variation in the amplitude of the voice. 
+It reflects how much the amplitude varies in a short time, with higher values indicating more variability and potential vocal cord dysfunction.
 
-MDVP:RAP stands for Relative Average Perturbation.
-It measures the variation in vocal fold cycle length within consecutive periods.
 
-MDVP:PPQ stands for Five-point Period Perturbation Quotient.
-It is a measure of the perturbation in the fundamental frequency, calculated based on five consecutive periods.
+MDVP:PPQ: The Pitch Period Perturbation Quotient is another measure of the variability in pitch, but calculated over a longer timeframe than RAP. 
+Increased values can signify more pronounced speech irregularities associated with Parkinson's disease.
 
-Jitter:DDP represents Jitter: Difference, Average Difference between consecutive periods.
-It is calculated as the average absolute difference of differences between consecutive cycles of the fundamental frequency.
 
-MDVP:Shimmer measures the variation in amplitude of the vocal fold vibrations.
-It quantifies the irregularities in the magnitude or strength of the voice signal.
+Jitter:DDP: A measure of cycle-to-cycle variability in vocal fold vibration, indicating irregularities in the voice signal. 
+DDP stands for Difference of Differences of Periods, highlighting more detailed aspects of jitter over time.
 
-MDVP:Shimmer(dB) represents Shimmer measured in decibels.
-It quantifies the variation in amplitude on a logarithmic scale.
 
-Shimmer:APQ3 stands for Amplitude Perturbation Quotient (APQ3).
-It calculates the average absolute difference between consecutive amplitude peaks within 3 consecutive periods.
+MDVP:Shimmer: Reflects the variation in loudness or amplitude of the voice signal. Higher levels of shimmer suggest greater amplitude variability, which can be a sign of vocal fold dysfunction.
 
-Shimmer:APQ5 represents Amplitude Perturbation Quotient (APQ5).
-It calculates the average absolute difference between consecutive amplitude peaks within 5 consecutive periods.
 
-MDVP:APQ represents Amplitude Perturbation Quotient (APQ).
-It calculates the average absolute difference between consecutive amplitude peaks within the entire phonation period.
+MDVP:Shimmer(dB): The decibel difference in the amplitude variation, providing an intensity perspective to shimmer. 
+Increases in this measure can indicate a loss of control over voice amplitude, seen in Parkinson’s disease.
 
-Shimmer:DDA stands for Shimmer: Difference, Average Difference between consecutive periods.
-It calculates the average absolute differences between consecutive amplitude peaks within the entire phonation period.
 
-NHR stands for Noise-to-Harmonics Ratio.
-It represents the ratio of noise to tonal components in the voice signal.
+Shimmer:APQ3: Amplitude Perturbation Quotient for 3 cycles, measuring the variability in amplitude across three vocal cycles. 
+It helps quantify the dynamic changes in voice amplitude, where higher values denote more variability.
 
-HNR stands for Harmonic-to-Noise Ratio.
-It represents the ratio of tonal components to noise in the voice signal.
+
+Shimmer:APQ5: Similar to APQ3, but measures amplitude variability over five cycles. 
+Both APQ3 and APQ5 offer insights into the consistency of vocal amplitude, important for detecting speech abnormalities.
+
+
+MDVP:APQ: The overall Amplitude Perturbation Quotient, representing general amplitude variability in the voice. A broader measure compared to APQ3 and APQ5, indicating global amplitude fluctuations.
+
+
+Shimmer:DDA: Another measure of amplitude variability, calculated similarly to APQ3 but over different cycles. It reinforces the assessment of vocal instability and amplitude variation.
+
+
+NHR (Noise to Harmonics Ratio): Indicates the ratio of noise in the voice signal to the harmonics. Higher NHR values can signify a more raspy and breathy voice, often associated with Parkinson’s disease.
+
+
+HNR (Harmonics to Noise Ratio): The inverse of NHR, showing the ratio of harmonic components to noise components in the voice. Lower HNR values are typical in disordered speech, including that affected by Parkinson's disease.
+
+
+RPDE (Recurrence Period Density Entropy): A measure of the dynamic complexity of the voice signal, capturing the recurrence behavior of the signal over time. Abnormalities in RPDE may indicate neurological impairments affecting speech.
+
+
+DFA (Detrended Fluctuation Analysis): Analyzes the signal for self-similarity or fractal patterns. Changes in DFA values can reflect alterations in speech production control, potentially due to Parkinson’s disease.
+
+
+PPE (Pitch Period Entropy): Quantifies the variability in the pitch period, providing insight into the regularity and complexity of the vocal signal. 
+Higher PPE values can indicate more erratic speech patterns characteristic of Parkinson's disease.
+
+

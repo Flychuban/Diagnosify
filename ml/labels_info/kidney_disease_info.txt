@@ -1,15 +1,22 @@
-SG (Specific Gravity): It represents the density of urine compared to the density of water. It is an important parameter to assess the kidney's ability to concentrate urine. Abnormal values of specific gravity may indicate kidney dysfunction.
+Specific Gravity: A measure of the density of urine compared to water. It can indicate the kidney's ability to concentrate urine. 
+Abnormal values may suggest kidney dysfunction, as healthy kidneys typically filter waste to concentrate urine without losing too much or too little water.
 
-AL (Albumin): It indicates the presence of protein (albumin) in the urine. Elevated levels of albumin in urine, known as albuminuria or proteinuria, can be a sign of kidney damage or disease.
 
-SC (Serum Creatinine): It measures the level of creatinine in the blood. Creatinine is a waste product that is filtered out by the kidneys. High levels of serum creatinine can indicate impaired kidney function.
+Albumin: A protein that can pass into the urine when the kidneys are damaged. Normally, the kidneys prevent large molecules like albumin from being lost. 
+However, kidney damage can allow albumin to leak into the urine, a condition known as albuminuria, which is an early sign of kidney disease.
 
-Hemo (Hemoglobin): It measures the level of hemoglobin in the blood, which is responsible for carrying oxygen. Abnormal hemoglobin levels can be indicative of anemia, which can be related to kidney disease.
 
-PCV (Packed Cell Volume): It refers to the volume of red blood cells in the blood. Abnormal PCV levels can be associated with anemia or other blood-related disorders, which may be related to kidney dysfunction.
+Serum Creatinine: A waste product from the normal breakdown of muscle tissue that the kidneys should filter out. 
+High levels in the blood can indicate impaired kidney function, as they suggest the kidneys are not effectively removing creatinine from the bloodstream.
 
-WBCC (White Blood Cell Count): It measures the number of white blood cells in the blood. Elevated white blood cell count can be an indicator of infection or inflammation, which can affect the kidneys.
 
-RBCC (Red Blood Cell Count): It measures the number of red blood cells in the blood. Abnormal red blood cell count can be associated with various conditions, including anemia or kidney-related disorders.
+Hemoglobin: A protein in red blood cells that carries oxygen. Low hemoglobin levels can be a sign of anemia, which is common in kidney disease. 
+The kidneys produce erythropoietin, a hormone that stimulates red blood cell production, and damage can lead to decreased erythropoietin and anemia.
 
-HTN (Hypertension): It indicates the presence of hypertension or high blood pressure. Hypertension is a risk factor for kidney disease, as it can damage the blood vessels in the kidneys and impair their function.
+
+PCV (Packed Cell Volume): Measures the volume percentage of red blood cells in blood. A low PCV indicates anemia, while a high PCV could suggest dehydration. 
+In the context of kidney disease, a low PCV can indicate erythropoietin deficiency due to kidney dysfunction.
+
+
+Hypertension: High blood pressure is both a cause and a complication of chronic kidney disease. The kidneys help regulate blood pressure by controlling the volume of blood 
+and the amount of blood vessel constriction. When the kidneys are damaged, they may not perform these functions properly, leading to increased blood pressure.
