@@ -1,8 +1,12 @@
 import streamlit as st
 import pickle
 import os
-from streamlit_option_menu import option_menu  
+from streamlit_option_menu import option_menu
+import pandas as pd
+import joblib  
 
+scaler_path = os.path.join(os.getcwd(), "scalers")
+scaler = joblib.load(os.path.join(scaler_path, "parkinson_scaler.pkl"))
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
 parkinson_model = pickle.load(open(os.path.join(disease_models_path, "parkinson_model.sav"), 'rb'))
@@ -60,10 +64,16 @@ def parkinson_menu():
     with col4:
         PPE = st.number_input("PPE", min_value=0.000000, step=0.000001, format="%.6f")
     
+    # Combine all the features into a list and then scale them
+    data = [[MDVP_Jitter_percent, MDVP_Jitter_abs, MDVP_RAP, MDVP_PPQ, Jitter_DDP, MDVP_Shimmer, MDVP_Shimmer_dB, Shimmer_APQ3, Shimmer_APQ5, MDVP_APQ, Shimmer_dda, NHR, HNR, RPDE, DFA, PPE]]
+    df_dummies = pd.DataFrame(data, columns=["MDVP:Jitter(%)", "MDVP:Jitter(Abs)", "MDVP:RAP", "MDVP:PPQ", "Jitter:DDP", "MDVP:Shimmer", "MDVP:Shimmer(dB)", "Shimmer:APQ3", "Shimmer:APQ5", "MDVP:APQ", "Shimmer:DDA", "NHR", "HNR", "RPDE", "DFA", "PPE"])
+    column_names = df_dummies.columns
+    df_dummies[column_names] = scaler.transform(df_dummies[column_names])
+    
     parkinson_prediction = ""
     
     if st.button("Parkinson Predict"):
-        parkinson_prediction = parkinson_model.predict([[MDVP_Jitter_percent, MDVP_Jitter_abs, MDVP_RAP, MDVP_PPQ, Jitter_DDP, MDVP_Shimmer, MDVP_Shimmer_dB, Shimmer_APQ3, Shimmer_APQ5, MDVP_APQ, Shimmer_dda, NHR, HNR, RPDE, DFA, PPE]])
+        parkinson_prediction = parkinson_model.predict(df_dummies[["MDVP:Jitter(%)", "MDVP:Jitter(Abs)", "MDVP:RAP", "MDVP:PPQ", "Jitter:DDP", "MDVP:Shimmer", "MDVP:Shimmer(dB)", "Shimmer:APQ3", "Shimmer:APQ5", "MDVP:APQ", "Shimmer:DDA", "NHR", "HNR", "RPDE", "DFA", "PPE"]])
         
         if parkinson_prediction[0] == 1:
             st.error("Person have Parkinson")
