@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import bodyParser from 'body-parser';
 import { DB, IDB } from '../db_clients/auth_repository';
 import { hasher } from '../hasher';
-import { twofa } from '../TwoFA';
+// import { twofa } from '../TwoFA';
 
 const app = express();
 app.use(cors());
@@ -64,17 +64,17 @@ app.post('/testing_route', (req: Request, res: Response) => {
   return res.status(201).json(jwt.verify(req.body.token, JWT_SECRET_KEY));
 });
 
-app.post('/auth/twofa/create', (req: Request, res: Response) => {
-  const { username } = req.body;
-  twofa.createUserCodePair(username);
-  res.status(200).json('hihi');
-});
+// app.post('/auth/twofa/create', (req: Request, res: Response) => {
+//   const { username } = req.body;
+//   twofa.createUserCodePair(username);
+//   res.status(200).json('hihi');
+// });
 
-app.post('/auth/twofa/check', async (req: Request, res: Response) => {
-  const { username, code } = req.body;
-  const result = await twofa.checkUserCodePair(username, code);
-  return res.status(200).json(result);
-});
+// app.post('/auth/twofa/check', async (req: Request, res: Response) => {
+//   const { username, code } = req.body;
+//   const result = await twofa.checkUserCodePair(username, code);
+//   return res.status(200).json(result);
+// });
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

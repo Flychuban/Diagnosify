@@ -36,5 +36,5 @@ model Diagnosis {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   raw_data   String
-  is_correct Boolean
+  is_correct Boolean?
 }

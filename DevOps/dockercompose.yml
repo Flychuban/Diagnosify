@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  gateway:
+    image: radoslav123/gate:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ml_service
+
+  ml_service:
+    image: your_ml_image:tag
+    ports:
+      - "5000:5000"

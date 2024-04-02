@@ -8,7 +8,6 @@ const port = 3000;
 app.use(express.json());
 app.use(cors());
 
-// Define API endpoints
 app.get('/user/:id/diagnoses', async (req: Request, res: Response) => {
   try {
     const userId = parseInt(req.params.id);
@@ -19,9 +18,14 @@ app.get('/user/:id/diagnoses', async (req: Request, res: Response) => {
   }
 });
 
-app.post('/user/:id/diagnoses', async (req: Request, res: Response) => {
+app.post('/diagnoses/verify/:id', async (req: Request, res: Response) => {
+  const diag = await db.verify_diagnosis(req.params.id, req.body.label);
+  res.status(200).json();
+});
+
+app.post('/user/:user_id/diagnoses', async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = parseInt(req.params.user_id);
     const newDiagnosis = await db.create_new_diagnosis(userId, req.body);
     res.json(newDiagnosis);
   } catch (error) {
@@ -36,6 +40,10 @@ app.get('/diagnoses/training', async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+app.get('/diagnoses/all', async (req: Request, res: Response) => {
+  res.status(200).json();
 });
 
 app.listen(port, () => {

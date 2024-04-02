@@ -39,7 +39,6 @@ def diabetes_menu():
     diabetes_prediction = ""
     
     if st.button("Diabetes Predict"):
-        diabetes_prediction = diabetes_model.predict([[pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, diabetes_pedigree_function, age]])
         print(diabetes_prediction)
         if diabetes_prediction[0] == 1:
             st.error("Person have Diabetes")

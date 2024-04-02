@@ -18,7 +18,11 @@ models = {
     # 'liver_disease': liver_disease_model.predict,
     # 'kidney': kidney_model.predict,
     # 'heart_disease': heart_disease_model.predict,
-    'diabetes': diabetes_model.predict,
+    'diabetes': diabetes_model.predict 
+    # lambda data: diabetes_model.predict(
+    #     [ [data['pregnancies'],data['glucose'], data['blood_pressure'], data['skin_thickness'], data['insulin'], data['bmi'], data['diabetes_pedigree_function'], data['age']    ]]   
+    # ),
+    ,
     # 'cancer_segmentation': cancer_segmentation_model.predict,
     # 'breast_cancer': breast_cancer_model.predict
 }

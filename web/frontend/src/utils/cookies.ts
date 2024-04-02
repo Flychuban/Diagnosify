@@ -1,5 +1,10 @@
 import Cookies from "js-cookie";
-
+function redirectToLoginIfNoCookie(cookie: string | boolean, path = "/login") {
+  if (!cookie) {
+    window.location.href = path;
+    return undefined;
+  }
+}
 class CookieWrapper {
   static setCookie(
     name: string,

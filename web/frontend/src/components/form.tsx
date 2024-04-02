@@ -8,9 +8,10 @@ interface InputSchema {
 
 interface Props {
   input_schema: InputSchema[];
+  handleSubmit: any;
 }
 
-export const InputForm: React.FC<Props> = ({ input_schema }) => {
+export const InputForm: React.FC<Props> = ({ input_schema, handleSubmit }) => {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, name: string) => {
@@ -20,14 +21,14 @@ export const InputForm: React.FC<Props> = ({ input_schema }) => {
     });
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log(formData);
-    // You can perform further actions with the form data here
-  };
-
   return (
-    <form onSubmit={handleSubmit}>
+    <form
+      onSubmit={(e: React.FormEvent) => {
+        e.preventDefault();
+
+        handleSubmit(formData);
+      }}
+    >
       {input_schema.map((input, index) => (
         <div key={index}>
           <label htmlFor={input.name}>{input.label}:</label>
@@ -35,7 +36,7 @@ export const InputForm: React.FC<Props> = ({ input_schema }) => {
             type={input.type}
             id={input.name}
             name={input.name}
-            value={formData[input.name] || ""}
+            value={formData[input.name] ?? ""}
             onChange={(e) => handleChange(e, input.name)}
           />
         </div>
