@@ -1,6 +1,11 @@
 import streamlit as st
 from tensorflow.keras.models import load_model
 import os
+import joblib
+import pandas as pd
+
+scaler_path = os.path.join(os.getcwd(), "scalers")
+scaler = joblib.load(os.path.join(scaler_path, "kidney_disease_scaler.pkl"))
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
 kidney_model = load_model(os.path.join(disease_models_path, "kidney_model.h5"))
@@ -28,10 +33,17 @@ def kidney_menu():
     with col2:
         hypertension = st.number_input("Hypertension", min_value=0, value=0, step=1, max_value=1)
     
+    
+        # Combine all the features into a list and then scale them
+    data = [[specific_gravity, albumin, serum_creatinine, hemoglobin, PCV, hypertension]]
+    df_dummies = pd.DataFrame(data, columns=["sg", "al", "sc", "hemo", "pcv", "htn"])
+    column_names = df_dummies.columns
+    df_dummies[column_names] = scaler.transform(df_dummies[column_names])
+    
     kidney_prediction = ""
     
     if st.button("Kidney Disease Predict"):
-        kidney_prediction = kidney_model.predict([[specific_gravity, albumin, serum_creatinine, hemoglobin, PCV, hypertension]])
+        kidney_prediction = kidney_model.predict(df_dummies[["sg", "al", "sc", "hemo", "pcv", "htn"]])
         if kidney_prediction[0] == 1:
             st.error("Person have Kidney Disease")
         else:

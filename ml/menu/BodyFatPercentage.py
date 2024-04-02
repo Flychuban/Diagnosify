@@ -6,7 +6,7 @@ import pandas as pd
 
 
 scaler_path = os.path.join(os.getcwd(), "scalers")
-scaler = joblib.load(os.path.join(scaler_path, "body_fat_scaler.save"))
+scaler = joblib.load(os.path.join(scaler_path, "body_fat_scaler.pkl"))
 
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
