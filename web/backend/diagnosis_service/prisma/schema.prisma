@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,29 +6,29 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-enum ModelEnum {
-  PNEUMONIA
-  PARKINSON
-  MALARIA
-  LIVER_DISEASE
-  KIDNEY
-  HEART_DISEASE
-  DIABETES
-  CANCER_SEGMENTATION
-  BREAST_CANCER
-}
-
 model User {
-  id         Int      @id @default(autoincrement())
-  username   String
-  diagnoses  Diagnosis[]
+  id        Int        @id @default(autoincrement())
+  username  String
+  diagnoses Diagnosis[]
+  votes     Voting[]
 }
 
 model Diagnosis {
-  id        Int      @id @default(autoincrement())
-  type      ModelEnum
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  raw_data   String
-  is_correct Boolean?
+  id          Int      @id @default(autoincrement())
+  type        String
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  prediction  Boolean
+  raw_data    Json
+  is_correct  Boolean?
+  voting      Voting? 
+}
+
+model Voting {
+  id            Int        @id @default(autoincrement())
+  yes           Int
+  no            Int
+  diagnosisId   Int        @unique
+  diagnosis     Diagnosis  @relation(fields: [diagnosisId], references: [id])
+  voters        User[]
 }

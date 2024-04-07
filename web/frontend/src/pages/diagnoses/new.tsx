@@ -88,12 +88,17 @@ const DisplayedPrediction: React.FC<{
   predictInfo: {
     raw_data: { type: string };
     prediction: boolean;
+    type: string;
   };
 }> = ({ predictInfo }) => {
   return (
     <div className="border-spacing-4 border-4 border-amber-500">
       <p>{predictInfo.raw_data.type} prediction</p>
-      <Reading obj={predictInfo.raw_data} />
+      <Reading
+        obj={predictInfo.raw_data}
+        prediction={predictInfo.prediction}
+        type={predictInfo.type}
+      />
       <button
         onClick={() => {
           console.log("hi", {
@@ -104,15 +109,20 @@ const DisplayedPrediction: React.FC<{
       >
         Send Prediction to feed if unsure about aquracy
       </button>
-      <div className="bg-blue-900">Predicted : {predictInfo.prediction}</div>
+      <div className="bg-blue-900">
+        Predicted : {JSON.stringify(predictInfo.prediction)}
+      </div>
       <button
-        onClick={() => {
+        onClick={async () => {
           const formatedObj = {
+            type: predictInfo.type,
             raw_data: { ...predictInfo.raw_data },
             label: predictInfo.prediction,
           };
 
           console.log(formatedObj);
+
+          await Api.createDiagnosis("username", formatedObj);
         }}
       >
         {" "}
@@ -160,7 +170,8 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
         <DisplayedPrediction
           predictInfo={{
             prediction: Prediction,
-            raw_data: { ...formState, type: type },
+            raw_data: { ...formState },
+            type: type,
           }}
         />
       )}

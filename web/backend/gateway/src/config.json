@@ -4,5 +4,8 @@
   },
   "ml": {
     "redirect_url": "http://localhost:5000"
+  },
+  "diag": {
+    "redirect_url": "http://localhost:3001"
   }
 }

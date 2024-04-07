@@ -1,49 +1,89 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { db, IDB } from './db_repo'; // Assuming your DB class and IDB interface are in a file named db.ts
+import { db, IDB } from './db_repo';
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 app.use(express.json());
 app.use(cors());
 
-app.get('/user/:id/diagnoses', async (req: Request, res: Response) => {
+app.post(
+  '/diag/user/:userId/diagnoses',
+  async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const newDiagnosis = await db.createDiagnosis(userId, req.body);
+      return res.status(200).json(newDiagnosis);
+    } catch (error) {
+      console.error(error);
+      return res.status(404).json({ error: error.message });
+    }
+  },
+);
+
+app.get('/diag/user/:userId/diagnoses', async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.id);
-    const diagnoses = await db.get_user_diagnosises(userId);
+    const userId = parseInt(req.params.userId);
+    const diagnoses = await db.getUserDiagnoses(userId);
     res.json(diagnoses);
   } catch (error) {
     res.status(404).json({ error: error.message });
   }
 });
 
-app.post('/diagnoses/verify/:id', async (req: Request, res: Response) => {
-  const diag = await db.verify_diagnosis(req.params.id, req.body.label);
-  res.status(200).json();
-});
+app.post(
+  '/diag/diagnoses/:diagnosisId/vote',
+  async (req: Request, res: Response) => {
+    try {
+      const diagnosisId = parseInt(req.params.diagnosisId);
+      const userId = parseInt(req.body.userId);
+      const vote = req.body.vote;
+      await db.vote(diagnosisId, userId, vote);
+      res.status(200).json({ message: 'Vote recorded successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+);
 
-app.post('/user/:user_id/diagnoses', async (req: Request, res: Response) => {
+app.get('/diag/diagnoses/:diagnosisId', async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.user_id);
-    const newDiagnosis = await db.create_new_diagnosis(userId, req.body);
-    res.json(newDiagnosis);
-  } catch (error) {
-    res.status(404).json({ error: error.message });
+    const diagnosisId = parseInt(req.params.diagnosisId);
+    const diagnosis = await db.getDiagnosis(diagnosisId);
+    return res.status(200).json(diagnosis);
+  } catch (e) {
+    console.error(e);
+    return res.status(404).json({ error: 'Diagnosis not found' });
   }
 });
 
-app.get('/diagnoses/training', async (req: Request, res: Response) => {
+app.get('/diag/diagnoses', async (req: Request, res: Response) => {
   try {
-    await db.get_diagnosises_for_model_training();
+    const diagnoses = await db.getAllDiagnoses();
+    res.status(200).json(diagnoses);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/diag/diagnoses/training', async (req: Request, res: Response) => {
+  try {
+    await db.getDiagnosesForModelTraining();
     res.sendStatus(200);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-app.get('/diagnoses/all', async (req: Request, res: Response) => {
-  res.status(200).json();
+app.post('/diag/user/new', async (req: Request, res: Response) => {
+  try {
+    const newUser = await db.createUser(req.body.userId, req.body.username);
+    return res.status(200).json(newUser);
+  } catch (e) {
+    res.status(500).json(e);
+  }
 });
 
 app.listen(port, () => {

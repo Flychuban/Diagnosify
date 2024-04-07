@@ -27,17 +27,62 @@ export class Api {
   }
 
   static async signup(data: { username: string; password: string }) {
-    return await this.authenticate(`${this.url}/auth/signup`, data);
+    const response = await this.authenticate(`${this.url}/auth/signup`, data);
+    console.log(response);
+    if (!response.success) {
+      return;
+    }
+    console.log("hijjih");
+    return await axios.post(`${this.url}/diag/user/new`, {
+      username: data.username,
+      userId: response.newUser.id,
+    });
   }
 
   static async sendDiagnose(diagnose: object) {
+    //for ml seervice
     console.log("jijijijijijiji", diagnose);
     return await axios.post(`${this.url}/ml/${diagnose.type}`, {
       data: { ...diagnose },
     });
   }
 
-  static async getAllDignoses(username: string) {
-    return await axios.get(`${this.url}/diagnoses/${username}`);
+  static async getUserDignoses(username: string) {
+    return await axios.get(`${this.url}/diag/${username}`);
+  }
+
+  static async getAllDiagnoses() {
+    return await axios.get(`${this.url}/diag/diagnoses/all`);
+  }
+
+  static async getReading(id: number) {
+    return await axios.get(`${this.url}/diag/diagnoses/${id}`);
+  }
+
+  static async createDiagnosis(username: string, data: object) {
+    return await axios.post(
+      `${this.url}/diag/user/${username}/diagnoses`,
+      data,
+    );
+  }
+
+  static async VoteForDiagnosis(
+    userId: number,
+    diagnosisId: number,
+    vote: boolean,
+  ) {
+    try {
+      return await axios.post(
+        `${this.url}/diag/diagnoses/${diagnosisId}/vote`, // make the endpoint on the server
+        {
+          vote: vote,
+          userId: userId,
+        },
+      );
+    } catch (e) {
+      return {
+        e: e,
+      };
+    }
   }
 }

@@ -36,11 +36,6 @@ for route_data in routes_data:
         request_object = await request.json()
         return handler(request_object['data'])
 
-    async def data_pipeline_handler(request: Request, handler=):
-        req = await request.json()
-        print(req)
-        return handler(req['data'])
-
     app.post(f"/ml{route}")(post_handler)
 
 if __name__ == "__main__":
