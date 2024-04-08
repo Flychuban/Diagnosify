@@ -7,7 +7,7 @@ const WHEN_TO_CHECK_VOTES = 3;
 export interface IDB {
   getUserDiagnoses(userId: number): Promise<Diagnosis[]>;
   createDiagnosis(userId: number, data: object): Promise<Diagnosis>;
-  getDiagnosesForModelTraining(): Promise<void>;
+  getDiagnosesForModelTraining(): Promise<object[]>;
   getAllDiagnoses(): Promise<Diagnosis[]>;
   getDiagnosis(diagnosisId: number): Promise<Diagnosis>;
   vote(diagnosisId: number, userId: number, vote: boolean): Promise<void>;
@@ -48,12 +48,16 @@ export class DB implements IDB {
     return user.diagnoses;
   }
 
-  async getDiagnosesForModelTraining(): Promise<void> {
+  async getDiagnosesForModelTraining(): Promise<object[]> {
     const diagnoses = await prisma.diagnosis.findMany({
-      where: { isCorrect: true },
+      where: {
+        is_correct: {
+          not: null,
+        },
+      },
     });
 
-    console.log(diagnoses);
+    return diagnoses;
   }
 
   async getAllDiagnoses(): Promise<Diagnosis[]> {
@@ -117,7 +121,7 @@ export class DB implements IDB {
       ) {
         await this.verifyDiagnosis(
           diagnosisId,
-          (existingVote.yes > existingVote.no)
+          existingVote.yes > existingVote.no,
         );
       }
     }
@@ -128,11 +132,11 @@ export class DB implements IDB {
     });
   }
 
-  async verifyDiagnosis(diagnosisId: number,isCorrect: boolean) {
+  async verifyDiagnosis(diagnosisId: number, isCorrect: boolean) {
     await prisma.diagnosis.update({
-          where: { id: diagnosisId },
-          data: { is_correct:isCorrect },
-        });
+      where: { id: diagnosisId },
+      data: { is_correct: isCorrect },
+    });
   }
 
   async createUser(userId: number, username: string): Promise<any> {

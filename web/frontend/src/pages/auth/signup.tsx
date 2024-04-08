@@ -26,7 +26,7 @@ const Signup: React.FC = () => {
 
       {isPopUpOpen && (
         <div>
-          <p>Succesfulr register proceed to login</p>
+          <p>Succesfulr register proceeding to login page </p>
         </div>
       )}
     </div>

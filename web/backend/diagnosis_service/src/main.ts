@@ -79,12 +79,12 @@ app.get('/diag/diagnoses', async (req: Request, res: Response) => {
   }
 });
 
-app.get('/diag/diagnoses/training', async (req: Request, res: Response) => {
+app.get('/diag/ml/get_verified_data', async (req: Request, res: Response) => {
   try {
-    await db.getDiagnosesForModelTraining();
-    res.sendStatus(200);
+    const data = await db.getDiagnosesForModelTraining();
+    return res.status(200).json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 

@@ -6,6 +6,7 @@ import React, {
   useContext,
 } from "react";
 import { cookies } from "./cookies";
+import { useRouter } from "next/router";
 function jwt_decode(token) {
   return JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
 }
@@ -25,7 +26,6 @@ export const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider: FC = ({ children }) => {
   const [token, setToken] = useState<User | null>(null);
-
   useEffect(() => {
     async function fetchCookie() {
       const token = await cookies.token.get(); //! DONT REMOVE AWAIT
