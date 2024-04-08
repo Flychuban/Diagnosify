@@ -31,11 +31,15 @@ export const AuthProvider: FC = ({ children }) => {
       const token = await cookies.token.get(); //! DONT REMOVE AWAIT
       console.log(token);
       if (token) {
-        const parsedToken = jwt_decode(token);
-        setToken({
-          id: parsedToken.userId,
-          username: parsedToken.username,
-        });
+        try {
+          const parsedToken = jwt_decode(token);
+          setToken({
+            id: parsedToken.userId,
+            username: parsedToken.username,
+          });
+        } catch (err) {
+          console.error(err);
+        }
       }
     }
 

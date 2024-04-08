@@ -52,18 +52,15 @@ export class Api {
   }
 
   static async getAllDiagnoses() {
-    return await axios.get(`${this.url}/diag/diagnoses/all`);
+    return await axios.get(`${this.url}/diag/diagnoses`);
   }
 
   static async getReading(id: number) {
     return await axios.get(`${this.url}/diag/diagnoses/${id}`);
   }
 
-  static async createDiagnosis(username: string, data: object) {
-    return await axios.post(
-      `${this.url}/diag/user/${username}/diagnoses`,
-      data,
-    );
+  static async createDiagnosis(userId: string, data: object) {
+    return await axios.post(`${this.url}/diag/user/${userId}/diagnoses`, data);
   }
 
   static async VoteForDiagnosis(

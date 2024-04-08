@@ -8,7 +8,7 @@ interface InputSchema {
 
 interface Props {
   input_schema: InputSchema[];
-  handleSubmit: any;
+  handleSubmit: void;
 }
 
 export const InputForm: React.FC<Props> = ({ input_schema, handleSubmit }) => {

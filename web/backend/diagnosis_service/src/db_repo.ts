@@ -50,7 +50,7 @@ export class DB implements IDB {
 
   async getDiagnosesForModelTraining(): Promise<void> {
     const diagnoses = await prisma.diagnosis.findMany({
-      where: { is_correct: true },
+      where: { isCorrect: true },
     });
 
     console.log(diagnoses);
@@ -63,7 +63,13 @@ export class DB implements IDB {
   async getDiagnosis(diagnosisId: number): Promise<Diagnosis> {
     const diagnosis = await prisma.diagnosis.findUnique({
       where: { id: diagnosisId },
-      include: { voting: true },
+      include: {
+        voting: {
+          include: {
+            voters: true,
+          },
+        },
+      },
     });
 
     if (!diagnosis) {
@@ -109,10 +115,10 @@ export class DB implements IDB {
         yesPercentage >= THRESHOLD_IN_PERCENTAGES_TO_BE_MET ||
         noPercentage >= THRESHOLD_IN_PERCENTAGES_TO_BE_MET
       ) {
-        await prisma.diagnosis.update({
-          where: { id: diagnosisId },
-          data: { is_correct: existingVote.yes > existingVote.no },
-        });
+        await this.verifyDiagnosis(
+          diagnosisId,
+          (existingVote.yes > existingVote.no)
+        );
       }
     }
 
@@ -120,6 +126,13 @@ export class DB implements IDB {
       where: { diagnosisId: diagnosisId },
       data: { voters: { connect: { id: userId } } },
     });
+  }
+
+  async verifyDiagnosis(diagnosisId: number,isCorrect: boolean) {
+    await prisma.diagnosis.update({
+          where: { id: diagnosisId },
+          data: { is_correct:isCorrect },
+        });
   }
 
   async createUser(userId: number, username: string): Promise<any> {

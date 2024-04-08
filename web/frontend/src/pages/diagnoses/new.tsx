@@ -19,7 +19,7 @@ interface InputFieldProps {
   onChange: (value: number | File | null) => void;
 }
 
-function displayFields(formState) {
+function displayFields(formState, handleChange) {
   return Object.keys(formState).map((key) => (
     <InputField
       key={key}
@@ -91,24 +91,51 @@ const DisplayedPrediction: React.FC<{
     type: string;
   };
 }> = ({ predictInfo }) => {
+  const { token } = useContext(AuthContext);
+  const [actualStatus, setActualStatus] = useState(false);
   return (
     <div className="border-spacing-4 border-4 border-amber-500">
       <p>{predictInfo.raw_data.type} prediction</p>
       <Reading
-        obj={predictInfo.raw_data}
+        rawData={predictInfo.raw_data}
         prediction={predictInfo.prediction}
         type={predictInfo.type}
       />
-      <button
-        onClick={() => {
-          console.log("hi", {
-            ...predictInfo.raw_data,
-            prediction: predictInfo.prediction,
-          });
-        }}
-      >
-        Send Prediction to feed if unsure about aquracy
-      </button>
+      <div>
+        <span>
+          Send Prediction with aqurate label{" "}
+          <br color={"a bit bad practice to use br"} />
+          Actual diagnosis: {JSON.stringify(actualStatus)}
+          <br />
+          <button
+            onClick={() => {
+              setActualStatus(false);
+            }}
+          >
+            False
+          </button>
+          <button
+            onClick={() => {
+              setActualStatus(true);
+            }}
+          >
+            True
+          </button>
+        </span>
+        <button
+          onClick={async () => {
+            console.log("hi", {});
+            await Api.createDiagnosis(token?.id, {
+              raw_data: { ...predictInfo.raw_data },
+              label: predictInfo.prediction,
+              type: predictInfo.type,
+              verified_prediction_status: actualStatus,
+            });
+          }}
+        >
+          Send
+        </button>
+      </div>
       <div className="bg-blue-900">
         Predicted : {JSON.stringify(predictInfo.prediction)}
       </div>
@@ -122,11 +149,11 @@ const DisplayedPrediction: React.FC<{
 
           console.log(formatedObj);
 
-          await Api.createDiagnosis("username", formatedObj);
+          await Api.createDiagnosis(token?.id, formatedObj);
         }}
       >
         {" "}
-        Send prediction cuz its right
+        Send Prediction to feed if unsure about aquracy
       </button>
     </div>
   );
@@ -158,7 +185,7 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
     <div className="flex-1 p-5">
       <h1 className="mb-5 text-3xl font-bold">{type} Prediction using ML</h1>
       <form onSubmit={handleSubmit}>
-        {displayFields(formState)}
+        {displayFields(formState, handleChange)}
         <button
           type="submit"
           className="mt-5 rounded bg-blue-500 p-3 text-white shadow"
@@ -180,7 +207,7 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
 };
 
 const App: React.FC = () => {
-  const { token } = useContext(AuthContext); // Use useContext hook to access the AuthContext
+  const { token } = useContext(AuthContext);
 
   const allPredictions: { type: Disease; info: object }[] = [
     {

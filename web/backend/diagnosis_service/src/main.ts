@@ -13,7 +13,18 @@ app.post(
   async (req: Request, res: Response) => {
     try {
       const userId = parseInt(req.params.userId);
+      console.log(req.body.verified_prediction_status);
       const newDiagnosis = await db.createDiagnosis(userId, req.body);
+      if (
+        req.body.verified_prediction_status !== null &&
+        req.body.verified_prediction_status !== undefined
+      ) {
+        console.log('flag');
+        await db.verifyDiagnosis(
+          newDiagnosis.id,
+          req.body.verified_prediction_status,
+        );
+      }
       return res.status(200).json(newDiagnosis);
     } catch (error) {
       console.error(error);
@@ -82,7 +93,7 @@ app.post('/diag/user/new', async (req: Request, res: Response) => {
     const newUser = await db.createUser(req.body.userId, req.body.username);
     return res.status(200).json(newUser);
   } catch (e) {
-    res.status(500).json(e);
+    return res.status(500).json(e);
   }
 });
 
