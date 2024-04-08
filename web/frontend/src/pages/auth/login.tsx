@@ -2,14 +2,18 @@ import { InputForm } from "../../components/form";
 import { cookies } from "~/utils/cookies"; // make sure cookies utility is correctly implemented
 import { Api } from "~/utils/api"; // ensure Api utility is implemented with a login method
 import { AuthContext } from "~/utils/context";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import { DefaultError, Error } from "~/components/error";
+import { useRouter } from "next/router";
 const Login: React.FC = () => {
   const { token } = useContext(AuthContext);
+  const router = useRouter();
   const inputSchema = [
     { name: "username", label: "Username", type: "text" },
     { name: "password", label: "Password", type: "password" },
   ];
-
+  const [isPopUpOpen, setIsPopUpOpen] = useState(false);
+  const [isError, setIsError] = useState(false);
   return (
     <div>
       <h1>Form Page</h1>
@@ -19,11 +23,22 @@ const Login: React.FC = () => {
           username: string;
           password: string;
         }) => {
-          const tokenObj = await Api.login(objToSend); // Assumed corrected Api.login usage
-          cookies.token.set(tokenObj.token);
+          try {
+            const tokenObj = await Api.login(objToSend); // Assumed corrected Api.login usage
+            cookies.token.set(tokenObj.token);
+            setIsPopUpOpen(true);
+            router.push("/");
+          } catch (err) {
+            setIsError(true);
+          }
         }}
       />
-      <p>{console.log(token)}</p>
+      {isPopUpOpen && (
+        <div>
+          <p>Redirecting ... </p>
+        </div>
+      )}
+      {isError && <DefaultError />}
     </div>
   );
 };

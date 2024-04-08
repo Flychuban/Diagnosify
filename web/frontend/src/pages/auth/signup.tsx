@@ -1,6 +1,7 @@
 import { InputForm } from "../../components/form";
-import { cookies } from "~/utils/cookies"; // make sure cookies utility is correctly implemented
-import { Api } from "~/utils/api"; // ensure Api utility is implemented with a login method
+import { cookies } from "~/utils/cookies";
+import { Api } from "~/utils/api";
+import { Error, DefaultError } from "~/components/error";
 import React, { useState } from "react";
 const Signup: React.FC = () => {
   const inputSchema = [
@@ -8,6 +9,7 @@ const Signup: React.FC = () => {
     { name: "password", label: "Password", type: "password" },
   ];
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
+  const [isError, setIsError] = useState(false);
   return (
     <div>
       <h1>Form Page</h1>
@@ -17,9 +19,13 @@ const Signup: React.FC = () => {
           username: string;
           password: string;
         }) => {
-          const res = await Api.signup(objToSend);
-          if (res) {
-            setIsPopUpOpen(true);
+          try {
+            const res = await Api.signup(objToSend);
+            if (res) {
+              setIsPopUpOpen(true);
+            }
+          } catch (err) {
+            setIsError(true);
           }
         }}
       />
@@ -29,6 +35,7 @@ const Signup: React.FC = () => {
           <p>Succesfulr register proceeding to login page </p>
         </div>
       )}
+      {isError && <DefaultError />}
     </div>
   );
 };

@@ -15,7 +15,6 @@ function MyApp({ Component, pageProps }: AppProps) {
 }
 
 const PageWrapper = ({ children }) => {
-  // Accessing context using useContext
   const { token } = useContext(AuthContext);
   const router = useRouter();
   const [contextLoaded, setContextLoaded] = useState(false);
@@ -28,7 +27,6 @@ const PageWrapper = ({ children }) => {
   }, [token]);
 
   useEffect(() => {
-    // Run the check only once the context has loaded
     if (contextLoaded) {
       console.log("drakeyyyyy", token);
       if (!router.pathname.includes("auth")) {
