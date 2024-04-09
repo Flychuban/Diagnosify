@@ -25,10 +25,10 @@ app.post(
           req.body.verified_prediction_status,
         );
       }
-      return res.status(200).json(newDiagnosis);
+      return res.status(201).json(newDiagnosis);
     } catch (error) {
       console.error(error);
-      return res.status(404).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
     }
   },
 );
@@ -39,7 +39,7 @@ app.get('/diag/user/:userId/diagnoses', async (req: Request, res: Response) => {
     const diagnoses = await db.getUserDiagnoses(userId);
     res.json(diagnoses);
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -54,7 +54,7 @@ app.post(
       res.status(200).json({ message: 'Vote recorded successfully' });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: err.message });
     }
   },
 );
@@ -63,10 +63,13 @@ app.get('/diag/diagnoses/:diagnosisId', async (req: Request, res: Response) => {
   try {
     const diagnosisId = parseInt(req.params.diagnosisId);
     const diagnosis = await db.getDiagnosis(diagnosisId);
+    if (!diagnosis) {
+      return res.status(404).json({ error: 'Diagnosis not found' });
+    }
     return res.status(200).json(diagnosis);
   } catch (e) {
     console.error(e);
-    return res.status(404).json({ error: 'Diagnosis not found' });
+    return res.status(500).json({ error: e.message });
   }
 });
 
@@ -91,12 +94,12 @@ app.get('/diag/ml/get_verified_data', async (req: Request, res: Response) => {
 app.post('/diag/user/new', async (req: Request, res: Response) => {
   try {
     const newUser = await db.createUser(req.body.userId, req.body.username);
-    return res.status(200).json(newUser);
+    return res.status(201).json(newUser);
   } catch (e) {
     return res.status(500).json(e);
   }
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on http:${port}`);
 });

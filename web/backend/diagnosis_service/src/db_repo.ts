@@ -16,71 +16,89 @@ export interface IDB {
 
 export class DB implements IDB {
   async createDiagnosis(userId: number, data: object): Promise<Diagnosis> {
-    const newDiagnosis = await prisma.diagnosis.create({
-      data: {
-        type: data.type,
-        userId: userId,
-        raw_data: data.raw_data,
-        prediction: data.label,
-        voting: {
-          create: {
-            yes: 0,
-            no: 0,
+    try {
+      const newDiagnosis = await prisma.diagnosis.create({
+        data: {
+          type: data.type,
+          userId: userId,
+          raw_data: data.raw_data,
+          prediction: data.label,
+          voting: {
+            create: {
+              yes: 0,
+              no: 0,
+            },
           },
         },
-      },
-      include: { voting: true },
-    });
+        include: { voting: true },
+      });
 
-    return newDiagnosis;
+      return newDiagnosis;
+    } catch (error) {
+      throw new Error(`Error creating diagnosis: ${error.message}`);
+    }
   }
 
   async getUserDiagnoses(userId: number): Promise<Diagnosis[]> {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: { diagnoses: true },
-    });
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { diagnoses: true },
+      });
 
-    if (!user) {
-      throw new Error('User not found');
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      return user.diagnoses;
+    } catch (error) {
+      throw new Error(`Error fetching user diagnoses: ${error.message}`);
     }
-
-    return user.diagnoses;
   }
 
   async getDiagnosesForModelTraining(): Promise<object[]> {
-    const diagnoses = await prisma.diagnosis.findMany({
-      where: {
-        is_correct: {
-          not: null,
+    try {
+      const diagnoses = await prisma.diagnosis.findMany({
+        where: {
+          is_correct: {
+            not: null,
+          },
         },
-      },
-    });
+      });
 
-    return diagnoses;
+      return diagnoses;
+    } catch (error) {
+      throw new Error(
+        `Error fetching diagnoses for model training: ${error.message}`,
+      );
+    }
   }
 
   async getAllDiagnoses(): Promise<Diagnosis[]> {
-    return await prisma.diagnosis.findMany();
+    try {
+      return await prisma.diagnosis.findMany();
+    } catch (error) {
+      throw new Error(`Error fetching all diagnoses: ${error.message}`);
+    }
   }
 
   async getDiagnosis(diagnosisId: number): Promise<Diagnosis> {
-    const diagnosis = await prisma.diagnosis.findUnique({
-      where: { id: diagnosisId },
-      include: {
-        voting: {
-          include: {
-            voters: true,
+    try {
+      const diagnosis = await prisma.diagnosis.findUnique({
+        where: { id: diagnosisId },
+        include: {
+          voting: {
+            include: {
+              voters: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!diagnosis) {
-      throw new Error('Diagnosis not found');
+      return diagnosis;
+    } catch (error) {
+      throw new Error(`Error fetching diagnosis: ${error.message}`);
     }
-
-    return diagnosis;
   }
 
   async vote(
@@ -88,65 +106,77 @@ export class DB implements IDB {
     userId: number,
     vote: boolean,
   ): Promise<void> {
-    const existingVote = await prisma.voting.findUnique({
-      where: { diagnosisId: diagnosisId },
-      include: { diagnosis: true, voters: true },
-    });
+    try {
+      const existingVote = await prisma.voting.findUnique({
+        where: { diagnosisId: diagnosisId },
+        include: { diagnosis: true, voters: true },
+      });
 
-    if (!existingVote) {
-      throw new Error('Voting not found');
-    }
-
-    if (existingVote.voters.some((voter) => voter.id === userId)) {
-      throw new Error('Voter has already voted');
-    }
-
-    const updateData = vote
-      ? { yes: existingVote.yes + 1 }
-      : { no: existingVote.no + 1 };
-
-    await prisma.voting.update({
-      where: { diagnosisId: diagnosisId },
-      data: updateData,
-    });
-
-    const totalVotes = existingVote.yes + existingVote.no + 1;
-    if (totalVotes >= WHEN_TO_CHECK_VOTES) {
-      const yesPercentage = (existingVote.yes / totalVotes) * 100;
-      const noPercentage = (existingVote.no / totalVotes) * 100;
-
-      if (
-        yesPercentage >= THRESHOLD_IN_PERCENTAGES_TO_BE_MET ||
-        noPercentage >= THRESHOLD_IN_PERCENTAGES_TO_BE_MET
-      ) {
-        await this.verifyDiagnosis(
-          diagnosisId,
-          existingVote.yes > existingVote.no,
-        );
+      if (!existingVote) {
+        throw new Error('Voting not found');
       }
-    }
 
-    await prisma.voting.update({
-      where: { diagnosisId: diagnosisId },
-      data: { voters: { connect: { id: userId } } },
-    });
+      if (existingVote.voters.some((voter) => voter.id === userId)) {
+        throw new Error('Voter has already voted');
+      }
+
+      const updateData = vote
+        ? { yes: existingVote.yes + 1 }
+        : { no: existingVote.no + 1 };
+
+      await prisma.voting.update({
+        where: { diagnosisId: diagnosisId },
+        data: updateData,
+      });
+
+      const totalVotes = existingVote.yes + existingVote.no + 1;
+      if (totalVotes >= WHEN_TO_CHECK_VOTES) {
+        const yesPercentage = (existingVote.yes / totalVotes) * 100;
+        const noPercentage = (existingVote.no / totalVotes) * 100;
+
+        if (
+          yesPercentage >= THRESHOLD_IN_PERCENTAGES_TO_BE_MET ||
+          noPercentage >= THRESHOLD_IN_PERCENTAGES_TO_BE_MET
+        ) {
+          await this.verifyDiagnosis(
+            diagnosisId,
+            existingVote.yes > existingVote.no,
+          );
+        }
+      }
+
+      await prisma.voting.update({
+        where: { diagnosisId: diagnosisId },
+        data: { voters: { connect: { id: userId } } },
+      });
+    } catch (error) {
+      throw new Error(`Error voting: ${error.message}`);
+    }
   }
 
   async verifyDiagnosis(diagnosisId: number, isCorrect: boolean) {
-    await prisma.diagnosis.update({
-      where: { id: diagnosisId },
-      data: { is_correct: isCorrect },
-    });
+    try {
+      await prisma.diagnosis.update({
+        where: { id: diagnosisId },
+        data: { is_correct: isCorrect },
+      });
+    } catch (error) {
+      throw new Error(`Error verifying diagnosis: ${error.message}`);
+    }
   }
 
   async createUser(userId: number, username: string): Promise<any> {
-    const newUser = await prisma.user.create({
-      data: {
-        username: username,
-        id: userId,
-      },
-    });
-    return newUser;
+    try {
+      const newUser = await prisma.user.create({
+        data: {
+          username: username,
+          id: userId,
+        },
+      });
+      return newUser;
+    } catch (error) {
+      throw new Error(`Error creating user: ${error.message}`);
+    }
   }
 }
 

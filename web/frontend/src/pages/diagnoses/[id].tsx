@@ -5,7 +5,18 @@ import { Reading } from "~/components/reading";
 import { Loading } from "~/components/loading";
 import { AuthContext } from "~/utils/context";
 import { ProgressBar } from "~/components/progressBar";
+import { BaseError, DefaultError } from "~/components/error";
+import { ResponseCodes } from "~/utils/statis_codes";
 const ReadingPage = () => {
+  const [Error, setError] = useState<{
+    state: boolean;
+    statusCode: null | number;
+    errorMessage: string;
+  }>({
+    state: false,
+    statusCode: null,
+    errorMessage: "try restarting or its probably not found",
+  });
   const { token } = useContext(AuthContext);
   const router = useRouter();
   const [diagnosis, setDiagnosis] = useState<object | null>(null);
@@ -16,25 +27,51 @@ const ReadingPage = () => {
       if (router.query.id === undefined) {
         return;
       }
-      const data = await Api.getReading(router.query.id);
-      console.log(data.data);
-      setDiagnosis(data.data);
-      if (
-        data.data.voting !== undefined &&
-        data.data.voting !== null &&
-        data.data.voting.voters.length > 0
-      ) {
-        setVotingData(data.data.voting);
+      try {
+        const data = await Api.getReading(router.query.id);
+        console.log(data);
+        console.log(data.status === ResponseCodes.NOT_FOUND, "kur");
+        if (data.status === ResponseCodes.NOT_FOUND) {
+          setError({
+            state: true,
+            statusCode: ResponseCodes.NOT_FOUND,
+            errorMessage: "not found",
+          });
+        } else if (data.status === ResponseCodes.SERVER_DIED)
+          console.log(data.data);
+        setDiagnosis(data.data);
+        if (
+          data.data.voting !== undefined &&
+          data.data.voting !== null &&
+          data.data.voting.voters.length > 0
+        ) {
+          setVotingData(data.data.voting);
+        }
+        setHaveAlreadyVoted(
+          data.data.voting.voters.some((voter) => {
+            return voter.id === token?.id;
+          }),
+        );
+      } catch (err) {
+        setError({
+          state: true,
+          statusCode: 500,
+          errorMessage: "something happend on the backend",
+        });
       }
-      setHaveAlreadyVoted(
-        data.data.voting.voters.some((voter) => {
-          return voter.id === token?.id;
-        }),
-      );
     }
     fetchData();
   }, [router.query.id, token]);
-
+  if (Error.state) {
+    // if it grows more might introduce a strategy pattern
+    if (Error.statusCode === null) {
+      return <BaseError message={Error.errorMessage} />;
+    } else if (Error.statusCode === 404) {
+      return <BaseError message={"not found ):"} />;
+    } else if (Error.statusCode === ResponseCodes.SERVER_DIED) {
+      return <BaseError message={"server died"} />;
+    }
+  }
   if (diagnosis === null || diagnosis === undefined) {
     return <Loading />;
   }
