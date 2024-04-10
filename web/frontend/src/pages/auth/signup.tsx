@@ -1,8 +1,9 @@
 import { InputForm } from "../../components/form";
 import { cookies } from "~/utils/cookies";
 import { Api } from "~/utils/api";
-import { Error, DefaultError } from "~/components/error";
+import { CustomError, DefaultError } from "~/components/error";
 import React, { useState } from "react";
+import { SuccesfulPopUp } from "~/components/popup";
 const Signup: React.FC = () => {
   const inputSchema = [
     { name: "username", label: "Username", type: "text" },
@@ -31,9 +32,10 @@ const Signup: React.FC = () => {
       />
 
       {isPopUpOpen && (
-        <div>
-          <p>Succesfulr register proceeding to login page </p>
-        </div>
+        <SuccesfulPopUp
+          succesfulPart="signing up"
+          timeBeforeExpiration={10000}
+        />
       )}
       {isError && <DefaultError />}
     </div>

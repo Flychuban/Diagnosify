@@ -4,6 +4,9 @@ import { AuthContext } from "~/utils/context";
 import { Api } from "~/utils/api";
 import { parseMlResult } from "~/utils/mlResultParser";
 import { Reading } from "~/components/reading";
+import { BaseError } from "~/components/error";
+import { ResponseCodes, SimplifiedResponseCodes } from "~/utils/statis_codes";
+import { PopUp, SuccesfulPopUp } from "~/components/popup";
 type Disease =
   | "heart Disease"
   | "parkinson"
@@ -92,7 +95,12 @@ const DisplayedPrediction: React.FC<{
   };
 }> = ({ predictInfo }) => {
   const { token } = useContext(AuthContext);
+  const [isPopup, setIsPopup] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [actualStatus, setActualStatus] = useState(false);
+  if (isError) {
+    return <BaseError message={"failed tpo create new diagnosis"} />;
+  }
   return (
     <div className="border-spacing-4 border-4 border-amber-500">
       <p>{predictInfo.raw_data.type} prediction</p>
@@ -125,12 +133,25 @@ const DisplayedPrediction: React.FC<{
         <button
           onClick={async () => {
             console.log("hi", {});
-            await Api.createDiagnosis(token?.id, {
-              raw_data: { ...predictInfo.raw_data },
-              label: predictInfo.prediction,
-              type: predictInfo.type,
-              verified_prediction_status: actualStatus,
-            });
+            try {
+              const res = await Api.createDiagnosis(token?.id, {
+                raw_data: { ...predictInfo.raw_data },
+                label: predictInfo.prediction,
+                type: predictInfo.type,
+                verified_prediction_status: actualStatus,
+              });
+              console.log("hihi-------hihi", res);
+              if (
+                res.status >= ResponseCodes.OK_WITH_RESPONSE &&
+                res.status < ResponseCodes.NOT_FOUND
+              ) {
+                console.log("koooor");
+
+                setIsPopup(true);
+              }
+            } catch (err) {
+              setIsError(true);
+            }
           }}
         >
           Send
@@ -141,20 +162,34 @@ const DisplayedPrediction: React.FC<{
       </div>
       <button
         onClick={async () => {
-          const formatedObj = {
-            type: predictInfo.type,
-            raw_data: { ...predictInfo.raw_data },
-            label: predictInfo.prediction,
-          };
+          try {
+            const formatedObj = {
+              type: predictInfo.type,
+              raw_data: { ...predictInfo.raw_data },
+              label: predictInfo.prediction,
+            };
 
-          console.log(formatedObj);
+            console.log(formatedObj);
 
-          await Api.createDiagnosis(token?.id, formatedObj);
+            const res = await Api.createDiagnosis(token?.id, formatedObj);
+            if (res.status >= ResponseCodes.OK_WITH_RESPONSE && res.status < ResponseCodes.NOT_FOUND) {
+              console.log("koooor");
+              setIsPopup(true);
+            }
+          } catch (err) {
+            setIsError(true);
+          }
         }}
       >
         {" "}
         Send Prediction to feed if unsure about aquracy
       </button>
+      {isPopup && (
+        <SuccesfulPopUp
+          succesfulPart="creating diagnosis"
+          timeBeforeExpiration={10000}
+        />
+      )}
     </div>
   );
 };
