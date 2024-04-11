@@ -41,22 +41,26 @@ const InputField: React.FC<InputFieldProps> = ({ label, value, onChange }) => {
   };
 
   return (
-    <div className="my-4 flex items-center">
-      <label className="mr-3 w-32">{label}:</label>
-      {typeof value === "number" ? (
-        <input
-          className="mx-3 w-20 border-2 border-gray-200 p-1 text-center"
-          type="number"
-          value={value}
-          onChange={(e) => onChange(+e.target.value)}
-        />
-      ) : (
-        <input
-          className="mx-3 w-20 border-2 border-gray-200 p-1 text-center"
-          type="file"
-          onChange={handleFileChange} // Handle file selection
-        />
-      )}
+    <div className="my-4">
+      <div>
+        <label className="mb-2 block">{label}:</label>
+      </div>
+      <div>
+        {typeof value === "number" ? (
+          <input
+            className="w-32 rounded border border-secondary bg-secondary p-2"
+            type="number"
+            value={value}
+            onChange={(e) => onChange(+e.target.value)}
+          />
+        ) : (
+          <input
+            className="mx-3 w-32 border-2 border-gray-200 p-1 text-center"
+            type="file"
+            onChange={handleFileChange} // Handle file selection
+          />
+        )}
+      </div>
     </div>
   );
 };
@@ -67,22 +71,33 @@ const Sidebar: React.FC<{
   selected_option_index: number;
 }> = ({ onSelectDisease, options, selected_option_index }) => {
   return (
-    <div className="space-y-3 bg-gray-800 p-5 text-white">
-      <h2 className="mb-3 text-lg font-bold">Select Disease</h2>
-      {options.map((option, index) => (
-        <div key={index}>
-          <button
-            className={
-              selected_option_index === index ? "bg-blue-400" : "bg-red-700"
-            }
-            onClick={() => {
-              onSelectDisease(index);
-            }}
-          >
-            {option}
-          </button>
+    <div className="flex w-64 flex-col items-center justify-center space-y-3 bg-secondary text-white">
+      <div className="a justify- flex flex-col justify-center text-center align-middle">
+        <h1 className="text-center">Disease predcition</h1>
+        <div className="flex  flex-col items-center bg-primary py-3">
+          <h2 className="mb-6 text-xl font-bold">Select Disease</h2>
+          <hr className="my-4 border-gray-300" />
+          {options.map((option, index) => (
+            <div
+              key={index}
+              className="flex w-[12rem] flex-col items-center bg-primary py-3"
+            >
+              <button
+                className={`${
+                  selected_option_index === index
+                    ? "bg-red-700"
+                    : "bg-transparent"
+                } mb-2 w-32 rounded px-4 py-2 text-white`}
+                onClick={() => {
+                  onSelectDisease(index);
+                }}
+              >
+                {option}
+              </button>
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
     </div>
   );
 };
@@ -172,7 +187,10 @@ const DisplayedPrediction: React.FC<{
             console.log(formatedObj);
 
             const res = await Api.createDiagnosis(token?.id, formatedObj);
-            if (res.status >= ResponseCodes.OK_WITH_RESPONSE && res.status < ResponseCodes.NOT_FOUND) {
+            if (
+              res.status >= ResponseCodes.OK_WITH_RESPONSE &&
+              res.status < ResponseCodes.NOT_FOUND
+            ) {
               console.log("koooor");
               setIsPopup(true);
             }
@@ -217,16 +235,19 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
   };
 
   return (
-    <div className="flex-1 p-5">
+    <div
+      className="flex-1 bg-primary p-5 text-white
+    
+    "
+    >
       <h1 className="mb-5 text-3xl font-bold">{type} Prediction using ML</h1>
       <form onSubmit={handleSubmit}>
-        {displayFields(formState, handleChange)}
-        <button
-          type="submit"
-          className="mt-5 rounded bg-blue-500 p-3 text-white shadow"
-        >
-          Predict
-        </button>
+        <div className=" mb-4 grid grid-cols-4 gap-4">
+          {displayFields(formState, handleChange)}
+          <button type="submit" className="rounded bg-blue-600 px-4 py-2">
+            Predict
+          </button>
+        </div>
       </form>
       {Prediction !== null && (
         <DisplayedPrediction
@@ -277,7 +298,7 @@ const App: React.FC = () => {
     cookies, [];
   });
   return (
-    <div className="flex">
+    <div className="flex h-[100vh] w-full">
       <Sidebar
         onSelectDisease={handleSelectDisease}
         options={allPredictions.map((prediction) => prediction.type)}
@@ -287,13 +308,6 @@ const App: React.FC = () => {
         predictInfo={{ ...predictInfo }}
         type={allPredictions[current].type}
       />
-      <button
-        onClick={() => {
-          cookies.token.set("hihihi");
-        }}
-      >
-        hi
-      </button>
     </div>
   );
 };

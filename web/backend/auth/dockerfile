@@ -40,11 +40,10 @@
 
 FROM node:alpine
 
-COPY . . 
+COPY . .
 
-RUN npm install 
-
+RUN npm install
+EXPOSE 8080
 CMD ["npm","run","start_ts_dev"]
-
 
 

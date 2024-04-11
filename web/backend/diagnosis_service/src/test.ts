@@ -1,16 +1,16 @@
-import { log } from "console";
+export const ResponseCodes = {
+  NOT_FOUND: 404,
+  SERVER_DIED: 500,
+  NOT_AUTH: 401,
+  OK_WITH_RESPONSE: 200,
+  OK_WITH_CREATED_RESPONSE: 201,
+  OK_WITHOUT_RESPONSE: 204,
+} as const;
 
-export enum ResponseCodes { // TODO fix later if soie of the codes mismatch
-  NOT_FOUND = 404,
-  SERVER_DIED = 500,
-  NOT_AUTH = 404 || 401, // auth for both authentication and authorization
-  OK_WITH_RESPONSE = 200 || 201,
-  OK_WITHOUT_RESPONSE = 204,
-} // TODO if iit sbecomes to much create an enum that uses this enum for simple values like ok-ish (200 | 204)
+// Define a type for the possible values
+type HttpStatusCode = typeof ResponseCodes[keyof typeof ResponseCodes];
 
-export enum SimplifiedResponseCodes {
-  OK_ish = ResponseCodes.OK_WITHOUT_RESPONSE || ResponseCodes.OK_WITH_RESPONSE,
-}
-
-
-console.log( 201 == ResponseCodes.OK_WITH_RESPONSE)
+// Define your simplified enum as an object with union types
+export const SimplifiedResponseCodes = {
+  OK_ish: ResponseCodes.OK_WITHOUT_RESPONSE,
+  OK_WITH_RESPONSE_OR_CREATED: ResponseCodes.OK_WITH_RESPONSE || Response

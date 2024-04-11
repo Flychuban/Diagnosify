@@ -1,18 +1,5 @@
 FROM node:alpine
-
-# Copy the current directory contents into the container at /app
 COPY . .
-
-# Install dependencies
 RUN npm install
-
-# Specify the command to run your application
+EXPOSE 3000
 CMD ["npm", "run", "start_ts_dev"]
-
-
-
-
-
-
-
-# dao na nqkakvo cleta tokeni ownership ako ima naem ako ima naem ako property 100 toekna ili dao 
