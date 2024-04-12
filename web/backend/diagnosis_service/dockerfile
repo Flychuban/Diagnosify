@@ -1,4 +1,4 @@
-FROM node:14
+FROM  node
 
 WORKDIR /usr/src/app
 
@@ -8,12 +8,8 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
-
 RUN npx prisma generate
 
 EXPOSE 3001
-
-ENV NODE_ENV production
 
 CMD ["npm", "run", "start_ts_dev"]

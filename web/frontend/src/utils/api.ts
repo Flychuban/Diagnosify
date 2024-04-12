@@ -1,7 +1,7 @@
 import axios from "axios";
-
+  console.log(process.env.NEXT_PUBLIC_GATEWAY_URL)
 export class Api {
-  private static url = "http://localhost:7000";
+  private static url =  process.env.NEXT_PUBLIC_GATEWAY_URL;
 
   private static async authenticate(
     url: string,
