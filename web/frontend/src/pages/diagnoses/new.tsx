@@ -1,3 +1,5 @@
+// pages/index.js
+
 import React, { useState, useEffect, useContext } from "react";
 import { cookies } from "~/utils/cookies";
 import { AuthContext } from "~/utils/context";
@@ -5,8 +7,10 @@ import { Api } from "~/utils/api";
 import { parseMlResult } from "~/utils/mlResultParser";
 import { Reading } from "~/components/reading";
 import { BaseError } from "~/components/error";
-import { ResponseCodes, SimplifiedResponseCodes } from "~/utils/statis_codes";
-import { PopUp, SuccesfulPopUp } from "~/components/popup";
+import { ResponseCodes } from "~/utils/statis_codes";
+import { SuccesfulPopUp } from "~/components/popup";
+import FileInput from "~/components/FileInput";
+
 type Disease =
   | "heart Disease"
   | "parkinson"
@@ -16,55 +20,6 @@ type Disease =
   | "diabetes"
   | "pneumonia";
 
-interface InputFieldProps {
-  label: string;
-  value: number | File | null; // Update value type to allow File object
-  onChange: (value: number | File | null) => void;
-}
-
-function displayFields(formState, handleChange) {
-  return Object.keys(formState).map((key) => (
-    <InputField
-      key={key}
-      label={key.charAt(0) + key.slice(1)}
-      value={formState[key]}
-      onChange={(newValue) => handleChange(key, newValue)}
-    />
-  ));
-}
-
-const InputField: React.FC<InputFieldProps> = ({ label, value, onChange }) => {
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      onChange(e.target.files[0]); // Store the selected file
-    }
-  };
-
-  return (
-    <div className="my-4">
-      <div>
-        <label className="mb-2 block">{label}:</label>
-      </div>
-      <div>
-        {typeof value === "number" ? (
-          <input
-            className="w-32 rounded border border-secondary bg-secondary p-2"
-            type="number"
-            value={value}
-            onChange={(e) => onChange(+e.target.value)}
-          />
-        ) : (
-          <input
-            className="mx-3 w-32 border-2 border-gray-200 p-1 text-center"
-            type="file"
-            onChange={handleFileChange} // Handle file selection
-          />
-        )}
-      </div>
-    </div>
-  );
-};
-
 const Sidebar: React.FC<{
   onSelectDisease: (disease: number) => void;
   options: Disease[];
@@ -73,7 +28,7 @@ const Sidebar: React.FC<{
   return (
     <div className="flex w-64 flex-col items-center justify-center space-y-3 bg-secondary text-white">
       <div className="a justify- flex flex-col justify-center text-center align-middle">
-        <h1 className="text-center">Disease predcition</h1>
+        <h1 className="text-center">Disease prediction</h1>
         <div className="flex  flex-col items-center bg-primary py-3">
           <h2 className="mb-6 text-xl font-bold">Select Disease</h2>
           <hr className="my-4 border-gray-300" />
@@ -88,9 +43,7 @@ const Sidebar: React.FC<{
                     ? "bg-red-700"
                     : "bg-transparent"
                 } mb-2 w-32 rounded px-4 py-2 text-white`}
-                onClick={() => {
-                  onSelectDisease(index);
-                }}
+                onClick={() => onSelectDisease(index)}
               >
                 {option}
               </button>
@@ -102,9 +55,39 @@ const Sidebar: React.FC<{
   );
 };
 
+const InputField: React.FC<{
+  label: string;
+  value: number | File | null;
+  onChange: (value: number | File | null) => void;
+}> = ({ label, value, onChange }) => {
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(+e.target.value);
+  };
+
+  return (
+    <div className="my-4">
+      <div>
+        <label className="mb-2 block">{label}:</label>
+      </div>
+      <div>
+        {!(typeof value === "number") ? (
+          <FileInput value={value} onChange={onChange} />
+        ) : (
+          <input
+            className="w-32 rounded border border-secondary bg-secondary p-2"
+            type="number"
+            value={value}
+            onChange={handleNumberChange}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
 const DisplayedPrediction: React.FC<{
   predictInfo: {
-    raw_data: { type: string };
+    raw_data: { type: string; file: string }; // Add 'file' property to raw_data
     prediction: boolean;
     type: string;
   };
@@ -113,98 +96,58 @@ const DisplayedPrediction: React.FC<{
   const [isPopup, setIsPopup] = useState(false);
   const [isError, setIsError] = useState(false);
   const [actualStatus, setActualStatus] = useState(false);
+
+  const handleStatusChange = (status: boolean) => {
+    setActualStatus(status);
+  };
+
+  const sendPrediction = async () => {
+    try {
+      const res = await Api.createDiagnosis(token?.id, {
+        raw_data: { ...predictInfo.raw_data },
+        label: predictInfo.prediction,
+        type: predictInfo.type,
+        verified_prediction_status: actualStatus,
+      });
+      if (
+        res.status >= ResponseCodes.OK_WITH_RESPONSE &&
+        res.status < ResponseCodes.NOT_FOUND
+      ) {
+        setIsPopup(true);
+      }
+    } catch (err) {
+      setIsError(true);
+    }
+  };
+
   if (isError) {
-    return <BaseError message={"failed tpo create new diagnosis"} />;
+    return <BaseError message={"Failed to create new diagnosis"} />;
   }
+
   return (
     <div className="border-spacing-4 border-4 border-amber-500">
       <p>{predictInfo.raw_data.type} prediction</p>
-      <Reading
-        rawData={predictInfo.raw_data}
-        prediction={predictInfo.prediction}
-        type={predictInfo.type}
-      />
+      <img src={predictInfo.raw_data.file} alt="Uploaded" />{" "}
+      {/* Display uploaded image */}
       <div>
         <span>
-          Send Prediction with aqurate label{" "}
-          <br color={"a bit bad practice to use br"} />
+          Send Prediction with accurate label <br />
           Actual diagnosis: {JSON.stringify(actualStatus)}
           <br />
-          <button
-            onClick={() => {
-              setActualStatus(false);
-            }}
-          >
-            False
-          </button>
-          <button
-            onClick={() => {
-              setActualStatus(true);
-            }}
-          >
-            True
-          </button>
+          <button onClick={() => handleStatusChange(false)}>False</button>
+          <button onClick={() => handleStatusChange(true)}>True</button>
         </span>
-        <button
-          onClick={async () => {
-            console.log("hi", {});
-            try {
-              const res = await Api.createDiagnosis(token?.id, {
-                raw_data: { ...predictInfo.raw_data },
-                label: predictInfo.prediction,
-                type: predictInfo.type,
-                verified_prediction_status: actualStatus,
-              });
-              console.log("hihi-------hihi", res);
-              if (
-                res.status >= ResponseCodes.OK_WITH_RESPONSE &&
-                res.status < ResponseCodes.NOT_FOUND
-              ) {
-                console.log("koooor");
-
-                setIsPopup(true);
-              }
-            } catch (err) {
-              setIsError(true);
-            }
-          }}
-        >
-          Send
-        </button>
+        <button onClick={sendPrediction}>Send</button>
       </div>
       <div className="bg-blue-900">
-        Predicted : {JSON.stringify(predictInfo.prediction)}
+        Predicted: {JSON.stringify(predictInfo.prediction)}
       </div>
-      <button
-        onClick={async () => {
-          try {
-            const formatedObj = {
-              type: predictInfo.type,
-              raw_data: { ...predictInfo.raw_data },
-              label: predictInfo.prediction,
-            };
-
-            console.log(formatedObj);
-
-            const res = await Api.createDiagnosis(token?.id, formatedObj);
-            if (
-              res.status >= ResponseCodes.OK_WITH_RESPONSE &&
-              res.status < ResponseCodes.NOT_FOUND
-            ) {
-              console.log("koooor");
-              setIsPopup(true);
-            }
-          } catch (err) {
-            setIsError(true);
-          }
-        }}
-      >
-        {" "}
-        Send Prediction to feed if unsure about aquracy
+      <button onClick={sendPrediction}>
+        Send Prediction to feed if unsure about accuracy
       </button>
       {isPopup && (
         <SuccesfulPopUp
-          succesfulPart="creating diagnosis"
+          succesfulPart="Creating diagnosis"
           timeBeforeExpiration={10000}
         />
       )}
@@ -216,8 +159,10 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
   predictInfo,
   type,
 }) => {
-  const [formState, setFormState] = useState<object>({});
-  const [Prediction, setPrediction] = useState<null | boolean>(null);
+  const [formState, setFormState] = useState<{ [key: string]: string }>({});
+  const [prediction, setPrediction] = useState<boolean | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+
   useEffect(() => {
     setFormState({ ...predictInfo });
   }, [predictInfo]);
@@ -225,36 +170,69 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submission:", formState);
-    const res = await Api.sendDiagnose({ ...predictInfo, type: type });
+    let formDataToSend = formState;
+    if (file) {
+      formDataToSend = new FormData();
+      formDataToSend.append("file", file);
+    }
+    console.log(formDataToSend);
+    const res = await Api.sendDiagnose({ data: formDataToSend, type });
     const parsedRes = parseMlResult(res.data.body);
     setPrediction(parsedRes);
   };
 
-  const handleChange = (key: string, value: number | File | null) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+      setFormState((prev) => ({
+        ...prev,
+        file: URL.createObjectURL(e.target.files[0]),
+      }));
+    }
+  };
+
+  const handleChange = (key: string, value: string) => {
     setFormState((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
-    <div
-      className="flex-1 bg-primary p-5 text-white
-    
-    "
-    >
+    <div className="flex-1 bg-primary p-5 text-white">
       <h1 className="mb-5 text-3xl font-bold">{type} Prediction using ML</h1>
       <form onSubmit={handleSubmit}>
         <div className=" mb-4 grid grid-cols-4 gap-4">
-          {displayFields(formState, handleChange)}
+          <div>
+            <label htmlFor="fileInput">Upload Image:</label>
+            <input
+              id="fileInput"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </div>
+          {predictInfo ? (
+            Object.keys(formState).map((key) => (
+              <InputField
+                key={key}
+                label={key.charAt(0).toUpperCase() + key.slice(1)}
+                value={formState[key]}
+                onChange={(newValue) => handleChange(key, newValue)}
+              />
+            ))
+          ) : (
+            <FileInput value={null} onChange={() => {}} />
+          )}
+
           <button type="submit" className="rounded bg-blue-600 px-4 py-2">
             Predict
           </button>
         </div>
       </form>
-      {Prediction !== null && (
+      {prediction !== null && (
         <DisplayedPrediction
           predictInfo={{
-            prediction: Prediction,
+            prediction,
             raw_data: { ...formState },
-            type: type,
+            type,
           }}
         />
       )}
@@ -264,6 +242,11 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
 
 const App: React.FC = () => {
   const { token } = useContext(AuthContext);
+  const [current, setCurrent] = useState<number>(0);
+
+  const handleSelectDisease = (disease: number) => {
+    setCurrent(disease);
+  };
 
   const allPredictions: { type: Disease; info: object }[] = [
     {
@@ -281,22 +264,17 @@ const App: React.FC = () => {
     },
     {
       type: "pneumonia",
-      info: {
-        age: 0,
-      },
+      info: {},
     },
   ];
-  const [current, setCurrent] = useState<number>(0);
-  const handleSelectDisease = (disease: number) => {
-    setCurrent(disease);
-  };
 
   const currentPrediction = allPredictions[current];
   const predictInfo = currentPrediction ? currentPrediction.info : {};
 
   useEffect(() => {
     cookies, [];
-  });
+  }, []);
+
   return (
     <div className="flex h-[100vh] w-full">
       <Sidebar

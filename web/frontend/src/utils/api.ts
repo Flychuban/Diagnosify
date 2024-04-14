@@ -1,7 +1,7 @@
 import axios from "axios";
-  console.log(process.env.NEXT_PUBLIC_GATEWAY_URL)
+console.log(process.env.NEXT_PUBLIC_GATEWAY_URL);
 export class Api {
-  private static url =  process.env.NEXT_PUBLIC_GATEWAY_URL;
+  private static url = process.env.NEXT_PUBLIC_GATEWAY_URL;
 
   private static async authenticate(
     url: string,
@@ -42,9 +42,16 @@ export class Api {
   static async sendDiagnose(diagnose: object) {
     //for ml seervice
     console.log("jijijijijijiji", diagnose);
-    return await axios.post(`${this.url}/ml/${diagnose.type}`, {
-      data: { ...diagnose },
-    });
+    if (diagnose.file) {
+      return await axios.post(`${this.url}/ml/${diagnose.type}`, {
+        data: { ...diagnose.data },
+      });
+    } else {
+      return await axios.post(
+        `http://localhost:5000/ml/${diagnose.type}`,
+        diagnose.data,
+      );
+    }
   }
 
   static async getUserDignoses(username: string) {

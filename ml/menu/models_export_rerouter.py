@@ -1,5 +1,5 @@
 # # Import necessary models
-# from Pneumonia import pneumonia_model
+from Pneumonia import pneumonia_model
 # from Parkinson import parkinson_model
 # from Malaria import malaria_model
 # from LiverDisease import liver_disease_model
@@ -12,7 +12,7 @@ from Diabetes import diabetes_model
 
 # Define models dictionary
 models = {
-    # 'pneumonia': pneumonia_model.predict,
+        'pneumonia': pneumonia_model.predict,
     # 'parkinson': parkinson_model.predict,
     # 'malaria': malaria_model.predict,
     # 'liver_disease': liver_disease_model.predict,
