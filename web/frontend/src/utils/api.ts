@@ -44,7 +44,7 @@ export class Api {
     console.log("jijijijijijiji", diagnose);
     if (diagnose.file) {
       return await axios.post(`${this.url}/ml/${diagnose.type}`, {
-        data: { ...diagnose.data },
+        data: diagnose.data,
       });
     } else {
       return await axios.post(

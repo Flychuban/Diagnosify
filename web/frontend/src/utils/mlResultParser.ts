@@ -1,8 +1,7 @@
 export function parseMlResult(result: string) {
   try {
     console.log(result);
-    const parsed = JSON.parse(result);
-    return parsed[0] === 0;
+    return result[0] === "T";
   } catch (err) {
     return err;
   }

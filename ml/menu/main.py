@@ -34,7 +34,7 @@ app.add_middleware(
 routes_data = [
     {
         "route": "/diabetes",
-        "post_handler": lambda req: { "body":str(models["diabetes"](  [ [req['pregnancies'],req['glucose'], req['blood_pressure'], req['skin_thickness'], req['insulin'], req['bmi'], req['diabetes_pedigree_function'], req['age']    ]]     ))}
+        "post_handler": lambda req: { "body":str(((models["diabetes"](  [ [req['pregnancies'],req['glucose'], req['blood_pressure'], req['skin_thickness'], req['insulin'], req['bmi'], req['diabetes_pedigree_function'], req['age']    ]])) == [0])[0])}
     },
     {
         "route": "/bye", 
@@ -45,7 +45,7 @@ routes_data = [
         "is_file": True, # the vslue does not really matter since its just a flag,
         "post_handler": lambda file: {"body": str(models["pneumonia"](file))}
     }
-]
+]       
 
 for route_data in routes_data:
     route = route_data["route"]
@@ -72,10 +72,13 @@ for route_data in routes_data:
         async def post_handler(request: Request, handler=handler):
             print(await request.json())
             request_object = await request.json()
-            return handler(request_object['data'])
+            predcition = handler(request_object)
+            print(predcition)
+            return predcition
 
         app.post(f"/ml{route}")(post_handler)
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=5000)
+

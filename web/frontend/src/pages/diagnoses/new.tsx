@@ -178,6 +178,7 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
     console.log(formDataToSend);
     const res = await Api.sendDiagnose({ data: formDataToSend, type });
     const parsedRes = parseMlResult(res.data.body);
+    console.log("jijibiji", parsedRes);
     setPrediction(parsedRes);
   };
 
@@ -200,16 +201,17 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
       <h1 className="mb-5 text-3xl font-bold">{type} Prediction using ML</h1>
       <form onSubmit={handleSubmit}>
         <div className=" mb-4 grid grid-cols-4 gap-4">
-          <div>
-            <label htmlFor="fileInput">Upload Image:</label>
-            <input
-              id="fileInput"
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-            />
-          </div>
-          {predictInfo ? (
+          {predictInfo.isFile ? (
+            <div>
+              <label htmlFor="fileInput">Upload Image:</label>
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </div>
+          ) : (
             Object.keys(formState).map((key) => (
               <InputField
                 key={key}
@@ -218,8 +220,6 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
                 onChange={(newValue) => handleChange(key, newValue)}
               />
             ))
-          ) : (
-            <FileInput value={null} onChange={() => {}} />
           )}
 
           <button type="submit" className="rounded bg-blue-600 px-4 py-2">
@@ -264,7 +264,9 @@ const App: React.FC = () => {
     },
     {
       type: "pneumonia",
-      info: {},
+      info: {
+        isFile: true,
+      },
     },
   ];
 

@@ -22,26 +22,35 @@ export const InputForm: React.FC<Props> = ({ input_schema, handleSubmit }) => {
   };
 
   return (
-    <form
-      onSubmit={(e: React.FormEvent) => {
-        e.preventDefault();
-
-        handleSubmit(formData);
-      }}
-    >
-      {input_schema.map((input, index) => (
-        <div key={index}>
-          <label htmlFor={input.name}>{input.label}:</label>
-          <input
-            type={input.type}
-            id={input.name}
-            name={input.name}
-            value={formData[input.name] ?? ""}
-            onChange={(e) => handleChange(e, input.name)}
-          />
-        </div>
-      ))}
-      <button type="submit">Submit</button>
-    </form>
+    <div className="flex h-[50%] w-[50%] items-center justify-center rounded-md bg-primary text-white">
+      <form
+        onSubmit={(e: React.FormEvent) => {
+          e.preventDefault();
+          handleSubmit(formData);
+        }}
+      >
+        {input_schema.map((input, index) => (
+          <div key={index} className="mb-4">
+            <label htmlFor={input.name} className="block">
+              {input.label}:
+            </label>
+            <input
+              type={input.type}
+              id={input.name}
+              name={input.name}
+              value={formData[input.name] ?? ""}
+              onChange={(e) => handleChange(e, input.name)}
+              className="mt-1 w-full rounded border bg-secondary px-3 py-2"
+            />
+          </div>
+        ))}
+        <button
+          type="submit"
+          className="rounded bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
+        >
+          Submit
+        </button>
+      </form>
+    </div>
   );
 };

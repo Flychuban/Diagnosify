@@ -15,8 +15,8 @@ const Login: React.FC = () => {
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [isError, setIsError] = useState(false);
   return (
-    <div>
-      <h1>Form Page</h1>
+    <div className="flex h-screen flex-col items-center justify-center bg-secondary text-white">
+      <h1>Login</h1>
       <InputForm
         input_schema={inputSchema}
         handleSubmit={async (objToSend: {
