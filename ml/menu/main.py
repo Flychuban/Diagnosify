@@ -54,6 +54,19 @@ def get_diabetes_label(req):
         result = False
     return {"body": str(result)}
 
+def get_breast_cancer_label(req):
+    data = [[req['radius_mean'], req['perimeter_mean'], req['area_mean'], req['compactness_mean'], req['concavity_mean'], req['concave_points_mean'], req['radius_se'], req['perimeter_se'], req['area_se'], req["radius_worst"], req['perimeter_worst'], req['area_worst'], req['compactness_worst'], req['concavity_worst'], req['concave_points_worst']]]
+    df_dummies = pd.DataFrame(data, columns=["radius_mean", "perimeter_mean", "area_mean", "compactness_mean", "concavity_mean", "concave points_mean", "radius_se", "perimeter_se", "area_se", "radius_worst", "perimeter_worst", "area_worst", "compactness_worst", "concavity_worst", "concave points_worst"])
+    column_names = df_dummies.columns
+    df_dummies[column_names] = models['breast_cancer_scaler'](df_dummies[column_names])
+    breast_cancer_prediction = models['breast_cancer'](df_dummies[["radius_mean", "perimeter_mean", "area_mean", "compactness_mean", "concavity_mean", "concave points_mean", "radius_se", "perimeter_se", "area_se", "radius_worst", "perimeter_worst", "area_worst", "compactness_worst", "concavity_worst", "concave points_worst"]])
+    result = breast_cancer_prediction[0]
+    if result == 1:
+        result = True
+    else:
+        result = False
+    return {"body": str(result)}
+
 def get_liver_disease_label(req):
     liver_disease_prediction = models['liver_disease']([[req['age'], req['gender'], req['total_bilirubin'], req['direct_bilirubin'], req['alkaline_phosphotase'], req['alamine_aminotransferase'], req['aspartate_aminotransferase'], req['total_proteins'], req['albumin'], req['albumin_and_globulin_ratio']]])
     
@@ -74,8 +87,12 @@ routes_data = [
         "post_handler": lambda req: get_body_fat_percentage_label(req)
     },
     {
-        "route":"/liver_disease",
+        "route": "/liver_disease",
         "post_handler": lambda req: get_liver_disease_label(req)
+    },
+    {
+        "route": "/breast_cancer",
+        "post_handler": lambda req: get_breast_cancer_label(req) 
     },
     {
         "route":"/pneumonia",
@@ -84,7 +101,7 @@ routes_data = [
     }
 ] 
 print("Before result-----------------")
-result = routes_data[0]['post_handler']({"pregnancies":2, "glucose":12, "blood_pressure":12, "skin_thickness":12, "insulin":12, "bmi":12, "diabetes_pedigree_function":12, "age":12})
+result = routes_data[3]['post_handler']({"radius_mean": 17.99, "perimeter_mean": 122.8, "area_mean": 1001, "compactness_mean": 0.2776, "concavity_mean": 0.3001, "concave_points_mean": 0.1471, "radius_se": 1.095, "perimeter_se": 8.589, "area_se": 153.4, "radius_worst": 25.38, "perimeter_worst": 184.6, "area_worst": 2019, "compactness_worst": 0.6656, "concavity_worst": 0.7119, "concave_points_worst": 0.2654})
 print(result)
 print("-----------------")
 

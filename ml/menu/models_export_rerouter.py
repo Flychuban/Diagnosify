@@ -7,7 +7,7 @@ from LiverDisease import liver_disease_model
 # from HeartDisease import heart_disease_model
 from Diabetes import diabetes_model, diabetes_scaler
 # from CancerSegmentation import model as cancer_segmentation_model
-# from BreastCancer import breast_cancer_model
+from BreastCancer import breast_cancer_model, breast_cancer_scaler
 from BodyFatPercentage import body_fat_percentage_model, body_fat_percentage_scaler
 
 # Define models dictionary
@@ -23,5 +23,6 @@ models = {
   'diabetes': diabetes_model.predict,
   'diabetes_scaler': diabetes_scaler.transform, 
   # 'cancer_segmentation': cancer_segmentation_model.predict,
-  # 'breast_cancer': breast_cancer_model.predict
+  'breast_cancer': breast_cancer_model.predict,
+  'breast_cancer_scaler': breast_cancer_scaler.transform
 }
