@@ -59,8 +59,8 @@ class SegmentationModel():
 # Path to the weights of the model     
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
 # Load the model
-model = SegmentationModel().model
-model.load_weights(os.path.join(disease_models_path, "cancer_weights.h5"))
+cancer_segmentation_model = SegmentationModel().model
+cancer_segmentation_model.load_weights(os.path.join(disease_models_path, "cancer_weights.h5"))
 
 # Function to resize the image
 def resize_image(image, size):
@@ -114,7 +114,7 @@ def cancer_segmentation_menu():
         bytes_data = image_stream.getvalue()
                 
         image = tf.io.decode_image(bytes_data) # Decode the image from bytes to tensors for prediction
-        yhat = model.predict(tf.expand_dims(image, axis=0)) # Predict the image
+        yhat = cancer_segmentation_model.predict(tf.expand_dims(image, axis=0)) # Predict the image
         
         yhat = np.squeeze(np.where(yhat > 0.5, 1.0, 0.0)) # Threshold the prediction
         
