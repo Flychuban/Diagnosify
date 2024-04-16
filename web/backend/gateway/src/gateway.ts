@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 dotenv.config();
 const config = JSON.parse(process.env.CONFIG);
+console.log(config)
 class API {
   private getIndexAfterServiceName(subRoute: string): number {
     for (let i = 1; i < subRoute.length; i += 1) {
