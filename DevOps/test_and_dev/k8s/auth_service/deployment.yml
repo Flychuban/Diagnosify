@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: express-app
-        image: radoslav123/auth:arm
+        image: "radoslav123/auth:arm"
         ports:
         - containerPort: 8080
