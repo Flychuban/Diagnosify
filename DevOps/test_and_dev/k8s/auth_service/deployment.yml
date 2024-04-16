@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: express-app
+spec:
+ replicas: 1
+ selector:
+    matchLabels:
+      app: express-app
+ template:
+    metadata:
+      labels:
+        app: express-app
+    spec:
+      containers:
+      - name: express-app
+        image: radoslav123/auth:arm
+        ports:
+        - containerPort: 8080
