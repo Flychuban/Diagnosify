@@ -11,3 +11,4 @@ streamlit_option_menu
 tensorflow
 uvicorn
 fastapi
+python-multipart
