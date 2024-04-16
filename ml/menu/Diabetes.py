@@ -6,7 +6,7 @@ import joblib
 import pandas as pd
 
 scaler_path = os.path.join(os.getcwd(), "scalers")
-scaler = joblib.load(os.path.join(scaler_path, "diabetes_scaler.pkl"))
+diabetes_scaler = joblib.load(os.path.join(scaler_path, "diabetes_scaler.pkl"))
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
 diabetes_model = pickle.load(open(os.path.join(disease_models_path, "diabetes_prediction.sav"), 'rb'))
@@ -44,7 +44,7 @@ def diabetes_menu():
     data = [[pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, diabetes_pedigree_function, age]]
     df_dummies = pd.DataFrame(data, columns=["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "DiabetesPedigreeFunction", "Age"])
     column_names = df_dummies.columns
-    df_dummies[column_names] = scaler.transform(df_dummies[column_names])
+    df_dummies[column_names] = diabetes_scaler.transform(df_dummies[column_names])
     
     diabetes_prediction = ""
     

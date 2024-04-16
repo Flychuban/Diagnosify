@@ -5,7 +5,7 @@ import joblib
 import pandas as pd
 
 scaler_path = os.path.join(os.getcwd(), "scalers")
-scaler = joblib.load(os.path.join(scaler_path, "breast_cancer_scaler.pkl"))
+breast_cancer_scaler = joblib.load(os.path.join(scaler_path, "breast_cancer_scaler.pkl"))
 
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
@@ -66,7 +66,7 @@ def breast_cancer_menu():
     data = [[radius_mean, perimeter_mean, area_mean, compactness_mean, concavity_mean, concave_points, radius_se, perimeter_se, area_se, radius_worst, perimeter_worst, area_worst, compactness_worst, concavity_worst, concave_points_worst]]
     df_dummies = pd.DataFrame(data, columns=["radius_mean", "perimeter_mean", "area_mean", "compactness_mean", "concavity_mean", "concave points_mean", "radius_se", "perimeter_se", "area_se", "radius_worst", "perimeter_worst", "area_worst", "compactness_worst", "concavity_worst", "concave points_worst"])
     column_names = df_dummies.columns
-    df_dummies[column_names] = scaler.transform(df_dummies[column_names])
+    df_dummies[column_names] = breast_cancer_scaler.transform(df_dummies[column_names])
 
     breast_cancer_prediction = ""
 
