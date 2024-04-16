@@ -3,7 +3,6 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 from matplotlib import pyplot as plt
-from PIL import Image
 from io import BytesIO
 from models_export_rerouter import models
 from keras.applications.vgg19 import preprocess_input
@@ -111,6 +110,18 @@ def get_parkinson_label(req):
     else:
         result = False
     return {"body": str(result)}
+
+def get_pneumonia_label(img):
+    x = image.img_to_array(img)
+    x = np.expand_dims(x, axis=0)
+    img_data = preprocess_input(x)
+    pneumonia_prediction = models['pneumonia'](img_data)
+    result = pneumonia_prediction[0][1]
+    if result < 0.5:
+        result = False
+    else:
+        result = True
+    return {"body": str(result)}
     
 routes_data = [
     {
@@ -142,13 +153,15 @@ routes_data = [
         "post_handler": lambda req: get_parkinson_label(req)
     },
     {
+        # img = image.load_img("./menu/pneumonia_true.jpeg", target_size=(224, 224)) for image loading
         "route":"/pneumonia",
         "is_file": True, # the vslue does not really matter since its just a flag,
-        "post_handler": lambda file: {"body": str(models["pneumonia"](file))}
+        "post_handler": lambda img: get_pneumonia_label(img)
     }
 ] 
 print("Before result-----------------")
-result = routes_data[6]['post_handler']({"mdvp_jitter_percent":0.005, "mdvp_jitter_abs":0.00003, "mdvp_rap":0.002, "mdvp_ppq":0.002, "jitter_ddp":0.005, "mdvp_shimmer":0.02, "mdvp_shimmer_db":0.2, "shimmer_apq3":0.01, "shimmer_apq5":0.01, "mdvp_apq":0.01, "shimmer_dda":0.02, "nhr":0.02, "hnr":0.02, "rpde":0.02, "dfa":0.02, "ppe":0.02})
+img = image.load_img("./menu/pneumonia_true.jpeg", target_size=(224, 224))
+result = routes_data[7]['post_handler'](img)
 print(result)
 print("-----------------")
 
