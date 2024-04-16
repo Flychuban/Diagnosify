@@ -77,6 +77,41 @@ def get_liver_disease_label(req):
         result = False
     return {"body": str(result)}
 
+def get_heart_disease_label(req):
+    heart_disease_prediction = models['heart_disease']([[req['age'], req['gender'], req['chest_pain'], req['resting_blood_pressure'], req['cholesterol'], req['fasting_blood_sugar'], req['resting_electrocardiographic'], req['maximum_heart_rate_achieved'], req['exercise_induced_angina'], req['oldpeak'], req['slope'], req['ca'], req['thal']]])
+    result = heart_disease_prediction[0]
+    if result == 1:
+        result = True
+    else:
+        result = False
+    return {"body": str(result)}
+
+def get_kidney_disease_label(req):
+    data = [[req['specific_gravity'], req['albumin'], req['serum_creatinine'], req['hemoglobin'], req['pcv'], req['hypertension']]]
+    df_dummies = pd.DataFrame(data, columns=["sg", "al", "sc", "hemo", "pcv", "htn"])
+    column_names = df_dummies.columns
+    df_dummies[column_names] = models['kidney_scaler'](df_dummies[column_names])
+    kidney_prediction = models['kidney'](df_dummies[["sg", "al", "sc", "hemo", "pcv", "htn"]])
+    result = kidney_prediction[0]
+    if result == 1:
+        result = True
+    else:
+        result = False
+    return {"body": str(result)}
+
+def get_parkinson_label(req):
+    data = [[req['mdvp_jitter_percent'], req['mdvp_jitter_abs'], req['mdvp_rap'], req['mdvp_ppq'], req['jitter_ddp'], req['mdvp_shimmer'], req['mdvp_shimmer_db'], req['shimmer_apq3'], req['shimmer_apq5'], req['mdvp_apq'], req['shimmer_dda'], req['nhr'], req['hnr'], req['rpde'], req['dfa'], req['ppe']]]
+    df_dummies = pd.DataFrame(data, columns=["MDVP:Jitter(%)", "MDVP:Jitter(Abs)", "MDVP:RAP", "MDVP:PPQ", "Jitter:DDP", "MDVP:Shimmer", "MDVP:Shimmer(dB)", "Shimmer:APQ3", "Shimmer:APQ5", "MDVP:APQ", "Shimmer:DDA", "NHR", "HNR", "RPDE", "DFA", "PPE"])
+    column_names = df_dummies.columns
+    df_dummies[column_names] = models['parkinson_scaler'](df_dummies[column_names])
+    parkinson_prediction = models['parkinson'](df_dummies[["MDVP:Jitter(%)", "MDVP:Jitter(Abs)", "MDVP:RAP", "MDVP:PPQ", "Jitter:DDP", "MDVP:Shimmer", "MDVP:Shimmer(dB)", "Shimmer:APQ3", "Shimmer:APQ5", "MDVP:APQ", "Shimmer:DDA", "NHR", "HNR", "RPDE", "DFA", "PPE"]])
+    result = parkinson_prediction[0]
+    if result == 1:
+        result = True
+    else:
+        result = False
+    return {"body": str(result)}
+    
 routes_data = [
     {
         "route": "/diabetes",
@@ -95,13 +130,25 @@ routes_data = [
         "post_handler": lambda req: get_breast_cancer_label(req) 
     },
     {
+        "route": "/heart_disease",
+        "post_handler": lambda req: get_heart_disease_label(req)
+    },
+    {
+        "route": "/kidney_disease",
+        "post_handler": lambda req: get_kidney_disease_label(req)
+    },
+    {
+        "route": "/parkinson",
+        "post_handler": lambda req: get_parkinson_label(req)
+    },
+    {
         "route":"/pneumonia",
         "is_file": True, # the vslue does not really matter since its just a flag,
         "post_handler": lambda file: {"body": str(models["pneumonia"](file))}
     }
 ] 
 print("Before result-----------------")
-result = routes_data[3]['post_handler']({"radius_mean": 17.99, "perimeter_mean": 122.8, "area_mean": 1001, "compactness_mean": 0.2776, "concavity_mean": 0.3001, "concave_points_mean": 0.1471, "radius_se": 1.095, "perimeter_se": 8.589, "area_se": 153.4, "radius_worst": 25.38, "perimeter_worst": 184.6, "area_worst": 2019, "compactness_worst": 0.6656, "concavity_worst": 0.7119, "concave_points_worst": 0.2654})
+result = routes_data[6]['post_handler']({"mdvp_jitter_percent":0.005, "mdvp_jitter_abs":0.00003, "mdvp_rap":0.002, "mdvp_ppq":0.002, "jitter_ddp":0.005, "mdvp_shimmer":0.02, "mdvp_shimmer_db":0.2, "shimmer_apq3":0.01, "shimmer_apq5":0.01, "mdvp_apq":0.01, "shimmer_dda":0.02, "nhr":0.02, "hnr":0.02, "rpde":0.02, "dfa":0.02, "ppe":0.02})
 print(result)
 print("-----------------")
 
