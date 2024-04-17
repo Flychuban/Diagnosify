@@ -171,10 +171,6 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
     e.preventDefault();
     console.log("Form submission:", formState);
     let formDataToSend = formState;
-    if (file) {
-      formDataToSend = new FormData();
-      formDataToSend.append("file", file);
-    }
     console.log(formDataToSend);
     const res = await Api.sendDiagnose({ data: formDataToSend, type });
     const parsedRes = parseMlResult(res.data.body);
@@ -212,14 +208,17 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
               />
             </div>
           ) : (
-            Object.keys(formState).map((key) => (
-              <InputField
-                key={key}
-                label={key.charAt(0).toUpperCase() + key.slice(1)}
-                value={formState[key]}
-                onChange={(newValue) => handleChange(key, newValue)}
-              />
-            ))
+            Object.keys(formState).map((key) => {
+              const newKey = key.replace(/_/g, " ");
+              return (
+                <InputField
+                  key={key}
+                  label={newKey.charAt(0).toUpperCase() + newKey.slice(1)}
+                  value={formState[key]}
+                  onChange={(newValue) => handleChange(key, newValue)}
+                />
+              );
+            })
           )}
 
           <button type="submit" className="rounded bg-blue-600 px-4 py-2">
