@@ -22,7 +22,7 @@ export const InputForm: React.FC<Props> = ({ input_schema, handleSubmit }) => {
   };
 
   return (
-    <div className="flex h-[50%] w-[50%] items-center justify-center rounded-md bg-primary text-white">
+    <div className="flex h-[50%] w-[100%] items-center justify-center rounded-md  text-white">
       <form
         onSubmit={(e: React.FormEvent) => {
           e.preventDefault();
@@ -46,7 +46,7 @@ export const InputForm: React.FC<Props> = ({ input_schema, handleSubmit }) => {
         ))}
         <button
           type="submit"
-          className="rounded bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
+          className="w-full rounded bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
         >
           Submit
         </button>

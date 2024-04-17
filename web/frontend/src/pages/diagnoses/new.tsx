@@ -268,6 +268,22 @@ const App: React.FC = () => {
         isFile: true,
       },
     },
+    {
+      type: "kidney_disease",
+      info: {
+        "Specific Gravity": 0,
+
+        "Serum Creatinine": 0,
+
+        "Packed Cell Volume": 0,
+
+        Albumin: 0,
+
+        Hemoglobin: 0,
+
+        Hypertension: 0,
+      },
+    },
   ];
 
   const currentPrediction = allPredictions[current];
@@ -278,7 +294,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex h-[100vh] w-full">
+    <div className="flex h-screen w-full bg-primary">
       <Sidebar
         onSelectDisease={handleSelectDisease}
         options={allPredictions.map((prediction) => prediction.type)}
