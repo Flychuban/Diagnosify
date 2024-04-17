@@ -4,6 +4,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 dotenv.config();
 
 const uri: string = process.env.MONGO_URI || '';
+console.log("debug",uri)
 mongoose.connect(uri);
 
 interface IUser extends Document {

@@ -5,7 +5,7 @@ import joblib
 import pandas as pd
 
 scaler_path = os.path.join(os.getcwd(), "scalers")
-scaler = joblib.load(os.path.join(scaler_path, "kidney_disease_scaler.pkl"))
+kidney_scaler = joblib.load(os.path.join(scaler_path, "kidney_disease_scaler.pkl"))
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
 kidney_model = load_model(os.path.join(disease_models_path, "kidney_model.h5"))
@@ -38,7 +38,7 @@ def kidney_menu():
     data = [[specific_gravity, albumin, serum_creatinine, hemoglobin, PCV, hypertension]]
     df_dummies = pd.DataFrame(data, columns=["sg", "al", "sc", "hemo", "pcv", "htn"])
     column_names = df_dummies.columns
-    df_dummies[column_names] = scaler.transform(df_dummies[column_names])
+    df_dummies[column_names] = kidney_scaler.transform(df_dummies[column_names])
     
     kidney_prediction = ""
     

@@ -1,0 +1,6 @@
+serviceName: diag
+replicaCount: 1
+image:
+  repository: radoslav123/diag
+  tag: arm
+containerPort: 3001

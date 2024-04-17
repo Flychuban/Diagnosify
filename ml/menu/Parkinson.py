@@ -6,7 +6,7 @@ import pandas as pd
 import joblib  
 
 scaler_path = os.path.join(os.getcwd(), "scalers")
-scaler = joblib.load(os.path.join(scaler_path, "parkinson_scaler.pkl"))
+parkinson_scaler = joblib.load(os.path.join(scaler_path, "parkinson_scaler.pkl"))
 
 disease_models_path = os.path.join(os.getcwd(), "disease_models")
 parkinson_model = pickle.load(open(os.path.join(disease_models_path, "parkinson_model.sav"), 'rb'))
@@ -68,7 +68,7 @@ def parkinson_menu():
     data = [[MDVP_Jitter_percent, MDVP_Jitter_abs, MDVP_RAP, MDVP_PPQ, Jitter_DDP, MDVP_Shimmer, MDVP_Shimmer_dB, Shimmer_APQ3, Shimmer_APQ5, MDVP_APQ, Shimmer_dda, NHR, HNR, RPDE, DFA, PPE]]
     df_dummies = pd.DataFrame(data, columns=["MDVP:Jitter(%)", "MDVP:Jitter(Abs)", "MDVP:RAP", "MDVP:PPQ", "Jitter:DDP", "MDVP:Shimmer", "MDVP:Shimmer(dB)", "Shimmer:APQ3", "Shimmer:APQ5", "MDVP:APQ", "Shimmer:DDA", "NHR", "HNR", "RPDE", "DFA", "PPE"])
     column_names = df_dummies.columns
-    df_dummies[column_names] = scaler.transform(df_dummies[column_names])
+    df_dummies[column_names] = parkinson_scaler.transform(df_dummies[column_names])
     
     parkinson_prediction = ""
     
