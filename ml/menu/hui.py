@@ -11,6 +11,6 @@ req = {
     'age': 50 # Age (years)
 }
 
-predict = (models["diabetes"](  [ [req['pregnancies'],req['glucose'], req['blood_pressure'], req['skin_thickness'], req['insulin'], req['bmi'], req['diabetes_pedigree_function'], req['age']    ]]) == [1])[0]
+predict = ((models["diabetes"](  [ [req['pregnancies'],req['glucose'], req['blood_pressure'], req['skin_thickness'], req['insulin'], req['bmi'], req['diabetes_pedigree_function'], req['age']    ]]) == [1]))[0]
 
 print(predict)
