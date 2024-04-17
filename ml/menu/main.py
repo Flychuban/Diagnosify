@@ -151,8 +151,11 @@ def get_cancer_segmentation_image(file_in_bytes):
     bytes_data = file_in_bytes.read()
     tensor = tf.convert_to_tensor(bytes_data, dtype=tf.string)
     image = tf.io.decode_image(tensor, channels=3)
+    
+    # Resize the image to the required size for the model
+    resized_image = tf.image.resize(image, [256, 256])
             
-    yhat = models["cancer_segmentation"](tf.expand_dims(image, axis=0)) # Predict the image
+    yhat = models["cancer_segmentation"](tf.expand_dims(resized_image, axis=0)) # Predict the image
     yhat = np.squeeze(np.where(yhat > 0.5, 1.0, 0.0)) # Threshold the prediction
     result_image = read_image(bytes_data) # Read the image again to show the result
     
@@ -176,18 +179,6 @@ def get_cancer_segmentation_image(file_in_bytes):
 
     # Return the file directly
     return FileResponse(file_path, media_type='image/png', filename="temp_image.png")
-    
-    # # img = Image.open("./menu/test_img.jpeg")
-    # # plot_image_stream = io.BytesIO()
-    # # img.save(plot_image_stream, format="PNG")
-    
-    # return {"body": plot_image_stream.getvalue(), "type": "picture"} # Type is a flag to indicate that the response is an image
-    #  Encode the binary data to Base64
-    # base64_encoded_data = base64.b64encode(plot_image_stream.getvalue())
-    # base64_message = base64_encoded_data.decode('utf-8')  # Decode to UTF-8 string for JSON compatibility
-
-    # # Return as JSON
-    # return JSONResponse(content={"image": base64_message}, media_type="application/json")
         
 routes_data = [
     {
@@ -260,5 +251,5 @@ for route_data in routes_data:
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=5005)
 
