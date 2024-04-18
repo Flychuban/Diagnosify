@@ -68,6 +68,15 @@ send it to the feed where after a trigger has been accomplished ( for example ce
 
 ![image info](./readme_images/data_explained_diagnosify.png)
 
+# Labels info for diseases
+
+breast cancer - ![link text](./ml/labels_info/breast_cancer_info.txt)
+diabetes - ![link text](./ml/labels_info/diabetes.txt)
+heart disease - ![link text](./ml/labels_info/heart_disease_info.txt)
+kidney disease - ![link text](./ml/labels_info/kidney_disease_info.txt)
+parkinson - ![link text](./ml/labels_info/parkinson_info.txt)
+liver disease - ![link text](./ml/labels_info/liver_disease.txt)
+
 ## Disclaimer
 
 Patients will be asked for confirmation of gathering data
