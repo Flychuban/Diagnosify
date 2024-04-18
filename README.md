@@ -60,7 +60,7 @@ send it to the feed where after a trigger has been accomplished ( for example ce
 - Deplyment: AWS, K8S, Docker
 - RabbitMQ for message queue ( if something happens to the main backend we would want to lose potential diagnoses )
 
-# Architecture - to be made
+# Architecture
 
 ![alt text](architecture.png)
 
