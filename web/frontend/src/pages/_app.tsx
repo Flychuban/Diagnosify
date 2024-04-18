@@ -6,11 +6,13 @@ import { AuthProvider, AuthContext } from "~/utils/context";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <AuthProvider>
-      <PageWrapper>
-        <Component {...pageProps} />
-      </PageWrapper>
-    </AuthProvider>
+    <div className="bg-primary">
+      <AuthProvider>
+        <PageWrapper>
+          <Component {...pageProps} />
+        </PageWrapper>
+      </AuthProvider>
+    </div>
   );
 }
 

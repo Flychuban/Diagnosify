@@ -41,10 +41,24 @@ export class Api {
 
   static async sendDiagnose(diagnose: object) {
     //for ml seervice
-    console.log("jijijijijijiji", diagnose);
-    return await axios.post(`${this.url}/ml/${diagnose.type}`, {
-      data: { ...diagnose },
-    });
+    try {
+      console.log("jijijijijijiji", diagnose);
+      if (diagnose.file) {
+        console.log("huhuhu");
+        return await axios.post(`${this.url}/ml/${diagnose.type}`, {
+          data: { ...diagnose.data },
+        });
+      } else {
+        console.log("sending file");
+        console.log(diagnose.data);
+        return await axios.post(
+          `${this.url}/ml/${diagnose.type}`,
+          diagnose.data,
+        );
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   static async getUserDignoses(username: string) {
