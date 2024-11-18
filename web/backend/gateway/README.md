@@ -1,61 +1,67 @@
-# Service Usage Guide
+# GATEWAY SERVICE DOCUMENTATION
 
-This guide provides instructions on how to use the service provided by the [Service Name].
+## How It Works
 
-## Overview
+### Config 
+First you need to create a config file which the service will use to reroute requests
 
-The service acts as a proxy for routing requests to different backend services based on the requested URL. It retrieves the target URL from a configuration file and forwards the request along with the request body and headers to the specified backend service.
+here is an example one
 
-## Getting Started
+`.env`
+```bash
+CONFIG="{"auth": {"redirect_url": "http://localhost:8080/"},"ml": {"redirect_url": "http://localhost:5000"},"diag": {"redirect_url": "http://localhost:3001"}}"
+```
 
-To start using the service, follow these steps:
+### How are requests rerouted 
 
-1. **Install Dependencies**: Ensure you have Node.js and npm (Node Package Manager) installed on your system.
 
-2. **Clone the Repository**: Clone the repository containing the service code to your local machine.
+every request to the gateway must follow this schema 
+`htttp://<gateway_host>/<service_url>/<route_of_service>`
 
-3. **Install Dependencies**: Navigate to the project directory and install the required dependencies using npm.
 
-   ```bash
-   cd <project-directory>
-   npm install
+here is an example usage: 
+this command 
+```zsh
+curl "http://localhost:7000/auth/auth/get" 
+```
+
+
+will be redirected to this url: `http://localhost:8080/auth/get` , see how the first auth is removed thats cuz we remove the service name so that its more flexible
+
+another useful thing is that the `service_name` does not have to match the actual url, for example our auth backendd actually exposes a router called tokenCreator
+
+example config
+`.env`
+```bash
+CONFIG={"auth":{"redirect_url":"http://localhost:8000/tokenCreator"}}
+```
+
+example request
+```zsh
+curl "http://localhost:7000/auth/issueNewToken
+```
+
+this will make the following redirect `http://localhost:8080/tokenCreator/issueNewToken`
+
+
+
+
+
+
+## Common mistakes
+- adding `/` after a redirect url
+   
+   Example:
+   
+   wrong config:
+
+   `CONFIG={"auth":{"redirect_url":"http://localhost:3000/"}}`
+
+   a redirect will always have an additional slash 
+   
+   ```zsh
+   curl "http://localhost:7000/auth/issueNewToken
    ```
+   will result in `http://localhost:8000//issueNewToken`
 
-4. **Configuration**: Update the configuration file `config.json` with the appropriate mappings of service names to their corresponding redirect URLs.
-
-5. **Start the Service**: Run the service using the following command:
-
-   ```bash
-   npm start
-   ```
-
-   The service will start listening for requests on the specified port.
-
-## Example Usage
-
-Assuming the service is running on `http://localhost:7000`, here's an example of how to send a request to the service:
-
-```http
-POST http://localhost:7000/ml/service1/endpoint
-Content-Type: application/json
-
-{
-  "key": "value"
-}
-```
-
-```microservices.json
-{
-    "ml":{
-        "baseUrl":"http://localhost:5000"
-        }
-}
-```
-
-and this will result in the following http reroute
-
-```http
-
-http://localhost:7000/ml/service1/endpoint -> http://localhost:5000/ml/service1/endpoint
-
-```
+   !hint look at the two slashes after the host, i mean if this is your desired behaviour, sure but just to note it as a commom mistake

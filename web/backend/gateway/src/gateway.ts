@@ -2,9 +2,16 @@ import express, { Request, Response } from 'express';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import { getSubroute } from './utils.js';
+
+
 dotenv.config();
 const config = JSON.parse(process.env.CONFIG);
 console.log(config)
+
+
+
+
 class API {
   private getIndexAfterServiceName(subRoute: string): number {
     for (let i = 1; i < subRoute.length; i += 1) {
@@ -20,6 +27,7 @@ class API {
       1,
       this.getIndexAfterServiceName(subRoute),
     );
+    console.log('Service Name:', serviceName);
     return config[serviceName]?.redirect_url || null; // Use optional chaining and provide a default value
   }
 
@@ -33,6 +41,7 @@ class API {
   }
 }
 
+
 const api = new API();
 const app = express();
 app.use(cors());
@@ -40,14 +49,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.all('*', async (req: Request, res: Response) => {
+
+  console.log("----------------------------------------------------------------");
   const parsedUrl = req.originalUrl;
 
   console.log('Requested URL:', parsedUrl);
   console.log('Request Body:', req.body);
   console.log('Request Method:', req.method);
-
   const targetUrl = api.getServiceUrl(parsedUrl);
-  console.log('Target URL:', targetUrl + parsedUrl);
+
+  console.log('Target URL:', targetUrl + getSubroute(parsedUrl));
 
   if (!targetUrl) {
     res.status(404).send('Service not found\n');
@@ -56,7 +67,7 @@ app.all('*', async (req: Request, res: Response) => {
 
   try {
     const axiosConfig: AxiosRequestConfig = {
-      method: req.method as any, // You may need to cast to 'any' due to mismatch between HTTP methods in Express and Axios
+      method: req.method,
       url: targetUrl + parsedUrl,
       data: req.body,
       headers: {
@@ -64,14 +75,13 @@ app.all('*', async (req: Request, res: Response) => {
         'User-Agent': req.headers['user-agent'] as string,
       },
     };
-    console.log('before', axiosConfig);
     const response = await api.sendReq(axiosConfig);
-    console.log('response', response);
     res.status(response.status).send(response.data);
   } catch (error) {
     console.error('Error:', error.message);
     res.status(500).send('Internal Server Error\n');
   }
+  console.log("----------------------------------------------------------------");
 });
 
 const port = 7000;
