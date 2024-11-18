@@ -2,7 +2,12 @@
 
 ## How It Works
 
-### Config 
+### Config
+
+### the service supports either a `.env` file ot loading it directly from a ts file 
+see `gateway.ts` for more info  
+
+### Example usage
 First you need to create a config file which the service will use to reroute requests
 
 here is an example one

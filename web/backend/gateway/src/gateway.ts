@@ -1,14 +1,12 @@
 import express, { Request, Response } from 'express';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import dotenv from 'dotenv';
 import cors from 'cors';
-import { getSubroute } from './utils.js';
+import { getConfig, getSubroute } from './utils.js';
 
 
-dotenv.config();
-const config = JSON.parse(process.env.CONFIG);
-console.log(config)
 
+
+const config = getConfig();
 
 
 

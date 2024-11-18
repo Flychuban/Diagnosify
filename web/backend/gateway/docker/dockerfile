@@ -1,0 +1,16 @@
+FROM oven/bun:1 AS base
+
+WORKDIR /usr/src/app
+
+# Copy dependency files first to leverage caching
+COPY package.json bun.lockb . 
+RUN bun install
+
+# Copy the rest of the application files
+COPY . .
+
+# Expose the port your app listens on (if applicable)
+EXPOSE 7000 
+
+# Set the default command
+CMD [ "bun", "run", "./src/gateway.ts" ]
