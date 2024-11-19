@@ -30,10 +30,9 @@ authRouter.post(
 
 authRouter.post("/issueNewTokenForUser", (req: express.Request<{}, {}, {username: string}>, res) => { 
     try {
-        sessions.issueNewTokenForUser(req.body.username) 
-        res.status(200);
-    }
-    catch(err) {
+        const token = sessions.issueNewTokenForUser(req.body.username) 
+        res.status(200).json({ authToken: token })
+    } catch(err) {
         console.error(err)
         res.status(500).json({ error: err })
     }
@@ -41,7 +40,7 @@ authRouter.post("/issueNewTokenForUser", (req: express.Request<{}, {}, {username
 })
 
 authRouter.post(
-  "/doesToken",
+  "/doesTokenExist",
   (req: express.Request<{}, {}, { token: string }>, res) => {
     res.json(sessions.tokenExists(req.body.token));
   }

@@ -12,7 +12,9 @@ export class SessionsManager{
     }
 
     issueNewTokenForUser(username: string) {
-        this.sessions[generateToken()] = username
+        const token = generateToken()
+        this.sessions[token] = username
+        return token
     }
 
     checkIfTokenBelongsToUser(token: Token, username: string) {
@@ -20,6 +22,6 @@ export class SessionsManager{
     }
 
     tokenExists(token: Token): boolean {
-        return (this.sessions[token] !== "")
+        return (this.sessions[token] !== "" && this.sessions[token] !== undefined && this.sessions[token] !== null)
     }
 }
