@@ -1,89 +1,77 @@
-import express, { Request, Response } from 'express';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import { getConfig, getSubroute } from './utils.js';
+import axios, { AxiosRequestConfig } from 'axios';
+import { API } from './api';
+import {  getConfig, getServiceUrl  } from './utils';
 
+export class Gateway {
+  private app: Application;
+  private port: number;
 
+  constructor(port: number) {
+    this.app = express();
+    this.port = port;
 
+    // Core middleware
+    this.app.use(cors());
+    this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(express.json());
+  }
 
-const config = getConfig();
+  /**
+   * Adds middleware to the Express application.
+   * @param handler Middleware handler function.
+   */
+  public addMiddleware(handler: (req: Request, res: Response, next: NextFunction) => void): void {
+    this.app.use(handler);
+  }
 
+  /**
+   * Starts the Express server.
+   */
+  public start(api: API): void {
+    this.app.all('*', async (req: Request, res: Response) => {
+      console.log('----------------------------------------------------------------');
+      const parsedUrl = req.url;
+      
+      
+      
+      
+      console.log('Requested URL:', parsedUrl);
+      console.log('Request Body:', req.body);
+      console.log('Request Method:', req.method);
+      const config =await getConfig()
+      console.log("kolok",config)
+      const targetUrl = getServiceUrl(parsedUrl,config );
+      console.log('Target URL:', targetUrl);
 
-
-class API {
-  private getIndexAfterServiceName(subRoute: string): number {
-    for (let i = 1; i < subRoute.length; i += 1) {
-      if (subRoute[i] === '/') {
-        return i;
+      if (!targetUrl) {
+        res.status(404).send('Service not found\n');
+        return;
       }
-    }
-    return subRoute.length;
-  }
 
-  public getServiceUrl(subRoute: string): string | null {
-    const serviceName = subRoute.slice(
-      1,
-      this.getIndexAfterServiceName(subRoute),
-    );
-    console.log('Service Name:', serviceName);
-    return config[serviceName]?.redirect_url || null; // Use optional chaining and provide a default value
-  }
+      try {
+        const axiosConfig: AxiosRequestConfig = {
+          method: req.method,
+          url: targetUrl + parsedUrl,
+          data: req.body,
+          headers: {
+            accept: req.headers.accept as string,
+            'User-Agent': req.headers['user-agent'] as string,
+          },
+        };
+        const response = await api.sendReq(axiosConfig);
+        res.status(response.status).send(response.data);
+      } catch (error: any) {
+        console.error('Error:', error.message);
+        res.status(500).send('Internal Server Error\n');
+      }
+      console.log('----------------------------------------------------------------');
+    });
 
-  public async sendReq(reqConfig: AxiosRequestConfig): Promise<AxiosResponse> {
-    try {
-      const response = await axios(reqConfig);
-      return response;
-    } catch (error) {
-      throw new Error(`Error sending request: ${error.message}`);
-    }
+    // Start the server
+    this.app.listen(this.port, () => {
+      console.log(`Gateway listening on port ${this.port}`);
+    });
   }
 }
-
-
-const api = new API();
-const app = express();
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-app.all('*', async (req: Request, res: Response) => {
-
-  console.log("----------------------------------------------------------------");
-  const parsedUrl = req.originalUrl;
-
-  console.log('Requested URL:', parsedUrl);
-  console.log('Request Body:', req.body);
-  console.log('Request Method:', req.method);
-  const targetUrl = api.getServiceUrl(parsedUrl);
-
-  console.log('Target URL:', targetUrl + getSubroute(parsedUrl));
-
-  if (!targetUrl) {
-    res.status(404).send('Service not found\n');
-    return;
-  }
-
-  try {
-    const axiosConfig: AxiosRequestConfig = {
-      method: req.method,
-      url: targetUrl + parsedUrl,
-      data: req.body,
-      headers: {
-        accept: req.headers.accept as string,
-        'User-Agent': req.headers['user-agent'] as string,
-      },
-    };
-    const response = await api.sendReq(axiosConfig);
-    res.status(response.status).send(response.data);
-  } catch (error) {
-    console.error('Error:', error.message);
-    res.status(500).send('Internal Server Error\n');
-  }
-  console.log("----------------------------------------------------------------");
-});
-
-const port = 7000;
-
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});

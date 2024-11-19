@@ -1,39 +1,47 @@
-import {getSubroute} from "../src/utils"
+import { executionResult, testExecutionResult, Test, Tests } from './tester'; 
+import { GatewayConfig } from "../src/types";
+import {  getServiceUrl } from "../src/utils";
 
-enum executionResult{
-    FAILED,
-    SUCCEEDED
-}
 
-type testExecutionResult = {
-    status: executionResult,
-    err ?: string
-} 
+function createTest3(): Test<GatewayConfig> {
+    const config: GatewayConfig = {
+        auth: { redirect_url: "http://localhost:3000" },
+        diagnosis: { redirect_url: "http://localhost:5001" }
+    };
 
-function test1(): testExecutionResult{
+    return {
+        dependencies: config,
+        execute: async () => {
+            try {
+                const requestedUrl = "/auth/auth/getToken";
+                const serviceUrl = getServiceUrl(requestedUrl, config);
 
-    try {
-        const subRoute = getSubroute("/auth/auth/issueNewTokenForUser")
-    
-        if (subRoute === "auth/issueNewTokenForUser") {
-            return { status: executionResult.SUCCEEDED };
+                if (serviceUrl === "http://localhost:3000/auth/getToken") {
+                    return { status: executionResult.SUCCEEDED };
+                }
+
+                return {
+                    status: executionResult.FAILED,
+                    err: `Expected "http://localhost:3000/auth/getToken" but got "${serviceUrl}"`
+                };
+            } catch (e) {
+                return {
+                    status: executionResult.FAILED,
+                    err: `Error: ${e.message}`
+                };
+            }
         }
-
-        return { status: executionResult.FAILED, err: "Test 1 failed. Expected {/auth/issueNewTokenForUser} but got " + "{" +  subRoute  + "}"};
-    } catch (e) { 
-        return { status: executionResult.FAILED, err: "Test 1 failed. Error: " + e.message };
-    }
+    };
 }
 
-function testSequenceForGetSubroute() {
-    const testRes = test1();
-    if (testRes.status === executionResult.FAILED)
-    {
-        console.log("test1 failed" + testRes.err);
-        return; 
-    }
-    console.log("all tests passed!")
+// Add and Run Tests
+async function main() {
+    const tests = new Tests();
+
+    // Add the tests
+    tests.addTest(createTest3());
+    // Run the tests
+    await tests.runTests();
 }
 
-
-testSequenceForGetSubroute()
+main().catch((err) => console.error(`Unexpected error: ${err}`));
