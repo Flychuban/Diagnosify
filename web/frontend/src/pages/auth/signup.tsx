@@ -1,6 +1,6 @@
 import { InputForm } from "../../components/form";
 import { cookies } from "~/utils/cookies";
-import { Api } from "~/utils/api";
+import { Api } from "~/utils/api/api";
 import { CustomError, DefaultError } from "~/components/error";
 import React, { useState } from "react";
 import { SuccesfulPopUp } from "~/components/popup";

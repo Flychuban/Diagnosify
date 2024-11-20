@@ -3,14 +3,14 @@ import { GatewayConfig } from "../src/types";
 import {  getServiceUrl } from "../src/utils";
 
 
-function createTest3(): Test<GatewayConfig> {
+function createTest3(): Test<GatewayConfig,string> {
     const config: GatewayConfig = {
         auth: { redirect_url: "http://localhost:3000" },
         diagnosis: { redirect_url: "http://localhost:5001" }
     };
 
     return {
-        dependencies: config,
+        // dependencies: config,
         execute: async () => {
             try {
                 const requestedUrl = "/auth/auth/getToken";
@@ -30,7 +30,7 @@ function createTest3(): Test<GatewayConfig> {
                     err: `Error: ${e.message}`
                 };
             }
-        }
+        },
     };
 }
 

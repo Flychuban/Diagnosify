@@ -33,40 +33,49 @@ export class Gateway {
     this.app.all('*', async (req: Request, res: Response) => {
       console.log('----------------------------------------------------------------');
       const parsedUrl = req.url;
-      
-      
-      
-      
+
+
+
+
       console.log('Requested URL:', parsedUrl);
       console.log('Request Body:', req.body);
       console.log('Request Method:', req.method);
-      const config =await getConfig()
-      console.log("kolok",config)
-      const targetUrl = getServiceUrl(parsedUrl,config );
-      console.log('Target URL:', targetUrl);
+      const config = await getConfig()
+      console.log("kolok", config)
 
-      if (!targetUrl) {
-        res.status(404).send('Service not found\n');
-        return;
-      }
 
-      try {
+      try{
+        const targetUrl = getServiceUrl(parsedUrl, config);
         const axiosConfig: AxiosRequestConfig = {
           method: req.method,
-          url: targetUrl + parsedUrl,
+          url: targetUrl,
           data: req.body,
           headers: {
             accept: req.headers.accept as string,
             'User-Agent': req.headers['user-agent'] as string,
           },
         };
+
+        console.log('Target URL:{' + targetUrl + "}");
+
+        if (!targetUrl) {
+          res.status(404).send('Service not found\n');
+          return;
+        }
+
+        console.log('----------------------------------------------------------------');
+
+
+        console.log("huiiii")
         const response = await api.sendReq(axiosConfig);
+        
+        console.log("huiiii")
         res.status(response.status).send(response.data);
-      } catch (error: any) {
-        console.error('Error:', error.message);
-        res.status(500).send('Internal Server Error\n');
+              } catch (e) {
+        console.log("service not found")
+        res.status(404).json({err: "serviceNotFound"})
+        return
       }
-      console.log('----------------------------------------------------------------');
     });
 
     // Start the server

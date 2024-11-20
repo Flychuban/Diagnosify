@@ -1,7 +1,13 @@
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 import bodyParser from 'body-parser';
 import { SessionsManager } from './session';
+import { db } from './db/db';
+import { password } from 'bun';
+type ErrorResponse = {
+    error: string;
+}
 
+type BaseResponse<T> = T | ErrorResponse
 const app = express();
 app.use(bodyParser.json())
 
@@ -28,25 +34,40 @@ authRouter.post(
 );
 
 
-authRouter.post("/issueNewTokenForUser", (req: express.Request<{}, {}, {username: string}>, res) => { 
+authRouter.post("/issueNewTokenForUser", (req: express.Request<{}, {}, { username: string }>, res: Response<BaseResponse<{authToken: string}>>) => { 
     try {
         const token = sessions.issueNewTokenForUser(req.body.username) 
         res.status(200).json({ authToken: token })
     } catch(err) {
         console.error(err)
-        res.status(500).json({ error: err })
+        res.status(500).json({ error: err.message })
     }
 
 })
 
 authRouter.post(
   "/doesTokenExist",
-  (req: express.Request<{}, {}, { token: string }>, res) => {
-    res.json(sessions.tokenExists(req.body.token));
+  (req: express.Request<{}, {}, { token: string }>, res: express.Response<{exists: boolean}>) => {
+    const token = sessions.tokenExists(req.body.token) 
+    res.status(200).json({exists: token});
   }
 );
 
+
+authRouter.post("/login", (req: Request<{}, {}, {username: string, password: string}>, res: Response<BaseResponse<{token: string}>>) => {
+  if (db.userRepo.getUserPassword(req.body.username) === req.body.password) {
+    res.status(200).json({
+      token: sessions.issueNewTokenForUser(req.body.username)
+    })
+    return
+  }
+  res.status(400).json({ error: "username or password is invalid"})
+ 
+})
+
+
 app.use("/auth", authRouter);
+
 
 
 

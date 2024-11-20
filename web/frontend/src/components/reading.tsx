@@ -1,4 +1,5 @@
 import React from "react";
+import { Diagnosis } from "~/utils/api/types";
 
 export const Reading: React.FC<{
   rawData: object;

@@ -1,27 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { Api } from "~/utils/api";
+import { api } from "~/utils/api/api";
 import { cookies } from "~/utils/cookies";
 import { Reading } from "~/components/reading";
 import Link from "next/link";
+import { Diagnosis } from "~/utils/api/types";
 
 const Feed: React.FC = () => {
-  const [feed, setFeed] = useState<object[] | null>(null);
+  const [feed, setFeed] = useState<Diagnosis[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    async function fetchData() {
+    (async () => {
       try {
-        const data = await Api.getAllDiagnoses();
-        console.log(data.data);
-        setFeed(data.data);
+        const data = await api.diagnoses.getAllDiagnoses();
+        console.log();
+        if ("errMsg" in data) { 
+        } else {
+          setFeed(data.diagnoses);
+          console.log("feed", feed);
+        }
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
         setFeed([]);
         setLoading(false);
       }
-    }
-    fetchData();
+    })()
+      .then(d => {
+        console.log("finished fetching data")
+      })
+      .catch(error => { throw new Error("encountered error during data fetching:", error) })
   }, []);
 
   return (
@@ -33,7 +41,8 @@ const Feed: React.FC = () => {
           feed.map((reading, index) => (
             <div key={index} className="my-4 w-96 bg-primary">
               <Reading
-                rawData={reading.raw_data}
+                rawData={JSON.parse(reading.raw_data?.toString() || 
+                `{"error":"data undefined"}`) }
                 type={reading.type}
                 prediction={reading.prediction}
               />

@@ -22,6 +22,6 @@ export class SessionsManager{
     }
 
     tokenExists(token: Token): boolean {
-        return (this.sessions[token] !== "" && this.sessions[token] !== undefined && this.sessions[token] !== null)
+        return (this.sessions[token] !== "" && this.sessions[token] !== undefined && this.sessions[token] !== null) // a bit strabge but ut gives undefined but ts lsp thinks it only returns a string and there is never a mismatch anywhere
     }
 }

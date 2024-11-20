@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { cookies } from "~/utils/cookies";
 import { AuthContext } from "~/utils/context";
-import { Api } from "~/utils/api";
+import { api } from "~/utils/api/api";
 import { parseMlResult } from "~/utils/mlResultParser";
 import { Reading } from "~/components/reading";
 import { BaseError } from "~/components/error";
@@ -71,7 +71,7 @@ const InputField: React.FC<{
       </div>
       <div>
         {!(typeof value === "number") ? (
-          <FileInput value={value} onChange={onChange} />
+          <FileInput value={value} onChange={onChange} callback={() => {}}/>
         ) : (
           <input
             className="w-32 rounded border border-secondary bg-secondary p-2"
@@ -110,8 +110,8 @@ const DisplayedPrediction: React.FC<{
         verified_prediction_status: actualStatus,
       });
       if (
-        res.status >= ResponseCodes.OK_WITH_RESPONSE &&
-        res.status < ResponseCodes.NOT_FOUND
+        res.status >= ResponseCodes.OK_WITH_RESPONSE.valueOf() &&
+        res.status < ResponseCodes.NOT_FOUND.valueOf()
       ) {
         setIsPopup(true);
       }
@@ -155,11 +155,11 @@ const DisplayedPrediction: React.FC<{
   );
 };
 
-const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
+const PredictionForm: React.FC<{ predictInfo: {isFile: boolean}; type: string }> = ({
   predictInfo,
   type,
 }) => {
-  const [formState, setFormState] = useState<{ [key: string]: string }>({});
+  const [formState, setFormState] = useState<{isFile: boolean, type: string, file: string}>({isFile: false});
   const [prediction, setPrediction] = useState<boolean | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
@@ -170,9 +170,12 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submission:", formState);
-    let formDataToSend = formState;
+    const formDataToSend = formState;
     console.log(formDataToSend);
     const res = await Api.sendDiagnose({ data: formDataToSend, type });
+    if (res?.data?.body != null && res?.data.body) {
+      
+    }
     const parsedRes = parseMlResult(res.data.body);
     console.log("jijibiji", parsedRes);
     setPrediction(parsedRes);
@@ -180,10 +183,22 @@ const PredictionForm: React.FC<{ predictInfo: object; type: string }> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+      
+
+      if(e.target.files[0] === null || e.target.files[0] === undefined){
+          return
+        }
+      
+      const fileToUpload = e.target.files[0]
+      
       setFile(e.target.files[0]);
+      
+      
+      
       setFormState((prev) => ({
+        
         ...prev,
-        file: URL.createObjectURL(e.target.files[0]),
+        file: URL.createObjectURL(fileToUpload),
       }));
     }
   };
@@ -268,7 +283,7 @@ const App: React.FC = () => {
       },
     },
     {
-      type: "kidney_disease",
+      type: "kidney Disease",
       info: {
         "Specific Gravity": 0,
 

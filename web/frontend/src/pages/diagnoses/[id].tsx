@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import React, { useState, useEffect, useContext } from "react";
-import { Api } from "~/utils/api";
+import { api } from "~/utils/api/api";
 import { Reading } from "~/components/reading";
 import { Loading } from "~/components/loading";
 import { AuthContext } from "~/utils/context";
@@ -31,8 +31,6 @@ const ReadingPage = () => {
       }
       try {
         const data = await Api.getReading(router.query.id);
-        console.log(data);
-        console.log(data.status === ResponseCodes.NOT_FOUND, "kur");
         if (data.status === ResponseCodes.NOT_FOUND) {
           setError({
             state: true,

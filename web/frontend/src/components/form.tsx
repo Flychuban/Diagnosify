@@ -6,13 +6,18 @@ interface InputSchema {
   type: string;
 }
 
+interface authForm {
+  username: string
+  password: string
+}
+
 interface Props {
   input_schema: InputSchema[];
-  handleSubmit: void;
+  handleSubmit: (argsObject: authForm) => Promise<void>;
 }
 
 export const InputForm: React.FC<Props> = ({ input_schema, handleSubmit }) => {
-  const [formData, setFormData] = useState<{ [key: string]: string }>({});
+  const [formData, setFormData] = useState<authForm>({username: "", password: ""});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, name: string) => {
     setFormData({
@@ -24,9 +29,9 @@ export const InputForm: React.FC<Props> = ({ input_schema, handleSubmit }) => {
   return (
     <div className="flex h-[50%] w-[100%] items-center justify-center rounded-md  text-white">
       <form
-        onSubmit={(e: React.FormEvent) => {
+        onSubmit={async (e: React.FormEvent) => {
           e.preventDefault();
-          handleSubmit(formData);
+          await handleSubmit(formData);
         }}
       >
         {input_schema.map((input, index) => (
@@ -38,7 +43,7 @@ export const InputForm: React.FC<Props> = ({ input_schema, handleSubmit }) => {
               type={input.type}
               id={input.name}
               name={input.name}
-              value={formData[input.name] ?? ""}
+              value={formData[input.name]}
               onChange={(e) => handleChange(e, input.name)}
               className="mt-1 w-full rounded border bg-secondary px-3 py-2"
             />

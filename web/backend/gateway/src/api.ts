@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from "axios";
 import { GatewayConfig } from "./types";
 import { getConfig } from "./utils";
 
-// a bit cringe code, wrote it a long time ago, idk why its a class when the two methods have nothing to do with each other,nor they operate on the same data and why is it even called api, TODO: rewrite later 
+// a bit cringe code, wrote it a long time ago, idk why its a class when the two methods have nothing to do with each other,nor they operate on the same data and why is it even called api, TODO: rewrite later
 export class API {
 
     private config: GatewayConfig;
@@ -36,7 +36,11 @@ export class API {
 
 
   async sendReq(config: AxiosRequestConfig) {
-    return axios(config);
+    try{
+      return axios(config);
+    }catch(e){
+      throw new Error("err happend during axios call"+e.message)
+    }
   }
-  
+
 }
