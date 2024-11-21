@@ -37,9 +37,11 @@ gateway.addMiddleware(async (req, res, next) => {
       }
 
       try {
+
+      const token = JSON.parse(authHeader)
         const tokenExists = await axios.post< boolean>(
           `${authServiceUrl}/auth/doesTokenExist`,
-          { token: authHeader }
+          { token: token }
         );
         console.log(tokenExists.data)
         if (!tokenExists.data) {

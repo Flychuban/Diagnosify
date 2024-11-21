@@ -1,6 +1,7 @@
 import express,{ Express, Request, Response } from "express";
 
 import { db } from '../db_repo';
+import { User } from "@prisma/client";
 
 export const userRouter = express.Router();
 
@@ -19,3 +20,21 @@ userRouter.post(
     }
   },
 );
+
+userRouter.get(
+  '/:username',
+async  (req: Request<{username: string}, {}, {}>, res: Response<{user: User | null}>) => {
+  try {
+  
+    const user = await db.users.get(
+      {
+        username: req.params.username,
+        userId: null
+      }
+    )
+    return res.status(200).json({user})
+    } catch (e) { 
+      return res.status(404).json({error: e.message} as any)
+    }
+  }
+)

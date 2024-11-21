@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const THRESHOLD_IN_PERCENTAGES_TO_BE_MET = 60;
 const WHEN_TO_CHECK_VOTES = 3;
 
-type NewDiagnosisInfo = {
+export type NewDiagnosisInfo = {
   type: string;
   raw_data: object;
   label: boolean;
@@ -40,6 +40,29 @@ class UserService {
       throw new Error(`Error fetching user diagnoses: ${error.message}`);
     }
   }
+
+  async get(queryObj: { userId : number | null, username: string | null }): User | null {
+    if (queryObj.userId === null) {
+      
+      if (queryObj.username === null) { 
+        throw new Error('Either userId or username must be provided');
+      }
+      
+      const user = await prisma.user.findFirst({
+      where: {
+        username: queryObj.username,
+        }
+      })
+
+      return user;
+    }
+    const user = await prisma.user.findUnique({
+      where: {
+        id: queryObj.userId,
+      }
+    })
+    return user
+  }
 }
 
 class DiagnosisService {
@@ -73,7 +96,7 @@ class DiagnosisService {
     }
   }
 
-  async get(diagnosisId: number): Promise<Diagnosis> {
+  async get(diagnosisId: number) {
     try {
       return await prisma.diagnosis.findUnique({
         where: { id: diagnosisId },

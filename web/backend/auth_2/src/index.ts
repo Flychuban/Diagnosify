@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import bodyParser from 'body-parser';
-import { SessionsManager } from './session';
+import { SessionsManager, type AuthToken } from './session';
 import { db } from './db/db';
 import { password } from 'bun';
 type ErrorResponse = {
@@ -18,15 +18,15 @@ const sessions = new SessionsManager()
 // not the best design but this service is more suited for grpc but dont want to set it up for something so small
 authRouter.post(
   "/checkIfTokenBelongsToUser",
-  (
-    req: express.Request<{}, {exists: boolean}, { token: string, username: string }>, 
+  async (
+    req: express.Request<{}, {exists: boolean}, { token: AuthToken, username: string }>, 
     res
   ) => {
     const username = req.body.username;
     const token = req.body.token;
 
     // Check if token belongs to the user
-    const exists = sessions.checkIfTokenBelongsToUser(username, token);
+    const exists = await sessions.checkIfTokenBelongsToUser( token, username);
 
     res.json({ exists });
       return;
@@ -34,9 +34,9 @@ authRouter.post(
 );
 
 
-authRouter.post("/issueNewTokenForUser", (req: express.Request<{}, {}, { username: string }>, res: Response<BaseResponse<{authToken: string}>>) => { 
+authRouter.post("/issueNewTokenForUser", async(req: express.Request<{}, {}, { username: string }>, res: Response<BaseResponse<{authToken: AuthToken}>>) => { 
     try {
-        const token = sessions.issueNewTokenForUser(req.body.username) 
+        const token = await sessions.issueNewTokenForUser(req.body.username) 
         res.status(200).json({ authToken: token })
     } catch(err) {
         console.error(err)
@@ -47,17 +47,17 @@ authRouter.post("/issueNewTokenForUser", (req: express.Request<{}, {}, { usernam
 
 authRouter.post(
   "/doesTokenExist",
-  (req: express.Request<{}, {}, { token: string }>, res: express.Response<{exists: boolean}>) => {
+  (req: express.Request<{}, {}, { token: AuthToken }>, res: express.Response<{exists: boolean}>) => {
     const token = sessions.tokenExists(req.body.token) 
     res.status(200).json({exists: token});
   }
 );
 
 
-authRouter.post("/login", (req: Request<{}, {}, {username: string, password: string}>, res: Response<BaseResponse<{token: string}>>) => {
-  if (db.userRepo.getUserPassword(req.body.username) === req.body.password) {
+authRouter.post("/login", async (req: Request<{}, {}, {username: string, password: string}>, res: Response<BaseResponse<{token: AuthToken}>>) => {
+  if (await db.userRepo.getUserPassword(req.body.username) === req.body.password) {
     res.status(200).json({
-      token: sessions.issueNewTokenForUser(req.body.username)
+      token: await sessions.issueNewTokenForUser(req.body.username)
     })
     return
   }

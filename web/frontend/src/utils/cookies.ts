@@ -1,80 +1,43 @@
 import Cookies from "js-cookie";
-function redirectToLoginIfNoCookie(cookie: string | boolean, path = "/login") {
-  if (!cookie) {
-    window.location.href = path;
-    return undefined;
-  }
-}
-class CookieWrapper {
-  static setCookie(
-    name: string,
-    value: string,
-    options?: Cookies.CookieAttributes,
-  ): void {
-    Cookies.set(name, value, options);
-  }
-
-  static getCookie(name: string): string | undefined {
-    return Cookies.get(name);
-  }
+export type AuthToken = {
+  hash: string,userId: number
 }
 
-interface CookieSettings {
-  user: string;
-  token: string;
-}
+class Cookie < T > {
+  name: string;
+  private customParser: (cookieString: string) => T
+  private customSetter: (data: T) => string;
 
-class CookieBuilder {
-  private cookieObject: {
-    [K in keyof CookieSettings]: {
-      set: (
-        value: CookieSettings[K],
-        options?: Cookies.CookieAttributes,
-      ) => void;
-      get: () => CookieSettings[K] | null;
-    };
-  } = {} as any;
-
-  setCookie<K extends keyof CookieSettings>(
-    key: K,
-    options?: Cookies.CookieAttributes,
-  ): this {
-    this.cookieObject[key] = {
-      set: (
-        value: CookieSettings[K],
-        cookieOptions?: Cookies.CookieAttributes,
-      ) => {
-        CookieWrapper.setCookie(
-          String(key),
-          JSON.stringify(value),
-          cookieOptions,
-        );
-      },
-      get: () => {
-        const cookieValue = CookieWrapper.getCookie(String(key));
-        return cookieValue
-          ? (JSON.parse(cookieValue) as CookieSettings[K])
-          : null;
-      },
-    } as any;
-    return this;
+  /*
+* {param} customParser is need since by default everything is saved as a string but we wouldnt want to reimplelemnt the logic everytime and we dont use json.Parse directly since there could be some more complex logic and we would like to happen in the cookie
+*/ 
+  constructor(name: string, customParser: (cookieString: string) => T,customSetter: (data: T) => string) {
+    this.name = name;
+    this.customParser = customParser;
+    this.customSetter = customSetter
   }
 
-  build(): {
-    [K in keyof CookieSettings]: {
-      set: (
-        value: CookieSettings[K],
-        options?: Cookies.CookieAttributes,
-      ) => void;
-      get: () => CookieSettings[K] | null;
-    };
-  } {
-    return this.cookieObject;
+  set(value: T): void { 
+    const stringifiedValue = this.customSetter(value);
+      Cookies.set(this.name,stringifiedValue);
+  }
+
+  get(): T | null {
+    const sookieString = Cookies.get(this.name);
+    if (sookieString === undefined) {
+      return null
+    }
+    return this.customParser(sookieString)
   }
 }
 
-// Usage example
-export const cookies = new CookieBuilder()
-  .setCookie("user")
-  .setCookie("token", { expires: 7 }) // Example with options
-  .build();
+export const cookies = {
+  token: new Cookie<AuthToken>("token", (cookieString: string) => { return JSON.parse(cookieString) }, (token) => {
+    return JSON.stringify({hash: token.hash, userId: token.userId})
+  }),
+}
+
+
+
+
+

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 export const Loading: React.FC = () => {
   return (
@@ -47,7 +47,7 @@ export const Loading: React.FC = () => {
           g
         </span>
       </div>
-      <style>
+      {/* <style> //! causes hydration error
         {`
           @keyframes bounce {
             0%, 100% {
@@ -62,7 +62,7 @@ export const Loading: React.FC = () => {
             animation: bounce 0.5s infinite;
           }
         `}
-      </style>
+      </style> */}
     </div>
   );
 };

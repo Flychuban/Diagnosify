@@ -1,3 +1,4 @@
+"use client";
 import { useRouter } from "next/router";
 import React, { useState, useEffect, useContext } from "react";
 import { api } from "~/utils/api/api";
@@ -7,9 +8,11 @@ import { AuthContext } from "~/utils/context";
 import { ProgressBar } from "~/components/progressBar";
 import { BaseError } from "~/components/error";
 import { ResponseCodes } from "~/utils/statis_codes";
+import { Diagnosis, Voting } from "~/utils/api/types";
+import { cookies } from "~/utils/cookies";
 
 const ReadingPage = () => {
-  const [Error, setError] = useState<{
+  const [error, setError] = useState<{
     state: boolean;
     statusCode: null | number;
     errorMessage: string;
@@ -18,38 +21,47 @@ const ReadingPage = () => {
     statusCode: null,
     errorMessage: "Try restarting or it's probably not found",
   });
-  const { token } = useContext(AuthContext);
+
   const router = useRouter();
-  const [diagnosis, setDiagnosis] = useState<object | null>(null);
+  const [diagnosisId, setDiagnosisId] = useState<string | null>(null);
+  const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
   const [haveAlreadyVoted, setHaveAlreadyVoted] = useState(false);
-  const [votingData, setVotingData] = useState<null | object>(null);
+  const [votingData, setVotingData] = useState<null | (Voting & { voters: { id: number; username: string }[] })>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      if (router.query.id === undefined) {
-        return;
+    if (!router.isReady || !router.query.id || Array.isArray(router.query.id)) {
+      return;
+    }
+    setDiagnosisId(router.query.id);
+  }, [router.isReady, router.query.id]);
+
+  useEffect(() => {
+    const fetchData = (async () => {
+      if (!diagnosisId) {
+       console.log("No diagnoses id")
+        return 
       }
+
+      const token = cookies.token.get()
+
       try {
-        const data = await Api.getReading(router.query.id);
-        if (data.status === ResponseCodes.NOT_FOUND) {
+        const data = await api.diagnoses.getDiagnosis(diagnosisId);
+        if (!data) {
           setError({
             state: true,
             statusCode: ResponseCodes.NOT_FOUND,
             errorMessage: "Not found",
           });
-        } else if (data.status === ResponseCodes.SERVER_DIED)
-          console.log(data.data);
-        setDiagnosis(data.data);
-        if (
-          data.data.voting !== undefined &&
-          data.data.voting !== null &&
-          data.data.voting.voters.length > 0
-        ) {
-          setVotingData(data.data.voting);
+          return;
         }
-        setHaveAlreadyVoted(
-          data.data.voting.voters.some((voter) => voter.id === token?.id),
-        );
+
+        if ("errMsg" in data || !data.voting) {
+          throw new Error("No voting available");
+        }
+
+        setDiagnosis(data);
+        setHaveAlreadyVoted(data.voting.voters.some((voter) => voter.id === token?.userId));
+        setVotingData(data.voting);
       } catch (err) {
         setError({
           state: true,
@@ -57,83 +69,69 @@ const ReadingPage = () => {
           errorMessage: "Something happened on the backend",
         });
       }
-    }
-    fetchData();
-  }, [router.query.id, token]);
+    })
+    fetchData().then().catch((err) => { console.log(err);})
+  }, [diagnosisId]);
 
-  if (Error.state) {
-    if (Error.statusCode === null) {
-      return <BaseError message={Error.errorMessage} />;
-    } else if (Error.statusCode === 404) {
-      return <BaseError message={"Not found"} />;
-    } else if (Error.statusCode === ResponseCodes.SERVER_DIED) {
-      return <BaseError message={"Server died"} />;
-    }
+  if (error.state) {
+    return <BaseError message={error.errorMessage} />;
   }
 
   if (diagnosis === null || diagnosis === undefined) {
     return <Loading />;
   }
 
+  async function vote(vote: boolean) {
+    if (!diagnosisId || !cookies.token.get()) return;
+
+    try {
+      const res = await api.diagnoses.votings.vote(1, parseInt(diagnosisId), vote);
+      if ("errMsg" in res) {
+        console.log("Unsuccessful vote");
+      } else {
+        console.log("Successful vote");
+        setHaveAlreadyVoted(true);
+      }
+    } catch (err) {
+      console.error("Voting failed", err);
+    }
+  }
+
   return (
     <div className="h-screen bg-secondary">
-      <Reading
-        type={diagnosis.type}
-        rawData={diagnosis.raw_data}
-        prediction={diagnosis.prediction}
-      />
+      <Reading type={diagnosis.type} rawData={{}} prediction={diagnosis.prediction} />
       <div className="mt-8 rounded-lg border border-primary bg-primary p-4 shadow-md">
-        <p className="text-lg font-semibold text-white">
-          What do you say about this prediction?
-        </p>
+        <p className="text-lg font-semibold text-white">What do you say about this prediction?</p>
         <div className="mt-4 flex space-x-4">
-          {!haveAlreadyVoted && (
+          {typeof window !== "undefined" && !haveAlreadyVoted && (
             <>
               <button
                 disabled={haveAlreadyVoted}
                 className="hover:bg-primary-dark focus:bg-primary-dark rounded-md bg-primary px-4 py-2 text-white focus:outline-none"
                 onClick={async () => {
-                  const res = await Api.VoteForDiagnosis(
-                    token?.id,
-                    router.query.id,
-                    true,
-                  );
-                  if (res.e) {
-                    console.log("Unsuccessful vote");
-                  }
+                 await vote(true) 
                 }}
               >
-                It's true
+                It is true
               </button>
               <button
                 disabled={haveAlreadyVoted}
                 className="hover:bg-secondary-dark focus:bg-secondary-dark rounded-md bg-secondary px-4 py-2 text-white focus:outline-none"
                 onClick={async () => {
-                  const res = await Api.VoteForDiagnosis(
-                    token?.id,
-                    router.query.id,
-                    false,
-                  );
-                  if (res.e) {
-                    console.log("Unsuccessful vote");
-                  }
+                 await vote(false) 
                 }}
               >
-                False
+                It is False
               </button>
             </>
           )}
         </div>
-        {haveAlreadyVoted && (
-          <div className="mt-4 text-sm text-white">You have already voted</div>
-        )}
+        {haveAlreadyVoted && <div className="mt-4 text-sm text-white">You have already voted</div>}
       </div>
       <div className="bg-secondary">
         <p className="text-white">Votes:</p>
-        {votingData !== undefined && votingData !== null && (
-          <ProgressBar
-            fill={(votingData.yes / votingData.voters.length) * 100}
-          />
+        {votingData && (
+          <ProgressBar fill={(votingData.yes / votingData.voters.length) * 100} />
         )}
       </div>
     </div>
@@ -141,3 +139,4 @@ const ReadingPage = () => {
 };
 
 export default ReadingPage;
+

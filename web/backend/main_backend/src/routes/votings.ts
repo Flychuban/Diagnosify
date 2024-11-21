@@ -13,7 +13,7 @@ votingRouter.post(
   ) => {
     try {
       const diagnosisId = parseInt(req.params.diagnosisId);
-      const userId = parseInt(req.body.userId);
+      const userId = req.body.userId; 
       const vote = req.body.vote;
       await db.votings.vote(diagnosisId, userId, vote);
       res.status(200).json({ wasVotingSuccessful: true });

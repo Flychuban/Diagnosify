@@ -1,12 +1,12 @@
 import { InputForm } from "../../components/form";
-import { cookies } from "~/utils/cookies";
+import { AuthToken, cookies } from "~/utils/cookies";
 import { api } from "~/utils/api/api";
 import { AuthContext } from "~/utils/context";
 import { useContext, useEffect, useState } from "react";
 import { DefaultError, DismissableError } from "~/components/error";
 import { useRouter } from "next/router";
 import { ErrorState } from "~/utils/types";
-import { getBaseUrl, getHost } from "~/utils/getHost";
+import { getBaseUrl } from "~/utils/getHost";
 
 const Login: React.FC = () => {
   const { token } = useContext(AuthContext);
@@ -23,7 +23,7 @@ const Login: React.FC = () => {
     if (stateForTriggeringRerender === 0) {
       return
     }
-    if (cookies.token.get() !== undefined && cookies.token.get() !== null && cookies.token.get() !== "") {
+    if (cookies.token.get() !== undefined && cookies.token.get() !== null && cookies.token.get() !== {} as AuthToken) {
      console.log("host",getBaseUrl(window.location.href)); 
     window.location.href = `${getBaseUrl(window.location.href)}` 
     }
