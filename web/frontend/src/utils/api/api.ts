@@ -28,7 +28,10 @@ function getAuthToken(): AuthToken | null | undefined {
   return cookies.token.get();
 }
 
+
 type RequestResponse<T> = T | { errMsg: string };
+
+
 
 function getGatewayUrl(): string {
   return Env.gateway_url;
@@ -163,9 +166,46 @@ class Diagnoses extends Model {
   }
 }
 
+type MlPredictionResponse<T> = {
+  prediction: T;
+}
+
+class ML extends Model {
+  constructor() {
+    super()
+    this.baseUrl = `${this.baseUrl}/ml`
+  }
+ 
+  async cancerPrediction(imageFile: File): Promise<RequestResponse<{ prediction: { confidence: string, messsage: string } }>> {
+    return (await axios.post<{ prediction: { confidence: string, messsage: string } }>(`${this.baseUrl}/pneummonia`,new FormData().append('file', imageFile))).data
+  }
+
+  async diabetesPrediction(data: {Pregnancies: string, Glucose: string, BloodPressure: string, 
+        SkinThickness: string, Insulin: string, BMI: string, 
+    DiabetesPedigreeFunction: string, Age: string
+  }) {
+    const res = await this.request<{ prediction: string }>({
+      url: "/diabetes",
+      method: "POST",
+      data: data
+    })
+        }
+
+  predict<T,V>(data: V,modelName: string) {
+    const res = this.request<T>({
+      method: "POST",
+      url: `/${modelName}`,
+      data: data
+   }) 
+  }
+
+
+}
+
 class Api {
   public user = new User();
-  public diagnoses = new Diagnoses();
+  public diagnoses = new Diagnoses()
+  public ml = new ML();
 }
 
 export const api = new Api();

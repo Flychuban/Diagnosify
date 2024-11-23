@@ -18,7 +18,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   },[])
   return (
-    <div className="bg-primary">
+    <div className="bg-black h-[100vh]">
           <Component {...pageProps} />
     </div>
   );

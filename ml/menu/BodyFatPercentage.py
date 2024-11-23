@@ -6,12 +6,6 @@ import pandas as pd
 
 
 scaler_path = os.path.join(os.getcwd(), "scalers")
-body_fat_percentage_scaler = joblib.load(os.path.join(scaler_path, "body_fat_scaler.pkl"))
-
-
-disease_models_path = os.path.join(os.getcwd(), "disease_models")
-body_fat_percentage_model = pickle.load(open(os.path.join(disease_models_path, "body_fat_linreg.sav"), 'rb'))
-
 
 def body_fat_menu():
     st.title("Body Fat Percentage Prediction using ML")

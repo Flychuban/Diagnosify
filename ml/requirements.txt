@@ -1,10 +1,10 @@
 python-multipart
 fastapi==0.110.1
-keras==2.15.0
+keras
 matplotlib==3.8.2
 numpy==1.26.4
 opencv_python==4.9.0.80
 opencv_python_headless==4.8.1.78
 pandas==2.2.2
-tensorflow==2.15.0
+tensorflow
 uvicorn==0.29.0

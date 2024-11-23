@@ -28,10 +28,15 @@ function createExpressServer(
   return app;
 }
 
+function create_ml_handler<T>(handler(request: express.Request, response: express.Response<{}>)) {
+
+}
+
+
 const handlers: MLRoute[] = [
   {
-    ml_type: 'handler1',
-    data_collection_handler: (req, res) => {
+    ml_type: 'handler1`',
+    data_collection_handler: (req: express.Request, res: express.Response) => {
       console.log('Received data for handler1:', req.body);
       res.send('Data received for handler1');
     },
