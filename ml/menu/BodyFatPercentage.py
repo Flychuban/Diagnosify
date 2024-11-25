@@ -49,7 +49,7 @@ def body_fat_menu():
 
     with col1:
         wrist = st.number_input("Wrist (cm)", min_value=0.00, value=0.00, max_value=100.00, step=0.01, format="%.2f")
-    
+
     
     # Combine all the features into a list and then scale them
     data = [[age, weight, height, neck, chest, abdomen, hip, thigh, knee, ankle, biceps, forearm, wrist]]

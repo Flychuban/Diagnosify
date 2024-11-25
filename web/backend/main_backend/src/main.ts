@@ -11,6 +11,10 @@ const port = 3003;
 
 app.use(bodyParser.json())
 app.use(cors());
+app.use((req, res, next) => {
+  console.log("req recieved")
+  next()
+})
 
 const diagRouter = express.Router();
 diagRouter.use('/diagnosis', diagnosisRouter);

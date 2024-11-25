@@ -73,12 +73,17 @@ def predict_pneumonia():
 
         if file.filename == '':
             return jsonify({"error": "No file selected"}), 400
-
-        # Open and preprocess the image
         img = Image.open(file)
-        img = img.resize((224, 224))  # Resize image to model's expected input size
+
+# Convert image to RGB to ensure it has 3 channels
+        img = img.convert("RGB")  
+
+# Resize image to model's expected input size
+        img = img.resize((224, 224))
+
+# Convert image to numpy array
         img_array = np.array(img)
-        
+       
         # Ensure image has 3 channels (RGB)
         if img_array.shape[-1] != 3:
             return jsonify({"error": "Image must have 3 channels (RGB)"}), 400
@@ -86,7 +91,6 @@ def predict_pneumonia():
         # Expand dimensions and preprocess
         img_array = np.expand_dims(img_array, axis=0)
         img_data = preprocess_input(img_array)
-
         # Predict
         prediction = pneumonia_model.predict(img_data)
 
@@ -158,7 +162,7 @@ def body_fat_predict():
 
         # Return prediction
         return jsonify({
-            "Body Fat Percentage": round(float(body_fat_prediction[0]), 2)
+            "prediction": round(float(body_fat_prediction[0]), 2)
         }), 200
 
     except Exception as e:
@@ -216,7 +220,10 @@ cancer_segmentation_model.load_weights(os.path.join(disease_models_path, "cancer
 
 # Utility function to resize image
 def resize_image(image, size):
+    if image.mode != "RGB":
+        image = image.convert("RGB")
     return image.resize(size)
+
 
 # Route for Cancer Segmentation
 @app.route('/cancer-segmentation', methods=['POST'])
@@ -231,7 +238,7 @@ def cancer_segmentation():
         # Open the image
         image = Image.open(file.stream)
 
-        # Resize the image
+        # Resize and ensure 3-channel image
         resized_image = resize_image(image, (256, 256))
 
         # Convert to bytes
@@ -241,8 +248,12 @@ def cancer_segmentation():
 
         # Prepare the image for prediction
         bytes_data = image_stream.getvalue()
-        image_tensor = tf.io.decode_image(bytes_data)  # Decode image as tensor
-        prediction = cancer_segmentation_model.predict(tf.expand_dims(image_tensor, axis=0))  # Predict
+        image_tensor = tf.io.decode_image(bytes_data, channels=3)  # Ensure 3 channels (RGB)
+        image_tensor = tf.image.resize(image_tensor, (256, 256))
+        image_tensor = tf.expand_dims(image_tensor, axis=0)  # Add batch dimension
+
+        # Predict
+        prediction = cancer_segmentation_model.predict(image_tensor)
 
         # Threshold the prediction
         yhat = np.squeeze(np.where(prediction > 0.5, 1.0, 0.0))
@@ -251,11 +262,15 @@ def cancer_segmentation():
         segmented_image = (yhat[:, :, 0] * 255).astype(np.uint8)  # Convert to uint8 for visualization
         _, buffer = cv2.imencode('.png', segmented_image)
         io_buffer = io.BytesIO(buffer)
-
+        
         return send_file(io_buffer, mimetype='image/png')
 
     except Exception as e:
+        print(f"Error in cancer_segmentation: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+
 
 
 kidney_scaler = joblib.load(os.path.join(scaler_path, "kidney_disease_scaler.pkl"))
@@ -301,8 +316,7 @@ def kidney_disease_predict():
         return jsonify({"error": str(e)}), 500
 
 
-# ask kala how to load weights
-# liver_disease_model = pickle.load(open(os.path.join(disease_models_path, "liver_disease_model.sav"), 'rb'))
+liver_disease_model = pickle.load(open(os.path.join(disease_models_path, "liver_disease_model.sav"), 'rb'))
 
 @app.route('/liver-disease-predict', methods=['POST'])
 def liver_disease_predict():
@@ -377,7 +391,7 @@ def predict_malaria():
                 "malaria_probability": f"{(1 - prediction[0][0]) * 100:.2f}%"
             }
 
-        return jsonify(result), 200
+        return jsonify({"prediction": result}), 200
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -391,118 +405,58 @@ def predict_malaria():
 
 # ask kala how to fix model loading
 
-# scaler_path = os.path.join(os.getcwd(), "scalers")
-# breast_cancer_scaler = joblib.load(os.path.join(scaler_path, "breast_cancer_scaler.pkl"))
+scaler_path = os.path.join(os.getcwd(), "scalers")
+breast_cancer_scaler = joblib.load(os.path.join(scaler_path, "breast_cancer_scaler.pkl"))
 
 
-# disease_models_path = os.path.join(os.getcwd(), "disease_models")
-# breast_cancer_model = pickle.load(open(os.path.join(disease_models_path, "breast_cancer_model.sav"), 'rb'))
+disease_models_path = os.path.join(os.getcwd(), "disease_models")
+breast_cancer_model = pickle.load(open(os.path.join(disease_models_path, "breast_cancer_model.sav"), 'rb'))
 
-# @app.route('/breast-cancer-predict', methods=['POST'])
-# def breast_cancer_predict():
-#     try:
-#         # Parse the JSON request
-#         data = request.json
+@app.route('/breast-cancer-predict', methods=['POST'])
+def breast_cancer_predict():
+    try:
+        # Parse the JSON request
+        data = request.json
         
-#         # Ensure all required fields are provided
-#         required_fields = [
-#             "radius_mean", "perimeter_mean", "area_mean", "compactness_mean",
-#             "concavity_mean", "concave_points", "radius_se", "perimeter_se",
-#             "area_se", "radius_worst", "perimeter_worst", "area_worst",
-#             "compactness_worst", "concavity_worst", "concave_points_worst"
-#         ]
+        # Ensure all required fields are provided
+        required_fields = [
+            "radius_mean", "perimeter_mean", "area_mean", "compactness_mean",
+            "concavity_mean", "concave_points", "radius_se", "perimeter_se",
+            "area_se", "radius_worst", "perimeter_worst", "area_worst",
+            "compactness_worst", "concavity_worst", "concave_points_worst"
+        ]
         
-#         # Check if any required field is missing
-#         missing_fields = [field for field in required_fields if field not in data]
-#         if missing_fields:
-#             return jsonify({"error": f"Missing fields: {', '.join(missing_fields)}"}), 400
+        # Check if any required field is missing
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({"error": f"Missing fields: {', '.join(missing_fields)}"}), 400
 
-#         # Extract features from the request
-#         input_data = [[
-#             data["radius_mean"], data["perimeter_mean"], data["area_mean"], data["compactness_mean"],
-#             data["concavity_mean"], data["concave_points"], data["radius_se"], data["perimeter_se"],
-#             data["area_se"], data["radius_worst"], data["perimeter_worst"], data["area_worst"],
-#             data["compactness_worst"], data["concavity_worst"], data["concave_points_worst"]
-#         ]]
+        # Extract features from the request
+        input_data = [[
+            data["radius_mean"], data["perimeter_mean"], data["area_mean"], data["compactness_mean"],
+            data["concavity_mean"], data["concave_points"], data["radius_se"], data["perimeter_se"],
+            data["area_se"], data["radius_worst"], data["perimeter_worst"], data["area_worst"],
+            data["compactness_worst"], data["concavity_worst"], data["concave_points_worst"]
+        ]]
 
-#         # Create a DataFrame
-#         df = pd.DataFrame(input_data, columns=required_fields)
+        # Create a DataFrame
+        df = pd.DataFrame(input_data, columns=required_fields)
         
-#         # Scale the input data
-#         scaled_data = breast_cancer_scaler.transform(df)
+        # Scale the input data
+        scaled_data = breast_cancer_scaler.transform(df)
 
-#         # Make a prediction
-#         prediction = breast_cancer_model.predict(scaled_data)
+        # Make a prediction
+        prediction = breast_cancer_model.predict(scaled_data)
 
-#         # Interpret the result
-#         result = "Person has Breast Cancer" if prediction[0] == 1 else "Person does not have Breast Cancer"
+        # Interpret the result
+        result = "Person has Breast Cancer" if prediction[0] == 1 else "Person does not have Breast Cancer"
 
-#         return jsonify({"prediction": result})
+        return jsonify({"prediction": result})
 
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
-
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
-
-
-
-
-#TODO: ask kala hoe to run it
-# alzheimer_model = load_model(os.path.join(disease_models_path, "alzheimer_model.h5"))
-
-# # Define the classes
-# CLASSES = ["MildDemented", "Demented", "NonDemented", "VeryMildDemented"]
-
-# @app.route('/predict', methods=['POST'])
-# def predict():
-#     try:
-#         # Ensure the request has the file part
-#         if 'file' not in request.files:
-#             return jsonify({"error": "No file part in the request"}), 400
-
-#         file = request.files['file']
-
-#         # Ensure a file is selected
-#         if file.filename == '':
-#             return jsonify({"error": "No file selected for uploading"}), 400
-
-#         # Process the uploaded image
-#         img = Image.open(file.stream).convert("RGB")
-#         img = img.resize((176, 208))  # Resize image as per model input requirement
-#         img_data = image.img_to_array(img)
-#         img_data = np.expand_dims(img_data, axis=0)  # Expand dimensions to match model input
-
-#         # Perform prediction
-#         prediction = alzheimer_model.predict(img_data)
-#         max_index = np.argmax(prediction[0])
-#         max_value = prediction[0][max_index]
-
-#         # Optional description field from form
-#         description = request.form.get("description", "Alzheimer Prediction")
-
-#         # Prepare the response
-#         response = {
-#             "Description": description,
-#             "Prediction": {},
-#             "Confidence": float(max_value),
-#         }
-#         if max_value > 0.40:  # Threshold for confident prediction
-#             response["Prediction"] = {
-#                 "class": CLASSES[max_index],
-#                 "message": f"Person is {CLASSES[max_index]}!"
-#             }
-#         else:
-#             response["Prediction"] = {
-#                 "class": "Uncertain",
-#                 "message": "Prediction is not confident enough!"
-#             }
-
-#         return jsonify(response), 200
-
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
 
 
 heart_disease_model = pickle.load(open(os.path.join(disease_models_path, "heart_disease_model.sav"), 'rb'))
@@ -534,7 +488,12 @@ def heart_disease_predict():
             data["slope"], data["ca"], data["thal"]
         ]]
 
+        # we do this since the fields are in string format
+        for i in range(0,len(input_data[0]),1):
+            input_data[0][i] = int(input_data[0][i])
+
         # Make a prediction
+        print(input_data)
         prediction = heart_disease_model.predict(input_data)
 
         # Interpret the result
@@ -543,9 +502,65 @@ def heart_disease_predict():
         return jsonify({"prediction": result})
 
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
+
+
+
+
+
+
+
+parkinson_scaler = joblib.load(os.path.join(scaler_path, "parkinson_scaler.pkl"))
+
+parkinson_model = pickle.load(open(os.path.join(disease_models_path, "parkinson_model.sav"), 'rb'))
+
+@app.route('/predict_parkinson', methods=['POST'])
+def predict_parkinson():
+    try:
+        # Get JSON data from request
+        data = request.get_json()
+
+        # Extract features
+        features = [
+            data["MDVP_Jitter_percent"],
+            data["MDVP_Jitter_abs"],
+            data["MDVP_RAP"],
+            data["MDVP_PPQ"],
+            data["Jitter_DDP"],
+            data["MDVP_Shimmer"],
+            data["MDVP_Shimmer_dB"],
+            data["Shimmer_APQ3"],
+            data["Shimmer_APQ5"],
+            data["MDVP_APQ"],
+            data["Shimmer_dda"],
+            data["NHR"],
+            data["HNR"],
+            data["RPDE"],
+            data["DFA"],
+            data["PPE"]
+        ]
+
+        # Convert to DataFrame
+        df = pd.DataFrame([features], columns=[
+            "MDVP:Jitter(%)", "MDVP:Jitter(Abs)", "MDVP:RAP", "MDVP:PPQ", 
+            "Jitter:DDP", "MDVP:Shimmer", "MDVP:Shimmer(dB)", "Shimmer:APQ3", 
+            "Shimmer:APQ5", "MDVP:APQ", "Shimmer:DDA", "NHR", "HNR", "RPDE", 
+            "DFA", "PPE"
+        ])
+
+        # Scale the data
+        df_scaled = pd.DataFrame(parkinson_scaler.transform(df), columns=df.columns)
+
+        # Make prediction
+        prediction = parkinson_model.predict(df_scaled)
+        result = "Person has Parkinson" if prediction[0] == 1 else "Person doesn't have Parkinson"
+
+        return jsonify({"prediction": result})
+
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-

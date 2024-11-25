@@ -41,7 +41,7 @@ class UserService {
     }
   }
 
-  async get(queryObj: { userId : number | null, username: string | null }): User | null {
+  async get(queryObj: { userId : number | null, username: string | null }): Promise<User | null> {
     if (queryObj.userId === null) {
       
       if (queryObj.username === null) { 
@@ -140,6 +140,23 @@ class DiagnosisService {
 }
 
 class VotingService {
+  /**
+   * 
+   * @param diagnosisId 
+   * @param vote 
+   * 
+   *  this method is used when we want to directly mark a diagnosis prediction as true or false
+   */
+  async label(diagnosisId: number, vote: boolean): Promise<void> {
+    try {
+      await prisma.diagnosis.update({
+        where: { id: diagnosisId },
+        data: { is_correct: vote },
+      })
+    } catch (e) { 
+      throw new Error(`Error labeling diagnosis: ${e.message}`);
+    }
+  }
   async vote(diagnosisId: number, userId: number, vote: boolean): Promise<void> {
     try {
       const existingVote = await prisma.voting.findUnique({

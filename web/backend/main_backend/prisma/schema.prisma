@@ -19,7 +19,7 @@ model Diagnosis {
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
   prediction  Boolean
-  raw_data    Json
+  link_to_data_blop String
   is_correct  Boolean?
   voting      Voting? 
 }

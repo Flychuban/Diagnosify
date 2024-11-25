@@ -37,6 +37,7 @@ diagnosisRouter.get(
     }
   }
 );
+
 diagnosisRouter.get(
   '/diagnoses/:diagnosisId',
   async (

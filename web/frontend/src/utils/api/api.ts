@@ -103,6 +103,8 @@ class Diagnoses extends Model {
     }
   }
 
+  async creatediagnosisAndSkipVoting(): Promise<RequestResponse<{ wasVotingSuccessful: boolean }>>{}
+
   async getAllDiagnoses(): Promise<RequestResponse<{ diagnoses: Diagnosis[] }>> {
     return this.request<{ diagnoses: Diagnosis[] }>({
       method: "GET",

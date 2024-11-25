@@ -4,6 +4,14 @@ import { useEffect, useContext, useState } from "react";
 import { useRouter } from "next/router";
 import { AuthProvider, AuthContext } from "~/utils/context";
 import { cookies } from "~/utils/cookies";
+import { Roboto } from 'next/font/google';
+import '../styles/globals.css'; // Your global styles if any
+
+const roboto = Roboto({
+  subsets: ['latin'], // Define subsets as needed
+  weight: ['400', '700'], // Optional: Specify weights
+  variable: '--font-roboto', // CSS variable name
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => { 
@@ -18,7 +26,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   },[])
   return (
-    <div className="bg-black h-[100vh]">
+    <div className={`bg-black h-[100vh] ${roboto.className}`}>
           <Component {...pageProps} />
     </div>
   );
