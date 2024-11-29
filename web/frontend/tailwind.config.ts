@@ -8,6 +8,7 @@ export default {
       colors: {
         primary: "#0f1117",
         secondary: "#262730",
+        primarytext: "#ffffff"
       },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],

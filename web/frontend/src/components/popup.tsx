@@ -1,4 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
+
+export const PopUpWrapper: React.FC<{ ComponentToDisplay: () => ReactNode, onClose: () => void, isOpen: boolean}> = ({ ComponentToDisplay, onClose, isOpen }) => {
+  
+  
+  if (!isOpen) {
+    return
+  }
+  
+  
+  return <div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+
+      <div className="bg-secondary rounded p-4 shadow-md border-primary border-x-4 border-y-4">
+        <ComponentToDisplay />
+        <button
+          onClick={onClose}
+          className="bg-9fb5b3 text-f6fcfc mt-2 rounded px-4 py-2 hover:bg-opacity-80 focus:outline-none"
+        >
+         Close 
+        </button>
+      </div>
+    </div>
+  </div>
+} 
+
 
 export const PopUp: React.FC<{ message: string; onClose: () => void }> = ({
   message,

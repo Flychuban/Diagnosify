@@ -6,58 +6,16 @@ import { parseMlResult } from "~/utils/mlResultParser";
 import { Reading } from "~/components/reading";
 import { BaseError } from "~/components/error";
 import { ResponseCodes } from "~/utils/statis_codes";
-import { SuccesfulPopUp } from "~/components/popup";
+import { PopUpWrapper, SuccesfulPopUp } from "~/components/popup";
 import FileInput from "~/components/FileInput";
 import { type Disease } from "~/utils/types";
 import { Sidebar } from "~/components/sidebar";
 import { Cloud, Upload } from 'lucide-react';
 import { InputField } from "~/components/inputField";
 import axios from "axios";
-
-interface MainFormProps<T> {
-  title: string;
-  onSubmit: (formData: any) => Promise<void>;
-  children: React.ReactNode;
-  isLoading: boolean;
-  responseMessage: T | null;
-  componentToDisplayPrediction: (data: T) => React.ReactNode;
-}
-
-const MainForm = <T,>({
-  title,
-  onSubmit,
-  children,
-  isLoading,
-  responseMessage,
-  componentToDisplayPrediction,
-}: MainFormProps<T>) => {
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await onSubmit(e);
-  };
-
-  return (
-    <div className="p-6 bg-secondary rounded-lg shadow-md">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-4">{title}</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {children}
-        <div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`px-4 py-2 rounded-md text-white text-lg transition duration-300 ${
-              isLoading
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-700'
-            }`}
-          >
-            {isLoading ? 'Loading...' : 'Submit'}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-};
+import { SimplePredictionForm } from "~/components/newDiagnosisPAgeComponents/baseComponents/SimplePrediction";
+import { useGetAuthToken } from "~/hooks/cookieGetter";
+import { PredictionForm } from "~/components/universal_components/PredictionForm";
 
 
 const RatePrediction = <T,>({ predictionData, diagnosisId }: { predictionData: T, diagnosisId: number }) => { 
@@ -76,145 +34,6 @@ const RatePrediction = <T,>({ predictionData, diagnosisId }: { predictionData: T
 </div>
 }
 
-interface PredictionFormWithImageProps<T,RequestResponse> {
-  title: string;
-  endpoint: string;
-  componentToDisplayPrediction?: (data: T) => React.ReactElement;
-  anotherComponentToDisplayPrediction: (data: RequestResponse) => React.ReactElement;
-}
-
-const PredictionForm = <T extends object,RequestResponse>({
-  title,
-  endpoint,
-  componentToDisplayPrediction,
-  anotherComponentToDisplayPrediction
-}: PredictionFormWithImageProps<T, RequestResponse>) => {
-  const [file, setFile] = useState<File | null>(null);
-  const [responseMessage, setResponseMessage] = useState<{
-    errMsg?: string;
-    predictionData?: T;
-  } | null>(null);
-  const [diagnosisId, setDignosisId] = useState<number | null>(null); 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files ? e.target.files[0] : null;
-    if (selectedFile) {
-      setFile(selectedFile);
-    }
-  };
-
-  const handleDragEnter = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile) {
-      setFile(droppedFile);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!file) {
-      setResponseMessage({ errMsg: "Please select a file." });
-      return;
-    }
-
-    setIsLoading(true);
-    setResponseMessage(null);
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await axios.post<{ prediction: T } | {errMsg: string}>(endpoint, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      if ("errMsg" in response.data) {
-        setResponseMessage({ errMsg: response.data.errMsg });
-        return;
-      } else {
-        setResponseMessage({ predictionData: response.data });
-        console.log("Prediction Response:", response.data);
-      }
-      } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setResponseMessage({ errMsg: error.message || "An error occurred." });
-      } else {
-        setResponseMessage({ errMsg: "Unexpected error occurred." });
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <MainForm
-      title={title}
-      onSubmit={handleSubmit}
-      isLoading={isLoading}
-      responseMessage={responseMessage}
-      componentToDisplayPrediction={
-        responseMessage?.predictionData && componentToDisplayPrediction
-          ? () => <div></div> 
-          : () => <div>hi</div> 
-      }
-    >
-      <div
-        className="relative rounded-lg border-2 border-dashed border-gray-300 bg-gray-900 p-6 hover:border-gray-400 transition-colors"
-        onDragEnter={handleDragEnter}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-      >
-        <input
-          type="file"
-          id="fileInput"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
-        <div className="flex flex-col items-center justify-center space-y-2">
-          <Cloud className="w-12 h-12 text-gray-400" />
-          <div className="text-sm text-gray-300">Drag and drop file here</div>
-          <div className="flex items-center text-xs text-gray-400">
-            <span>Limit 200MB per file · JPG, JPEG, JFIF, PNG</span>
-          </div>
-          {file && (
-            <div className="flex items-center mt-2 text-sm text-green-400">
-              <Upload className="w-4 h-4 mr-2" />
-              {file.name}
-            </div>
-          )}
-        </div>
-        
-      </div>
-<div>
-          <button onClick={async () => {
-            const userId = cookies.token.get()
-            if (userId === null) {
-              throw new Error("user id is not set")
-            }
-            const data = responseMessage!.predictionData
-            if (data === undefined) {
-              throw new Error("Prediction data is not set")
-            }
-            await api.diagnoses.createDiagnosis(userId.userId.toString(),data)}}>publish diagnosis for review</button>
-        </div>
-      {(responseMessage?.predictionData !== undefined && responseMessage.predictionData !== null && diagnosisId !== null 
-      ) && RatePrediction<T>({ predictionData: responseMessage?.predictionData, diagnosisId: diagnosisId })}
-      {responseMessage !== null && responseMessage !== undefined && anotherComponentToDisplayPrediction<RequestResponse>(responseMessage.predictionData)}
-    </MainForm>
-  );
-};
 
 const CancerPredictionForm: React.FC = () => {
   return (
@@ -222,7 +41,8 @@ const CancerPredictionForm: React.FC = () => {
       title="Cancer Prediction"
       endpoint="http://127.0.0.1:5000/cancer-segmentation"
       componentToDisplayPrediction={(data) => <div>{data}</div>}
-      anotherComponentToDisplayPrediction={(data) => { return <div>{ data}</div>}}
+      anotherComponentToDisplayPrediction={(data) => { return <div>{data}</div> }}
+
     />
   );
 }
@@ -249,90 +69,16 @@ const MAlari = () => {
   )
 }
 
-
-
-
-interface PredictionFormProps<PredictionResponse,T> {
-  title: string;
-  endpoint: string;
-  formFields: { key: keyof T; label: string; type?: string }[];
-  componentToDisplayPrediction: (data: PredictionResponse) => ReactNode
+enum requestCompletionStatus{
+  OK,
+  ERRORED
 }
 
-const SimplePredictionForm = <PredictionResponse, FormDataStructure extends Record<string, any>>({
-  title,
-  endpoint,
-  formFields,
-  componentToDisplayPrediction,
-}: PredictionFormProps<PredictionResponse, FormDataStructure>) => {
-  const [formData, setFormData] = useState<FormDataStructure>(
-    formFields.reduce((acc, field) => {
-      acc[field.key] = ""; // Correctly assign an empty string to each field key
-      return acc;
-    }, {} as FormDataStructure) // Ensure type safety for the accumulator
-  );
-
-  const [responseMessage, setResponseMessage] = useState<PredictionResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setResponseMessage(null);
-
-    try {
-      const response = await axios.post<PredictionResponse>(endpoint, formData);
-      setResponseMessage(response.data);
-    } catch (error) {
-      setResponseMessage(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="mx-auto max-w-2xl rounded-lg bg-secondary p-6 shadow">
-      <h2 className="mb-6 text-2xl font-bold text-primary">{title}</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex flex-wrap gap-4">
-          {formFields.map(({ key, label, type = "text" }) => (
-            <div key={key as string} className="basis-1/3">
-              <label
-                htmlFor={key as string}
-                className="block text-sm font-medium text-primary-dark"
-              >
-                {label}
-              </label>
-              <input
-                id={key as string}
-                name={key as string}
-                type={type}
-                value={formData[key]}
-                onChange={handleInputChange}
-                className="w-full rounded border bg-secondary p-2 text-primary-dark"
-              />
-            </div>
-          ))}
-        </div>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full rounded bg-primary p-2 text-white hover:bg-primary-dark disabled:bg-gray-400"
-        >
-          {isLoading ? "Processing..." : "Predict"}
-        </button>
-      </form>
-
-      {responseMessage && componentToDisplayPrediction(responseMessage)}
-    </div>
-  );
-};
-
+async function saveTextDataTextPrediction(data: object, disease: Disease): Promise<{ status: requestCompletionStatus, err: string | null }>
+{
+  const res = await axios.post<{ status: requestCompletionStatus, err: string | null }>(`http://localhost:4001/data/${disease}`,data)
+  return res.data
+}
 
 
 const bodyFatFields = [
@@ -423,8 +169,6 @@ const parkinsonFields = [
   { key: "PPE", label: "PPE" }
 ];
 
-
-
 const LiverDisease = [
   
   { key: "age", label: "Age" },
@@ -438,12 +182,11 @@ const LiverDisease = [
   { key: "albumin", label: "Albumin" },
   { key: "ag_ratio", label: "A/G Ratio" }
 ];
- 
 
-// Updated App component to include all forms
+
 const App = () => {
   const [current, setCurrent] = useState(0);
-
+  const authToken = useGetAuthToken()
   const allPredictions = [
     { type: "Cancer segmentation", form: () => <CancerPredictionForm /> },
     { type: "Pneumonia", form: () => <PneumoniaPredictionForm /> },
@@ -451,22 +194,46 @@ const App = () => {
       type: "Diabetes", form: () => <SimplePredictionForm<{prediction: string},{Pregnancies:number, Glucose: number, BloodPRessure: number, SkinThickness: number, Insulin: number, BMI: number, DiabetesPedigreeFunction: number, Age: number}>
         title="Diabetes Prediction"
         endpoint="http://127.0.0.1:5000/diabetes"
-      formFields={diabetesFields}
-      componentToDisplayPrediction={(data) => {return <div>{data.prediction}</div>}}
-      /> },
+        formFields={diabetesFields}
+        componentToDisplayPrediction={(data) => { return <div>{ data.prediction }</div> }}
+        SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
+          // upload to the s3 bucket 
+          const s3 = (await axios.post<{link_to_data_blob_which_holds_prediction_params:string}>("http://localhost:4001/data/diabetes", data)).data
+
+          // save the data with the s3 link
+          if (authToken === null) {
+            throw new Error("Unauthorized: No token found")
+          }
+          const res = await axios.post<object>(`http://localhost:3003/diag/diagnoses/user/${authToken?.userId}/diagnoses`, {
+            NewDiagnosisInfo: {
+              type: allPredictions[current]?.type,
+              link_raw_data: s3.link_to_data_blob_which_holds_prediction_params,
+              label: data.responseMsg.prediction,
+              vote: false
+            }
+          }) 
+          
+          return res
+          
+        }}
+      />
+    },
     {
       type: "Body fat", form: () => <SimplePredictionForm<{prediction: string}, {}>
         title="Body Fat Prediction"
         endpoint="http://127.0.0.1:5000/body-fat-predict"
         formFields={bodyFatFields}
         componentToDisplayPrediction={(data) => {return <div>{data.prediction}</div>}}
- /> },
-    { type: "Kidney disease", form: () => <SimplePredictionForm
+      />
+    },
+    {
+      type: "Kidney disease", form: () => <SimplePredictionForm
         title="Kidney Disease Prediction"
         endpoint="http://127.0.0.1:5000/kidney-disease-predict"
         formFields={kidneyDiseaseFields}
         componentToDisplayPrediction={(data) => {return <div>{data.prediction}</div>}}
-      /> },
+      />
+    },
     {
       type: "Heart disease",
       form: () => <SimplePredictionForm<{ prediction: string }, { prediction: string }>
@@ -474,7 +241,8 @@ const App = () => {
         endpoint="http://127.0.0.1:5000/heart-disease-predict"
         formFields={heartDiseaseFields}
         componentToDisplayPrediction={(data) => { return <div>{ data.prediction }</div> }}
-      /> },
+      />
+    },
     { type: "Malaria", form: () => <MAlari /> },
     {
       type: "Liver Disease",

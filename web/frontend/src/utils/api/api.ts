@@ -103,7 +103,13 @@ class Diagnoses extends Model {
     }
   }
 
-  async creatediagnosisAndSkipVoting(): Promise<RequestResponse<{ wasVotingSuccessful: boolean }>>{}
+  async createTextDataTextPredictionDiagnosis(data) {
+    await axios.post(this.baseUrl, {})
+  }
+
+  async creatediagnosisAndSkipVoting(data): Promise<RequestResponse<{ wasVotingSuccessful: boolean }>>{
+
+  }
 
   async getAllDiagnoses(): Promise<RequestResponse<{ diagnoses: Diagnosis[] }>> {
     return this.request<{ diagnoses: Diagnosis[] }>({

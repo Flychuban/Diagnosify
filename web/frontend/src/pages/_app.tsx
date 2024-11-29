@@ -18,7 +18,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     // Your custom app code here
     const token = cookies.token.get();
     console.log(token)
-    if (token === undefined || token === null || token === "") {
+    if (token === undefined || token === null || token.hash === "") {
+      console.log("missing token, redirecting ....")
       if (window.location.href.indexOf("/auth") > -1) {
         return
       }
