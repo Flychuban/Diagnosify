@@ -2,11 +2,13 @@ import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import type { Message, Chat, User } from "~/types/apiTypes";
 import { cookies } from "~/utils/cookies";
-import { Statuses, timelimitedProxy } from "~/singletons/requestSender";
+import { anotherTimeLimitedProxy, Statuses, timelimitedProxy } from "~/singletons/requestSender";
 import { useGetAuthToken } from "~/hooks/cookieGetter";
 import { useExecuteRequest } from "~/hooks/requestHook";
 import { ComponentReliantOnRequest, ComponentReliantOnRequestWrapper } from "./universal_components/CompoentReliantOnARequestWrapper";
 import { MessageBox } from "./MessageBox";
+import { Vote, Voting } from "~/utils/api/types";
+import { useTraceUpdate } from "~/hooks/debug/checkPropCausingRerender";
 
 type apiResponse<T> = T | { errMsg: string };
 
@@ -38,46 +40,68 @@ type chatQueryOptions = {
 }
 
 
-function getUserVote(identifier: chatQueryOptions, userId: number): Promise<string> {
-    return Promise.resolve("")
+async function getVoting(chatId: number) {
+    return anotherTimeLimitedProxy.send<{ voting: Voting }>(async () => {
+        return (await axios.get<{
+            voting: Voting
+        }>(`http://localhost:3003/diag/voting/chat/${chatId}`)).data
+    })
 }
 
-const Msg: React.FC<{ idOfUserViewingThePage: number; msg: FullMessage, setSelectedMsg: () => void}> = ({ msg, idOfUserViewingThePage, setSelectedMsg }) => {
-    const isCurrentUser = idOfUserViewingThePage === msg.user.id;
-    
-
-    const [voteOfUserMsgIsBelongingTo, isLoading, error] = useExecuteRequest(
-    null,
-    async () => {
-        return await getUserVote({ diagnosisId: 1 }, msg.userId);
+async function getUserVote(identifier: chatQueryOptions, userId: number): Promise<{vote : Vote | null}> {
+    if (identifier.chatId === null || identifier.chatId === undefined) {
+        throw new Error("chatId is null")
     }
-  );
+    const voting = await getVoting(identifier.chatId)
+    console.log("voting data", voting)
+    const res = await anotherTimeLimitedProxy.send<{vote: Vote}>(async () => {return (await axios.get<{vote: Vote}>(`http://localhost:3003/diag/voting/${1}/${userId}`)).data})
+    console.log("vite",res)
+    if (res.vote) {
+        return res
+    }
+    return {vote: null}
+}
+const Msg: React.FC<{ idOfUserViewingThePage: number; msg: FullMessage, setSelectedMsg: () => void }> = ({ msg, idOfUserViewingThePage, setSelectedMsg }) => {
+    const isCurrentUser = idOfUserViewingThePage === msg.user.id;
 
-  // Determine styling classes dynamically
-  const messageClassNames = [
-    "p-2 mb-2 rounded border",
-    isCurrentUser ? "bg-primary text-primarytext bd-secondary" : "bg-light text-secondary bd-secondary",
-  ].join(" ");
+    // Determine styling classes dynamically
+    const messageClassNames = [
+        "p-3 mb-3 rounded-lg shadow-md",
+        isCurrentUser ? "bg-blue-500 text-white self-end" : "bg-gray-100 text-black self-start",
+        "border border-gray-300 max-w-[70%]",
+        "transition-transform duration-150 ease-in-out",
+    ].join(" ");
 
-  return (
-    <ComponentReliantOnRequestWrapper isLoading={isLoading} error={error}>
-      <div >
-        {msg.MsgWeAreReplyingTo && (
-          <div className="mb-2">
-            <p>Replied to: {msg.MsgWeAreReplyingTo.content}</p>
-          </div>
-        )}
-        <div className={messageClassNames}>
-          <strong>
-            {isCurrentUser ? "You" : msg.user.username}: 
-            (voted: {voteOfUserMsgIsBelongingTo ?? "loading..."})
-          </strong>
-                  <p className="text-primarytext">{msg.content}</p>
-                  <button onClick={() => {setSelectedMsg()}}>reply</button>
-        </div>
-      </div>
-    </ComponentReliantOnRequestWrapper>
-  );
+    const replyMessageClassNames = [
+        "bg-gray-200 p-2 text-sm italic text-gray-600 mb-2 border-l-4 border-blue-300",
+    ].join(" ");
+
+    return (
+        <ComponentReliantOnRequestWrapper isLoading={false} error={null}>
+            <div className="flex flex-col">
+                {msg.MsgWeAreReplyingTo && (
+                    <div className={replyMessageClassNames}>
+                        <p>Replied to: {msg.MsgWeAreReplyingTo.content}</p>
+                    </div>
+                )}
+                <div className={messageClassNames}>
+                    <div className="flex items-baseline justify-between">
+                        <strong>
+                            {isCurrentUser ? "You" : msg.user.username}
+                        </strong>
+                        <span className="text-xs text-gray-400">{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                    </div>
+                    <p className="text-sm mt-1">{msg.content}</p>
+                    <button
+                        onClick={setSelectedMsg}
+                        className="mt-2 text-xs text-primary hover:underline"
+                    >
+                        Reply
+                    </button>
+                </div>
+            </div>
+        </ComponentReliantOnRequestWrapper>
+    );
 };
 
 
@@ -93,6 +117,7 @@ async function getDiagnosisReviewChat(diagnosisID: number): Promise<{ chat: Full
 }
 
 export const ChatComponent: React.FC<{ diagnosisId: number }> = ({ diagnosisId }) => {
+    useTraceUpdate(diagnosisId)
     console.log("rerendering")
     const authToken = useGetAuthToken() 
     const [selectedMsgIndex, setSelectedMsgIndex] = useState<number | null>(null)

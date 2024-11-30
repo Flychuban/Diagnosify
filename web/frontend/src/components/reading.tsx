@@ -19,9 +19,6 @@ export const Reading: React.FC<{
           );
         })}
       </div>
-      <p className="mt-4 text-sm text-white">
-        Predicted: {prediction ? "Yes" : "No"}
-      </p>
     </div>
   );
 };

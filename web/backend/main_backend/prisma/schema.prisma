@@ -6,29 +6,67 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model User {
-  id        Int        @id @default(autoincrement())
+  id        Int        @id @default(autoincrement()) @unique
   username  String
   diagnoses Diagnosis[]
-  votes     Voting[]
+
+  Message Message[]
+
+  Vote Vote[]
 }
 
 model Diagnosis {
-  id          Int      @id @default(autoincrement())
-  type        String
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
-  prediction  Boolean
-  link_to_data_blop String
-  is_correct  Boolean?
-  voting      Voting? 
+  id                Int      @id @default(autoincrement()) @unique
+  type              String
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id])
+  link_to_prediction_info String 
+  link_to_data_blob String
+  is_correct        Boolean?
+  voting            Voting?
+  chatId            Int      @unique
+  chat              Chat     @relation(fields: [chatId], references: [id])
 }
 
+model Message {
+  id       Int    @id @default(autoincrement()) @unique
+  userId   Int 
+  user     User @relation(fields: [userId], references: [id])
+  chatId   Int
+  chat     Chat   @relation(fields: [chatId], references: [id])
+  content String
+  idOfMessageThisMsgIsReplyingTo Int?   
+  MsgWeAreReplyingTo           Message? @relation("ReplyRelation", fields: [idOfMessageThisMsgIsReplyingTo], references: [id])
+  Replies                      Message[] @relation("ReplyRelation")
+
+  createdAt                    DateTime @default(now())
+  updatedAt                    DateTime @updatedAt
+}
+
+model Chat {
+  id         Int         @id @default(autoincrement()) @unique
+  messages   Message[]   
+  diagnosis  Diagnosis? 
+}
+
+
+
 model Voting {
-  id            Int        @id @default(autoincrement())
-  yes           Int
-  no            Int
+  id            Int        @id @default(autoincrement()) @unique
   diagnosisId   Int        @unique
   diagnosis     Diagnosis  @relation(fields: [diagnosisId], references: [id])
-  voters        User[]
+  is_closed     Boolean @default(false)
+  votes Vote[]
+}
+
+model Vote{
+  id Int @id @default(autoincrement()) @unique
+  userId Int 
+  user User @relation(fields: [userId], references: [id])
+  vote String
+  votingId Int 
+  Voting Voting @relation(fields: [votingId], references: [id])
+
 }

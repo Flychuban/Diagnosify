@@ -2,10 +2,11 @@ import bodyParser from 'body-parser';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 
-import { db } from './db_repo';
+import { db } from './db/db';
 import { userRouter } from './routes/users';
 import { votingRouter } from './routes/votings';
 import { diagnosisRouter } from './routes/diagnoses';
+import { chatRouter } from './routes/chat';
 const app = express();
 const port = 3003;
 
@@ -20,6 +21,9 @@ const diagRouter = express.Router();
 diagRouter.use('/diagnosis', diagnosisRouter);
 diagRouter.use('/user', userRouter);
 diagRouter.use('/voting', votingRouter);
+diagRouter.use('/chat', chatRouter)
+
+
 
 
 app.use("/diag",diagRouter)

@@ -18,7 +18,20 @@ class Proxy{
         console.log("making req")
         return await funcToExecute()
     }
+
+
 }
 
 
 export const timelimitedProxy = new Proxy();
+export const anotherTimeLimitedProxy = new Proxy()
+
+class ProxyManger{
+    private proxies = new Array<Proxy>();
+    
+    newChannel() {
+        const newProxy = new Proxy();
+        this.proxies.push(newProxy);
+        return newProxy;
+    }
+}

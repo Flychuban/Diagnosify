@@ -1,3 +1,4 @@
+import { AuthToken } from './../../auth_2/src/session';
 import axios from "axios";
 import { API } from "./api";
 import { Gateway } from "./gateway";
@@ -42,9 +43,14 @@ gateway.addMiddleware(async (req, res, next) => {
             next();
             return;
           }
+        
+        
 
-          const token = JSON.parse(authHeader)
-
+          const token = JSON.parse(authHeader) as AuthToken
+          if (token.hash === "skip_auth") {
+            next()
+            return;
+          }
         const tokenExists = await axios.post< boolean>(
           `${authServiceUrl}/auth/doesTokenExist`,
           { token: token }

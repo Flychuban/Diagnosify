@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { set } from "zod";
 
 export function useExecuteRequest<T>(refreshPeriod: number | null, funcToExecute: () => Promise<T>): [ data: T | null, isLoading: boolean, errorMsg: string | null] {
@@ -7,30 +7,39 @@ export function useExecuteRequest<T>(refreshPeriod: number | null, funcToExecute
     const [isLoading, setIsLoading] = useState<boolean>(true)
     
     
-    const handleFuncToExecute = () => funcToExecute()
-      .then((data) => {
+  const handleFuncToExecute = useCallback(() => {
+  funcToExecute()
+    .then((data) => {
+      if ((data === null && state !== null) || (data === 0) || (JSON.stringify(data) === JSON.stringify(state))) {
+      } else {
         setState(data);
         setErrorMsg(null);
         setIsLoading(false);
-      })
-      .catch((error) => {
-        setState(null);
-        setIsLoading(false);
-        setErrorMsg(error.message);
-      })
-        .finally(() => setState(null));
-    
-    
-    useEffect(() => {
-      
-      if (refreshPeriod) {
-            setInterval(() => {
-                handleFuncToExecute().then().catch(e => {setErrorMsg(e.message)})
-            }, refreshPeriod)
-        }
-      
-      handleFuncToExecute().then().catch(error => {setErrorMsg(error.message)})
+      }
     })
+    .catch((error) => {
+      console.log("error in execute request hook", error);
+      setState(null);
+      setIsLoading(false);
+      setErrorMsg(error.message);
+    });
+  }, [funcToExecute,state])
+
+    useEffect(() => {
+  let intervalId: NodeJS.Timeout | null = null;
+
+  if (refreshPeriod) {
+    intervalId = setInterval(() => {
+      handleFuncToExecute();
+    }, refreshPeriod);
+  }
+
+  handleFuncToExecute()
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+    },[handleFuncToExecute, refreshPeriod])
 
     return [state, isLoading,errorMsg ]
 }

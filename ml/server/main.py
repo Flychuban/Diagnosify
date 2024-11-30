@@ -14,7 +14,7 @@ from keras.layers import Input, Conv2D, Conv2DTranspose, MaxPooling2D, Concatena
 from flask import Flask, request, jsonify, send_file
 import tensorflow as tf
 import io
-
+import requests
 
 def create_response_object(data):
     return jsonify({"prediction" : data}), 200
@@ -162,7 +162,7 @@ def body_fat_predict():
 
         # Return prediction
         return jsonify({
-            "prediction": round(float(body_fat_prediction[0]), 2)
+            "prediction": str(round(float(body_fat_prediction[0]), 2))
         }), 200
 
     except Exception as e:
@@ -229,40 +229,37 @@ def resize_image(image, size):
 @app.route('/cancer-segmentation', methods=['POST'])
 def cancer_segmentation():
     try:
-        # Check if the file is in the request
         if 'file' not in request.files:
             return jsonify({"error": "No file provided"}), 400
         
         file = request.files['file']
 
-        # Open the image
         image = Image.open(file.stream)
 
-        # Resize and ensure 3-channel image
         resized_image = resize_image(image, (256, 256))
 
-        # Convert to bytes
         image_stream = io.BytesIO()
         resized_image.save(image_stream, format="PNG")
         image_stream.seek(0)
 
-        # Prepare the image for prediction
         bytes_data = image_stream.getvalue()
         image_tensor = tf.io.decode_image(bytes_data, channels=3)  # Ensure 3 channels (RGB)
         image_tensor = tf.image.resize(image_tensor, (256, 256))
         image_tensor = tf.expand_dims(image_tensor, axis=0)  # Add batch dimension
 
-        # Predict
         prediction = cancer_segmentation_model.predict(image_tensor)
 
-        # Threshold the prediction
         yhat = np.squeeze(np.where(prediction > 0.5, 1.0, 0.0))
 
-        # Create and return segmented image
         segmented_image = (yhat[:, :, 0] * 255).astype(np.uint8)  # Convert to uint8 for visualization
         _, buffer = cv2.imencode('.png', segmented_image)
         io_buffer = io.BytesIO(buffer)
-        
+
+        form_data = {'file': file}
+
+        response = requests.post('http://localhost:3000/handle-file', files=form_data)
+
+
         return send_file(io_buffer, mimetype='image/png')
 
     except Exception as e:
@@ -397,12 +394,6 @@ def predict_malaria():
         return jsonify({'error': str(e)}), 500
 
 
-
-
-
-
-
-
 # ask kala how to fix model loading
 
 scaler_path = os.path.join(os.getcwd(), "scalers")
@@ -436,7 +427,7 @@ def breast_cancer_predict():
             data["radius_mean"], data["perimeter_mean"], data["area_mean"], data["compactness_mean"],
             data["concavity_mean"], data["concave_points"], data["radius_se"], data["perimeter_se"],
             data["area_se"], data["radius_worst"], data["perimeter_worst"], data["area_worst"],
-            data["compactness_worst"], data["concavity_worst"], data["concave_points_worst"]
+            data["compactness_worst"], data["concavity_worst"], data["concave_points_worst"] # in the streamlit it is concave points_worst so ask kala
         ]]
 
         # Create a DataFrame

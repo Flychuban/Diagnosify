@@ -87,24 +87,33 @@ class User extends Model {
   }
 }
 
+class Votings extends Model {
+  constructor() {
+    super();
+    this.baseUrl = `${this.baseUrl}/diag/diag/votings`;
+  }
+  async vote(votingId: number, userId: number, vote: boolean) {
+    return this.request<{}>({
+      method: "POST",
+      url: `/${votingId}/vote`,
+      data: { userId, vote },
+    })
+  }
+}
+
 class Diagnoses extends Model {
-  public votings: { vote(diagnosisId: number, userId: number, vote: boolean): Promise<RequestResponse<{wasVotingSuccessful: boolean}>>}
+
   constructor() {
     super();
     this.baseUrl = `${this.baseUrl}/diag/diag`;
-    this.votings = {
-      vote: (diagnosisId: number, userId: number, vote: boolean) => { 
-        return this.request<{wasVotingSuccessful: boolean}>({
-        method: "POST",
-        url: `/diagnosis/${diagnosisId}/vote`,
-        data: { userId , vote }, 
-      })
-      }
-    }
+    
   }
 
   async createTextDataTextPredictionDiagnosis(data) {
-    await axios.post(this.baseUrl, {})
+    await axios.post(this.baseUrl, {
+      method: "POST",
+      url: ""
+    })
   }
 
   async creatediagnosisAndSkipVoting(data): Promise<RequestResponse<{ wasVotingSuccessful: boolean }>>{
