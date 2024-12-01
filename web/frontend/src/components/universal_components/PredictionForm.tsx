@@ -14,7 +14,7 @@ export interface PredictionFormWithImageProps<T, RequestResponse> {
     data: RequestResponse,
   ) => React.ReactElement;
   savePrediction: (
-    data: RequestResponse,
+    data: {prediction: string, file: File},
   ) => Promise<{ isSaved: boolean; payloadWithAdditionalInfo: string }>;
 }
 
@@ -193,7 +193,13 @@ export const PredictionForm = <T extends object, RequestResponse>({
         <button
           className="bg-primary"
           onClick={async () => {
-            await savePrediction();
+            if (file === null) {
+              throw new Error("Please select a file first");
+            }
+            await savePrediction({
+              file: file,
+              prediction: JSON.stringify(responseMessage!.predictionData!)
+            });
           }}
         >
           Send to feed

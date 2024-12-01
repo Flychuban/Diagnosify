@@ -2,7 +2,8 @@ import bodyParser  from 'body-parser';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import AWS from "aws-sdk"
-
+import multer from "multer"
+import { buffer } from 'stream/consumers';
 enum requestCompletionStatus{
   OK,
   ERRORED
@@ -11,6 +12,9 @@ enum requestCompletionStatus{
 const app = express()
 app.use(cors())
 app.use(bodyParser.json());
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
 app.use((req, res, next) => {
   console.log('Request received:', req.method, req.url);
   next();
@@ -113,39 +117,102 @@ function createRouteForTextDataResponseData<T>(diseaseName: string) {
     }
   })
 }
+
 createRouteForTextDataResponseData("liver-disease")
 createRouteForTextDataResponseData("breast-cancer")
 createRouteForTextDataResponseData("parkinson")
 createRouteForTextDataResponseData("heart-disease")
 createRouteForTextDataResponseData("kidney-disease")
 createRouteForTextDataResponseData("bodyfat")
-dataCollectionRouter.post("/cancer-segmentation",async (req, res: express.Response<ApiResponse>) => {
+
+dataCollectionRouter.post(
+  "/cancer-segmentation",
+  upload.single('data'), // Add multer middleware here
+  async (req, res: express.Response<ApiResponse>) => {
+    try {
+      if (!req.file) { // Correct the check
+        return res.status(400).json({ err: "File not found" });
+      }
+
+      const params = {
+        Bucket: S3_BUCKET_NAME,
+        Key: `diag/cancer-segmentation/${generateFileName()}`,
+        Body: req.file.buffer, // Use file buffer
+        ContentType: req.file.mimetype, // Ensure correct content type
+        ACL: "public-read",
+      };
+
+      const uploadResult = await s3.upload(params).promise();
+
+      res.status(200).json({ link_to_data_blob_which_holds_prediction_params: uploadResult.Location });
+    } catch (e) {
+      res.status(500).json({ err: e.message });
+    }
+  }
+);
+
+app.post("/canc",upload.single('data'), async (req: Request<{file: File}, {}, {file: File}>, res) => { 
   try {
-    if (req.file) {
+    console.log("hit endpoint")
+    console.log("data",req.file)
+    if (!req.file) {
       res.status(500).json({ err: "file not found"})
     }
 
-    const params = {
+   const params = {
       Bucket: S3_BUCKET_NAME,
-      Key: `diag/diabetes/${generateFileName()}`,
-      Body: req.file,
-      ContentType: 'text/plain',
+      Key: `diag/predictions/${JSON.stringify(new Date())}`,
+      Body: req.file.buffer,
+      ContentType: req.filter.mimetype,
       ACL: "public-read"
     }
 
 
     const uploadResult = await s3.upload(params).promise();
 
-    res.status(200).json({ link_to_data_blob_which_holds_prediction_params: uploadResult.Location})
-    
+    res.status(200).json({ s3_loc: uploadResult.Location})
+
     return 
 
 
-
   } catch (e) {
-    res.status(500).json({ err: e.message})
+    console.log(e)
+    res.status(500).json({err: e})
   }
 })
+
+
+function ImageDataTextReposnseHandler(diseaseEndpoint: string) {
+
+  app.post(`/${diseaseEndpoint}`, upload.single('data'),(req: Request<{ file: File },{},{}>, res: Response) => {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+
+    const params = {
+      Bucket: S3_BUCKET_NAME,
+      Key: `diag/${diseaseEndpoint}/${JSON.stringify(new Date())}`,
+      Body: req.file.buffer,
+      ContentType: req.filter.mimetype,
+      ACL: "public-read",
+    };
+
+    s3.upload(params, (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Error uploading file to S3" });
+      }
+      return res.status(200).json({ link_to_data_blob_which_holds_prediction_params: data.Location });
+    });
+  })
+}
+
+
+ImageDataTextReposnseHandler("pneumonia")
+ImageDataTextReposnseHandler("malaria")
+
+
 
 
 app.use("/data", dataCollectionRouter)

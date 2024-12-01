@@ -41,19 +41,45 @@ const CancerPredictionForm: React.FC = () => {
       title="Cancer Prediction"
       endpoint="http://127.0.0.1:5000/cancer-segmentation"
       componentToDisplayPrediction={(data) => <div>{data}</div>}
-      anotherComponentToDisplayPrediction={(data) => { return <div>{data}</div> }}
+      anotherComponentToDisplayPrediction={(data) => { return <div>{(JSON.stringify(data))}</div> }}
 
     />
   );
 }
 
-const PneumoniaPredictionForm = () => {
+
+async function saveImageDataTextResponse(diseaseEndpoint: string,data: {prediction: string}) {
+  const authToken2 = cookies.token.get()
+        if (authToken2 === null) {
+          throw new Error("invalid token")
+        }
+        
+        const formDdata = new FormData()
+        formDdata.append("data", data.file)
+        const s3uploadData = await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>("http://localhost:4001/"+diseaseEndpoint,formDdata)
+        const res = await axios.post<object>(`http://localhost:3003/diag/diagnosis/user/${authToken2.userId}/diagnoses`, {
+              newDiagInfo: {
+                type: diseaseEndpoint,
+                link_raw_data: s3uploadData.data.link_to_data_blob_which_holds_prediction_params,
+                label: data.prediction,
+                vote: false
+              }
+            })
+            return res
+}
+
+
+const PneumoniaPredictionForm: React.FC = () => {
   return (
-    <PredictionForm<{}, {prediction: { message: string, confidence: string}}>
+    <PredictionForm<object, {prediction: { message: string, confidence: string}}>
       title="Pneumonia Prediction"
       endpoint="http://127.0.0.1:5000/predict_pneumonia"
-      componentToDisplayPrediction={(data) => <div>{data}</div>}
+      componentToDisplayPrediction={(data) => <div>{JSON.stringify(data)}</div>}
       anotherComponentToDisplayPrediction={(data) => { console.log("dat",data); return <div>{ data.prediction.message}</div>}}
+      savePrediction={async (data) => {
+        await saveImageDataTextResponse("pneumonia", data)
+        const authToken2 = cookies.token.get()
+      }}
     />
   );
 };
@@ -65,6 +91,9 @@ const MAlari = () => {
       endpoint="http://127.0.0.1:5000/predict-malaria"
       componentToDisplayPrediction={(data: { message: string }) => <div>{data.message}</div>}
       anotherComponentToDisplayPrediction={(data) => { return <div>{ data.prediction.message}</div>}}
+      savePrediction={async (data) => {
+        await saveImageDataTextResponse("malaria", data)
+      }}
     />
   )
 }
@@ -189,7 +218,7 @@ async function textDataTextResponseUpload(diseaseEndpoint: string,data: {respons
             const s3 = (await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>("http://localhost:4001/data/"+diseaseEndpoint, data)).data
 
             // save the data with the s3 link
-            if (authToken === null) {
+            if (authToken === null || authToken === undefined) {
               throw new Error("Unauthorized: No token found")
             }
             const res = await axios.post<object>(`http://localhost:3003/diag/diagnosis/user/${authToken?.userId}/diagnoses`, {

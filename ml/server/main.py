@@ -254,13 +254,13 @@ def cancer_segmentation():
         segmented_image = (yhat[:, :, 0] * 255).astype(np.uint8)  # Convert to uint8 for visualization
         _, buffer = cv2.imencode('.png', segmented_image)
         io_buffer = io.BytesIO(buffer)
-
+        print()
         form_data = {'file': file}
 
-        response = requests.post('http://localhost:3000/handle-file', files=form_data)
+        response = requests.post('http://localhost:4001/canc', files=form_data)
 
-
-        return send_file(io_buffer, mimetype='image/png')
+        print(response)
+        return jsonify({"res": response.s3_loc}) 
 
     except Exception as e:
         print(f"Error in cancer_segmentation: {e}")

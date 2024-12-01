@@ -38,15 +38,26 @@ const TextDatatextResponse: React.FC<{
       </p>
     </div>
   );
-};
+  };
+
+const ImageDataTextResponse: React.FC<{data: {prediction: string, link_to_data_blob: string}}> = ({data}) => {
+  return (
+    <div>
+      <img src={data.link_to_data_blob} />
+      <div className="text-primarytext"> Prediction: { data.prediction}</div>
+    </div>
+  )
+}
 
 function getStrategy(
   type: string
 ): React.FC<{ data: { link_to_data_blob: string; prediction: string } }> {
-    if (type === "Diabetes" || type === "diabetes") {
+    if (type === "Diabetes" || type === "diabetes" || type === "heart-disease" || type === "bodyfat" || type === "liver-disease" || type ==="kidney-disease" ) {
         return TextDatatextResponse;
     }
-
+  if (type === "pneumonia" || type === "malaria") {
+      return ImageDataTextResponse 
+    }
     
 }
 
