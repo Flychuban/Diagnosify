@@ -1,8 +1,10 @@
+
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import axios, { AxiosRequestConfig } from 'axios';
+import FormData from 'form-data';
 import { API } from './api';
-import {  getConfig, getServiceUrl  } from './utils';
+import { getConfig, getServiceUrl } from './utils';
 
 export class Gateway {
   private app: Application;
@@ -34,47 +36,74 @@ export class Gateway {
       console.log('----------------------------------------------------------------');
       const parsedUrl = req.url;
 
-
-
-
       console.log('Requested URL:', parsedUrl);
       console.log('Request Body:', req.body);
       console.log('Request Method:', req.method);
-      const config = await getConfig()
-      console.log("kolok", config)
 
-
-      try{
+      try {
+        const config = await getConfig();
         const targetUrl = getServiceUrl(parsedUrl, config);
-        const axiosConfig: AxiosRequestConfig = {
-          method: req.method,
-          url: targetUrl,
-          data: req.body,
-          headers: {
-            accept: req.headers.accept as string,
-            'User-Agent': req.headers['user-agent'] as string,
-          },
-        };
-
-        console.log('Target URL:{' + targetUrl + "}");
+        console.log('Target URL: {' + targetUrl + '}');
 
         if (!targetUrl) {
           res.status(404).send('Service not found\n');
           return;
         }
 
+        // Axios configuration
+        const axiosConfig: AxiosRequestConfig = (() => {
+          if (req.is('multipart/form-data')) {
+            const formData = new FormData();
+
+            // Add form fields
+            for (const key in req.body) {
+              if (Object.prototype.hasOwnProperty.call(req.body, key)) {
+                formData.append(key, req.body[key]);
+              }
+            }
+
+            // Add files if using multer or similar middleware
+            if (req.files) {
+              for (const file of req.files as Express.Multer.File[]) {
+                formData.append(file.fieldname, file.buffer, {
+                  filename: file.originalname,
+                  contentType: file.mimetype,
+                });
+              }
+            }
+
+            return {
+              method: req.method,
+              url: targetUrl,
+              data: formData,
+              headers: {
+                ...formData.getHeaders(),
+                accept: req.headers.accept as string,
+                'User-Agent': req.headers['user-agent'] as string,
+              },
+            };
+          } else {
+            return {
+              method: req.method,
+              url: targetUrl,
+              data: req.body,
+              headers: {
+                accept: req.headers.accept as string,
+                'User-Agent': req.headers['user-agent'] as string,
+              },
+            };
+          }
+        })();
+
         console.log('----------------------------------------------------------------');
 
-
-        console.log("huiiii")
+        // Send request using API wrapper
         const response = await api.sendReq(axiosConfig);
-        
-        console.log("huiiii")
+
         res.status(response.status).send(response.data);
-              } catch (e) {
-        console.log("service not found")
-        res.status(404).json({err: "serviceNotFound"})
-        return
+      } catch (e) {
+        console.error('Service not found or request error:', e);
+        res.status(500).json({ error: 'Internal Server Error', details: e });
       }
     });
 
@@ -84,3 +113,4 @@ export class Gateway {
     });
   }
 }
+

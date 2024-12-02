@@ -28,7 +28,7 @@ gateway.addMiddleware(async (req, res, next) => {
     if (req.path.includes("auth")) {
       next();
     } else {
-      const authHeader: string | undefined = req.headers["authorization"]?.split(" ")[1];
+      const authHeader: string | undefined = req.headers["authorization"]?.split(" ")[1] || req.headers["Authrozation"]?.split(" ")[1];
       console.log("head",authHeader)
       if (!authHeader) {
         res.status(401).json({
@@ -43,8 +43,8 @@ gateway.addMiddleware(async (req, res, next) => {
             next();
             return;
           }
-        
-        
+
+
 
           const token = JSON.parse(authHeader) as AuthToken
           if (token.hash === "skip_auth") {

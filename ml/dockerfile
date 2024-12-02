@@ -1,17 +1,21 @@
-# Use an official Python runtime as the base image
-FROM python
+
+# Start with the official Python 3.10 image from Docker Hub
+FROM python:3.10-slim
+
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy requirements file to the container
+COPY requirements.txt /app/
 
-# Install any needed dependencies specified in requirements.txt
-RUN pip  install -r requirements.txt
+# Install dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Expose the port your app runs on (if applicable)
+# Copy the application code to the container
+COPY . /app/
 EXPOSE 5000
+# Specify the default command to run the application
+CMD ["python", "server/main.py"]
 
-# Define the command to run your app using Python
-CMD ["python", "menu/main.py"]

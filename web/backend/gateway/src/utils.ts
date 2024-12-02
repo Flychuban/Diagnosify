@@ -10,13 +10,6 @@ dotenv.config();
 
 export function getConfig() : Promise<Record<string,GatewayUrlEntry>>{
     return (async () => {
-    try {
-        const { config } = await import("../src/config")
-        if (config === undefined) {
-throw new Error("no config.ts file found")
-        }
-        return config;
-    } catch (error) {
         const configStringified = process.env.CONFIG
         if (configStringified === undefined) {
             throw new Error('No config file found')
@@ -24,13 +17,13 @@ throw new Error("no config.ts file found")
         //TODO: refactor
         try {
             const config = JSON.parse(configStringified);
-            console.log("loaded config "+ config + "from env")
+            console.log("loaded config from env: ",config)
             return config
         } catch (error) {
+            console.log("error for config:",configStringified)
             console.error('Error parsing config:', error);
             throw new Error('Invalid config format')
         }
-    }
 })();
 
 }

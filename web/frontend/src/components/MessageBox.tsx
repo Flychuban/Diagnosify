@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { SendHorizontal, MessageCircleHeart } from "lucide-react"; // Update this with the actual import
 import { Message } from "~/types/apiTypes";
+import { api } from "~/utils/api/api";
 
 export const MessageBox: React.FC<{
   chatId: number;
   userId: number;
   isReply: boolean;
   msgWeAreReplyingTo: Message | null;
-}> = ({ chatId, userId, isReply, msgWeAreReplyingTo }) => {
+  onRemoveReplyingToMsg: () => void
+}> = ({ chatId, userId, isReply, msgWeAreReplyingTo , onRemoveReplyingToMsg }) => {
   const [msg, setMsg] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
 
@@ -21,8 +22,7 @@ export const MessageBox: React.FC<{
 
   return (
     <div
-      className="sticky bottom-0 left-0 w-full p-4 bg-white shadow-lg z-10"
-      style={{ backgroundColor: "var(--primary)" }} // or use Tailwind CSS class
+      className="sticky bottom-0 left-0 w-full p-4 bg-secondary shadow-lg z-10"
     >
       <div
         ref={messageBoxRef}
@@ -30,7 +30,8 @@ export const MessageBox: React.FC<{
       >{msgWeAreReplyingTo && (
           <div className="flex flex-col space-y-2">
             <div className="h-px w-full bg-gray-200" />
-            <span className="text-xs font-medium text-primarytext">Replying to: { msgWeAreReplyingTo.content}</span>
+            <span className="text-xs font-medium text-primarytext">Replying to: {msgWeAreReplyingTo.content}</span>
+            <button onClick={() => {onRemoveReplyingToMsg()}}>x</button>
             <div className="h-px w-full bg-gray-200" />
           </div>
         )}
@@ -64,22 +65,9 @@ export const MessageBox: React.FC<{
               if (msgWeAreReplyingTo === null) {
                 throw new Error("No message to reply to");
               }
-              await axios.post(
-                `http://localhost:3003/diag/chat/${chatId}/reply`,
-                {
-                  userId: userId,
-                  idOfMsgWeAreReplyingTo: msgWeAreReplyingTo.id,
-                  msgContent: msg,
-                }
-              );
+              await api.chat.replyToMsg(chatId, msgWeAreReplyingTo.id,userId, msg) 
             } else {
-              await axios.post(
-                `http://localhost:3003/diag/chat/${chatId}/message`,
-                {
-                  userId: userId,
-                  message: msg,
-                }
-              );
+              await api.chat.postMsg(chatId, userId, msg)
             }
           }}
           className="flex items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none"

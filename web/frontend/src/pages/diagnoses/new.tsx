@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, ReactNode } from "react";
 import { AuthToken, cookies } from "~/utils/cookies";
 import { AuthContext } from "~/utils/context";
-import { api } from "~/utils/api/api";
+import { api, getGatewayUrl } from "~/utils/api/api";
 import { parseMlResult } from "~/utils/mlResultParser";
 import { Reading } from "~/components/reading";
 import { BaseError } from "~/components/error";
@@ -16,6 +16,7 @@ import axios from "axios";
 import { SimplePredictionForm } from "~/components/newDiagnosisPAgeComponents/baseComponents/SimplePrediction";
 import { useGetAuthToken } from "~/hooks/cookieGetter";
 import { PredictionForm } from "~/components/universal_components/PredictionForm";
+import { Env } from "~/utils/env";
 
 
 const RatePrediction = <T,>({ predictionData, diagnosisId }: { predictionData: T, diagnosisId: number }) => { 
@@ -48,37 +49,56 @@ const CancerPredictionForm: React.FC = () => {
 }
 
 
-async function saveImageDataTextResponse(diseaseEndpoint: string,data: {prediction: string}) {
+async function saveImageDataTextResponse(diseaseEndpoint: string,data: {prediction: string, file: File}) {
   const authToken2 = cookies.token.get()
         if (authToken2 === null) {
           throw new Error("invalid token")
         }
-        
+
         const formDdata = new FormData()
         formDdata.append("data", data.file)
-        const s3uploadData = await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>("http://localhost:4001/"+diseaseEndpoint,formDdata)
-        const res = await axios.post<object>(`http://localhost:3003/diag/diagnosis/user/${authToken2.userId}/diagnoses`, {
+  const s3uploadData = await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>("http://localhost:4001/" + diseaseEndpoint, formDdata, {
+    headers: {
+            "Authorization": "Bearer " + cookies.token.get()?.userId,
+            "authorization": "Bearer " + cookies.token.get()?.userId
+          }
+        })
+        const res = await axios.post<object>(`${getGatewayUrl()}/diag/diag/diagnosis/user/${authToken2.userId}/diagnoses`, {
               newDiagInfo: {
                 type: diseaseEndpoint,
                 link_raw_data: s3uploadData.data.link_to_data_blob_which_holds_prediction_params,
                 label: data.prediction,
                 vote: false
               }
-            })
-            return res
+            }, {
+    headers: {
+            "Authorization": "Bearer " + cookies.token.get()?.userId,
+            "authorization": "Bearer " + cookies.token.get()?.userId
+          }
+        })
+        return res
+
+        // return api.diagnoses.saveImageDataTextResponse(diseaseEndpoint,data)
+
 }
 
 
 const PneumoniaPredictionForm: React.FC = () => {
   return (
-    <PredictionForm<object, {prediction: { message: string, confidence: string}}>
+    <PredictionForm<
+      object,
+      { prediction: { message: string; confidence: string } }
+    >
       title="Pneumonia Prediction"
       endpoint="http://127.0.0.1:5000/predict_pneumonia"
       componentToDisplayPrediction={(data) => <div>{JSON.stringify(data)}</div>}
-      anotherComponentToDisplayPrediction={(data) => { console.log("dat",data); return <div>{ data.prediction.message}</div>}}
+      anotherComponentToDisplayPrediction={(data) => {
+        console.log("dat", data);
+        return <div>{data.prediction.message}</div>;
+      }}
       savePrediction={async (data) => {
-        await saveImageDataTextResponse("pneumonia", data)
-        const authToken2 = cookies.token.get()
+        await saveImageDataTextResponse("pneumonia", data);
+        const authToken2 = cookies.token.get();
       }}
     />
   );
@@ -101,12 +121,6 @@ const MAlari = () => {
 enum requestCompletionStatus{
   OK,
   ERRORED
-}
-
-async function saveTextDataTextPrediction(data: object, disease: Disease): Promise<{ status: requestCompletionStatus, err: string | null }>
-{
-  const res = await axios.post<{ status: requestCompletionStatus, err: string | null }>(`http://localhost:4001/data/${disease}`,data)
-  return res.data
 }
 
 
@@ -213,22 +227,9 @@ const LiverDisease = [
   { key: "ag_ratio", label: "A/G Ratio" }
 ];
 
-async function textDataTextResponseUpload(diseaseEndpoint: string,data: {responseMsg: {prediction: string}},authToken: AuthToken | null): Promise<object> {
+async function textDataTextResponseUpload(diseaseEndpoint: string,data: {responseMsg: {prediction: string}}): Promise<object> {
             try {
-            const s3 = (await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>("http://localhost:4001/data/"+diseaseEndpoint, data)).data
-
-            // save the data with the s3 link
-            if (authToken === null || authToken === undefined) {
-              throw new Error("Unauthorized: No token found")
-            }
-            const res = await axios.post<object>(`http://localhost:3003/diag/diagnosis/user/${authToken?.userId}/diagnoses`, {
-              newDiagInfo: {
-                type: diseaseEndpoint,
-                link_raw_data: s3.link_to_data_blob_which_holds_prediction_params,
-                label: data.responseMsg.prediction,
-                vote: false
-              }
-            })
+            const res = await api.diagnoses.saveTextDataTextResponseDiagnosis(diseaseEndpoint, data)
           
             return res
           } catch (error) { 
@@ -236,6 +237,7 @@ async function textDataTextResponseUpload(diseaseEndpoint: string,data: {respons
               return {error: error.message}
           }
 }
+const mlPredictionUrl = Env.prediction_service_url
 const App = () => {
   const [current, setCurrent] = useState(0);
   const authToken = useGetAuthToken()
@@ -245,28 +247,16 @@ const App = () => {
     {
       type: "Diabetes", form: () => <SimplePredictionForm<{prediction: string},{Pregnancies:number, Glucose: number, BloodPRessure: number, SkinThickness: number, Insulin: number, BMI: number, DiabetesPedigreeFunction: number, Age: number}>
         title="Diabetes Prediction"
-        endpoint="http://127.0.0.1:5000/diabetes"
+        endpoint={mlPredictionUrl+"/diabetes"}
         formFields={diabetesFields}
         componentToDisplayPrediction={(data) => { return <div>{ data.prediction }</div> }}
         SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
           // upload to the s3 bucket 
           try {
-            const s3 = (await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>("http://localhost:4001/data/diabetes", data)).data
+            
+        
 
-            // save the data with the s3 link
-            if (authToken === null) {
-              throw new Error("Unauthorized: No token found")
-            }
-            const res = await axios.post<object>(`http://localhost:3003/diag/diagnosis/user/${authToken?.userId}/diagnoses`, {
-              newDiagInfo: {
-                type: "Diabetes",
-                link_raw_data: s3.link_to_data_blob_which_holds_prediction_params,
-                label: data.responseMsg.prediction,
-                vote: false
-              }
-            })
-          
-            return res
+            return await textDataTextResponseUpload("diabetes", data)
           } catch (error) { 
             console.error("Error saving prediction:", error);
             return {data: {error: error.message}, status: 500, statusText: "Error saving prediction" , config: {}, headers: {}} // as axios response
@@ -277,7 +267,7 @@ const App = () => {
     {
       type: "Body fat", form: () => <SimplePredictionForm<{prediction: string}, {}>
         title="Body Fat Prediction"
-        endpoint="http://127.0.0.1:5000/body-fat-predict"
+        endpoint={mlPredictionUrl + "/body-fat-predict"}
         formFields={bodyFatFields}
         componentToDisplayPrediction={(data) => { return <div>{data.prediction}</div> }}
         SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
@@ -288,7 +278,7 @@ const App = () => {
     {
       type: "Kidney disease", form: () => <SimplePredictionForm
         title="Kidney Disease Prediction"
-        endpoint="http://127.0.0.1:5000/kidney-disease-predict"
+        endpoint={mlPredictionUrl+"/kidney-disease-predict"}
         formFields={kidneyDiseaseFields}
         componentToDisplayPrediction={(data) => { return <div>{data.prediction}</div> }}
         SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
@@ -300,7 +290,7 @@ const App = () => {
       type: "Heart disease",
       form: () => <SimplePredictionForm<{ prediction: string }, { prediction: string }>
         title="Heart Disease Prediction"
-        endpoint="http://127.0.0.1:5000/heart-disease-predict"
+        endpoint={mlPredictionUrl + "/heart-disease-predict"}
         formFields={heartDiseaseFields}
         componentToDisplayPrediction={(data) => { return <div>{ data.prediction }</div> }}
         SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
@@ -313,11 +303,11 @@ const App = () => {
       type: "Liver Disease",
       form: () => <SimplePredictionForm<{ prediction: string }, { prediction: string }>
         title="Liver Disease"
-        endpoint="http://127.0.0.1:5000/liver-disease-predict"
+        endpoint={mlPredictionUrl + "/liver-disease-predict"}
         formFields={ LiverDisease}
         componentToDisplayPrediction={(data) => { return <div>{data.prediction}</div> }}
         SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
-           return await textDataTextResponseUpload("liver-disease", data, authToken)
+           return await textDataTextResponseUpload("liver-disease", data)
          }}
       />
     },
@@ -325,7 +315,7 @@ const App = () => {
       type: "Breast Cancer",
       form: () => <SimplePredictionForm<{ prediction: string }, { prediction: string }>
         title="Breast Cancer Prediction"
-        endpoint="http://127.0.0.1:5000/breast-cancer-predict"
+        endpoint={mlPredictionUrl + "/breast-cancer-predict"}
         formFields={breastCancerFields}
         componentToDisplayPrediction={(data) => { return <div>{data.prediction}</div> }}
         SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
@@ -337,7 +327,7 @@ const App = () => {
       type: "Parkinson",
       form: () => <SimplePredictionForm<{ prediction: string }, { prediction: string }>
         title="Parkinson"
-        endpoint="http://127.0.0.1:5000/predict_parkinson"
+        endpoint={mlPredictionUrl + "/predict_parkinson"}
         formFields={parkinsonFields}
         componentToDisplayPrediction={(data) => { return <div>{data.prediction}</div> }}
         SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {

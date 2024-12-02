@@ -1,0 +1,15 @@
+# Stage 1: Build
+FROM oven/bun:latest AS build
+WORKDIR /app
+COPY package.json  ./
+RUN bun install
+COPY src ./src
+COPY .env /env
+# bad practice but in a hurry
+# Stage 2: Run
+FROM oven/bun:latest as run
+WORKDIR /app
+COPY --from=build /app /app
+EXPOSE 4001
+CMD ["bun", "run", "src/main.ts"]
+

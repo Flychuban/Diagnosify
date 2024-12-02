@@ -1,10 +1,37 @@
 import React from "react";
+import { Progress } from "antd";
+import "antd/dist/reset.css"; // Ensure Ant Design styles are loaded
 
-export const ProgressBar: React.FC<{fill: number}> = ({ fill }) => {
-  console.log(fill)
+export const ProgressBar: React.FC<{ fill: number}> = ({ fill }) => {
+  const fillB = 100 - fill; // Remaining percentage for the other side
+
   return (
-    <div className="h-8 w-full overflow-hidden rounded bg-red-500">
-      <div className="h-full bg-blue-500 flex justify-between" style={{ width: `${fill}%` }}><p>Yes</p></div>
+    <div className="w-full max-w-lg mx-auto space-y-4">
+      {/* Title */}
+      <h3 className="text-center text-lg font-semibold">Vote Distribution</h3>
+
+      {/* Progress Bar */}
+      <div className="h-8 w-full flex items-center relative bg-gray-200 rounded-full overflow-hidden shadow-md">
+        {/* Side A */}
+        <div
+          className="h-full bg-blue-500 flex items-center justify-center text-white"
+          style={{ width: `${fill}%`, transition: "width 0.3s ease" }}
+        >
+          {fill > 5 && (
+            <span className="text-sm font-medium">Yes {fill}%</span>
+          )}
+        </div>
+
+        {/* Side B */}
+        <div
+          className="h-full bg-red-500 flex items-center justify-center text-white"
+          style={{ width: `${fillB}%`, transition: "width 0.3s ease" }}
+        >
+          {fillB > 5 && (
+            <span className="text-sm font-medium">No {fillB}%</span>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

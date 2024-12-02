@@ -1,4 +1,9 @@
 python-multipart
+flask
+joblib
+scikit-learn
+opencv_python
+flask-cors
 fastapi==0.110.1
 keras
 matplotlib==3.8.2

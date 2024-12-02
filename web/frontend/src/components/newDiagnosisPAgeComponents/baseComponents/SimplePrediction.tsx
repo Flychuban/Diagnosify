@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios, {  } from "axios";
 import React,{ ReactNode, useState } from "react";
 import {PopUpWrapper} from "../../popup"
 interface PredictionFormProps<PredictionResponse,T> {

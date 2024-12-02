@@ -13,6 +13,10 @@ diagnosisRouter.post(
     res: Response<{}>
   ) => {
     try {
+      if (req.body.newDiagInfo.type === undefined) {
+        res.status(402).json({err: "type is undefined", data : req.body})
+        return
+      }
       const userId = parseInt(req.params.userId);
       console.dir(req.body.newDiagInfo)
       const newDiagnosis = await db.diagnoses.create(userId, req.body.newDiagInfo, req.body.directVoteWhichSkipsVoting);

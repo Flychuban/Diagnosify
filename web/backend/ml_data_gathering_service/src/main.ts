@@ -189,7 +189,7 @@ function ImageDataTextReposnseHandler(diseaseEndpoint: string) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-
+    console.log("hitting endpoint")
     const params = {
       Bucket: S3_BUCKET_NAME,
       Key: `diag/${diseaseEndpoint}/${JSON.stringify(new Date())}`,

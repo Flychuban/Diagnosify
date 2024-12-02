@@ -1,15 +1,15 @@
-FROM  node
+# Stage 1: Build
+FROM oven/bun:latest as build
+WORKDIR /app
+COPY package.json bun.lockb ./
+COPY prisma ./prisma/
+RUN bun install && \
+    bunx prisma generate
+COPY src ./src
 
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-RUN npx prisma generate
-
-EXPOSE 3001
-
-CMD ["npm", "run", "start_ts_dev"]
+# Stage 2: Run
+FROM oven/bun:latest as run
+WORKDIR /app
+COPY --from=build /app /app
+EXPOSE 3003
+CMD ["bun", "run", "src/main.ts"]

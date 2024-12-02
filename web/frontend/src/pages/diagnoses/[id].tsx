@@ -5,15 +5,17 @@ import { api } from "~/utils/api/api";
 import { Reading } from "~/components/reading";
 import { Loading } from "~/components/loading";
 import { BaseError } from "~/components/error";
-import { ResponseCodes } from "~/utils/statis_codes";
-import { Diagnosis, Voting } from "~/utils/api/types";
 import { cookies } from "~/utils/cookies";
 import { ChatComponent } from "~/components/Chat";
 import { DisplayReadingComponent } from "~/components/newDiagnosisPAgeComponents/baseComponents/DisplayReading";
 import { useExecuteRequest } from "~/hooks/requestHook";
 import { useTraceUpdate } from "~/hooks/debug/checkPropCausingRerender";
 import { ProgressBar } from "~/components/progressBar";
+import { Button, Card, Divider, Space, Typography } from "antd";
 import axios from "axios";
+
+// Ant Design Imports
+const { Title, Text } = Typography;
 
 // Voting component
 const VotingSection: React.FC<{
@@ -25,10 +27,7 @@ const VotingSection: React.FC<{
   const handleVote = async (vote: boolean) => {
     if (!diagnosisId || !cookies.token.get()) return;
     try {
-      const res = await axios.post(`http://localhost:3003/diag/voting/${votingId}/vote`, {
-        userId: cookies.token.get()?.userId,
-        vote: vote
-      }) 
+      const res = api.votings.vote(votingId, cookies.token.get()?.userId, vote);
       if ("errMsg" in res) {
         console.log("Unsuccessful vote");
       } else {
@@ -41,24 +40,29 @@ const VotingSection: React.FC<{
   };
 
   return (
-    <div className="mt-4 flex text-primarytext space-x-4">
-      {!haveAlreadyVoted ? 
-      <>
-      <button
-        className="hover:bg-primary-dark focus:bg-primary-dark rounded-md bg-primary px-4 py-2 text-white focus:outline-none"
-        onClick={() => handleVote(true)}
-        disabled={haveAlreadyVoted}
-      >
-        It is true
-      </button>
-      <button
-        className="hover:bg-secondary-dark focus:bg-secondary-dark rounded-md bg-secondary px-4 py-2 text-white focus:outline-none"
-        onClick={() => handleVote(false)}
-        disabled={haveAlreadyVoted}
-      >
-        It is False
-        </button>
-      </> : <div>ypu have already voted</div>}
+    <div className="mt-4 flex flex-col items-center gap-4">
+      {!haveAlreadyVoted ? (
+        <Space size="large">
+          <Button
+            type="primary"
+            className="hover:bg-green-600"
+            onClick={() => handleVote(true)}
+            disabled={haveAlreadyVoted}
+          >
+            It is True
+          </Button>
+          <Button
+            danger
+            className="hover:bg-red-600"
+            onClick={() => handleVote(false)}
+            disabled={haveAlreadyVoted}
+          >
+            It is False
+          </Button>
+        </Space>
+      ) : (
+        <Text type="warning">You have already voted</Text>
+      )}
     </div>
   );
 };
@@ -67,16 +71,17 @@ const ReadingPage: React.FC = () => {
   const router = useRouter();
   const [diagnosisId, setDiagnosisId] = useState<string | null>(null);
   const [haveAlreadyVoted, setHaveAlreadyVoted] = useState(false);
-  console.log("rerendering")
+
   React.useEffect(() => {
     if (!router.isReady || !router.query.id || Array.isArray(router.query.id)) {
       return;
     }
-    console.log("running the useEffect")
     setDiagnosisId(router.query.id);
   }, [router.isReady, router.query.id]);
 
-  const [diagnosis, isLoading, errorMsg] = useExecuteRequest<{diagnosis: Diagnosis & {prediction : boolean}} | null>(
+  const [diagnosis, isLoading, errorMsg] = useExecuteRequest<{
+    diagnosis: Diagnosis & { prediction: boolean };
+  } | null>(
     null,
     async () => {
       if (!diagnosisId) return null;
@@ -93,7 +98,8 @@ const ReadingPage: React.FC = () => {
     }
   );
 
-  useTraceUpdate({diagnosisId})
+  useTraceUpdate({ diagnosisId });
+
   if (errorMsg) {
     return <BaseError message={errorMsg} />;
   }
@@ -109,15 +115,29 @@ const ReadingPage: React.FC = () => {
   }
 
   return (
-    <div className="h-screen bg-secondary">
-      <Reading
-        type={diagnosis.diagnosis.type}
-        rawData={{}}
-        prediction={diagnosis.diagnosis.prediction}
-      />
-      <DisplayReadingComponent data={diagnosis.diagnosis} />
-      <div className="mt-8 rounded-lg border border-primary bg-primary p-4 shadow-md">
-        <p className="text-lg font-semibold text-white">What do you say about this prediction?</p>
+    <div className="min-h-screen bg-primary p-8">
+      {/* Reading Section */}
+      <Card
+        className="mb-8 shadow-lg bg-secondary text-primarytext"
+        bodyStyle={{ padding: "20px" }}
+        title={<Title level={4}><p className="text-primarytext">Reading Analysis</p></Title>}
+      >
+        <Reading
+          type={diagnosis.diagnosis.type}
+          rawData={{}}
+          prediction={diagnosis.diagnosis.prediction}
+        />
+        <Divider />
+        <DisplayReadingComponent data={diagnosis.diagnosis} />
+      </Card>
+
+      {/* Voting Section */}
+      <Card
+        className="mb-8 shadow-lg bg-secondary text-primarytext"
+        bodyStyle={{ padding: "20px" }}
+        title={<Title level={4} color="white">Vote on This Prediction</Title>}
+      >
+        <Text color="white">What do you think about this prediction?</Text>
         {diagnosisId && (
           <VotingSection
             diagnosisId={diagnosisId}
@@ -126,15 +146,32 @@ const ReadingPage: React.FC = () => {
             onVote={() => setHaveAlreadyVoted(true)}
           />
         )}
-      </div>
+      </Card>
 
-      <div className="bg-secondary">
-        <p className="text-white">Votes:</p>
-        <ProgressBar fill={getVotingPercentage(diagnosis.diagnosis.voting.votes)}/>
-        {/* Add voting data visualization like a ProgressBar here */}
-      </div>
+      {/* Progress Section */}
+      <Card
+        className="mb-8 shadow-lg bg-secondary text-white"
+        bodyStyle={{ padding: "20px" }}
+        title={<Title level={4} color="white">Vote Results</Title>}
+      >
+        <ProgressBar
+          fill={getVotingPercentage(diagnosis.diagnosis.voting.votes)}
+        />
+        <Text className="">
+          Total Votes: {diagnosis.diagnosis.voting.votes.length}
+        </Text>
+      </Card>
 
-      {diagnosisId && <ChatComponent diagnosisId={parseInt(diagnosisId)} />}
+      {/* Chat Section */}
+      {diagnosisId && (
+        <Card
+          className="shadow-lg bg-secondary"
+          bodyStyle={{ padding: "20px" }}
+          title={<Title level={4} color="white">Discussion</Title>}
+        >
+          <ChatComponent diagnosisId={parseInt(diagnosisId)} />
+        </Card>
+      )}
     </div>
   );
 };

@@ -34,7 +34,7 @@ const JsonViewer: React.FC<{ jsonUrl: string }> = ({ jsonUrl }) => {
                     <div className="text-red-500 font-semibold text-center">{error}</div>
                 ) : (
                     <textarea
-                        className="w-full h-96 p-4 text-sm font-mono bg-gray-100 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full h-96 p-4 text-sm font-mono bg-secondary border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         value={jsonData ? JSON.stringify(jsonData, null, 2) : "Loading..."}
                         readOnly
                     />
