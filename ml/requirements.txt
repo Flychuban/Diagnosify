@@ -1,7 +1,7 @@
 python-multipart
 flask
 joblib
-scikit-learn
+scikit-learn==1.2.2
 opencv_python
 flask-cors
 fastapi==0.110.1

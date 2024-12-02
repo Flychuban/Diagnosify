@@ -55,14 +55,17 @@ authRouter.post(
 
 
 authRouter.post("/login", async (req: Request<{}, {}, {username: string, password: string}>, res: Response<BaseResponse<{token: AuthToken}>>) => {
-  if (await db.userRepo.getUserPassword(req.body.username) === req.body.password) {
-    res.status(200).json({
-      token: await sessions.issueNewTokenForUser(req.body.username)
-    })
-    return
+  try{
+    if (await db.userRepo.getUserPassword(req.body.username) === req.body.password) {
+      res.status(200).json({
+        token: await sessions.issueNewTokenForUser(req.body.username)
+      })
+      return
+    }
+    res.status(400).json({ error: "username or password is invalid" })
+  } catch (e) {
+    res.status(404).json({msg: "user does not exist"})
   }
-  res.status(400).json({ error: "username or password is invalid"})
- 
 })
 
 

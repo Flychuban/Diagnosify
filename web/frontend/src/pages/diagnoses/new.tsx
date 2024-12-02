@@ -57,7 +57,7 @@ async function saveImageDataTextResponse(diseaseEndpoint: string,data: {predicti
 
         const formDdata = new FormData()
         formDdata.append("data", data.file)
-  const s3uploadData = await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>("http://localhost:4001/" + diseaseEndpoint, formDdata, {
+  const s3uploadData = await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>(Env.upload_url+"/" + diseaseEndpoint, formDdata, {
     headers: {
             "Authorization": "Bearer " + cookies.token.get()?.userId,
             "authorization": "Bearer " + cookies.token.get()?.userId
@@ -90,7 +90,7 @@ const PneumoniaPredictionForm: React.FC = () => {
       { prediction: { message: string; confidence: string } }
     >
       title="Pneumonia Prediction"
-      endpoint="http://127.0.0.1:5000/predict_pneumonia"
+      endpoint={`${mlPredictionUrl}/predict_pneumonia`}
       componentToDisplayPrediction={(data) => <div>{JSON.stringify(data)}</div>}
       anotherComponentToDisplayPrediction={(data) => {
         console.log("dat", data);
@@ -108,7 +108,7 @@ const MAlari = () => {
   return (
     <PredictionForm<{prediction: {message: string, malaria_probability: string}},{prediction: {message: string, malaria_probability: string}}>
       title="Malaria Prediction"
-      endpoint="http://127.0.0.1:5000/predict-malaria"
+      endpoint={`${mlPredictionUrl}/predict-malaria`}
       componentToDisplayPrediction={(data: { message: string }) => <div>{data.message}</div>}
       anotherComponentToDisplayPrediction={(data) => { return <div>{ data.prediction.message}</div>}}
       savePrediction={async (data) => {
@@ -242,7 +242,6 @@ const App = () => {
   const [current, setCurrent] = useState(0);
   const authToken = useGetAuthToken()
   const allPredictions = [
-    { type: "Cancer segmentation", form: () => <CancerPredictionForm /> },
     { type: "Pneumonia", form: () => <PneumoniaPredictionForm /> },
     {
       type: "Diabetes", form: () => <SimplePredictionForm<{prediction: string},{Pregnancies:number, Glucose: number, BloodPRessure: number, SkinThickness: number, Insulin: number, BMI: number, DiabetesPedigreeFunction: number, Age: number}>
@@ -323,6 +322,8 @@ const App = () => {
         }}
       />
     },
+
+    { type: "Cancer segmentation", form: () => <CancerPredictionForm /> },
     {
       type: "Parkinson",
       form: () => <SimplePredictionForm<{ prediction: string }, { prediction: string }>

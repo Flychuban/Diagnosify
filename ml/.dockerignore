@@ -1,0 +1,31 @@
+# venv
+venv*/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+
+# .dockerignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.env
+.venv
+venv/
+ENV/
