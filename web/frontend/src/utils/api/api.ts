@@ -165,7 +165,7 @@ class Diagnoses extends Model {
     })
   }
 
-  async saveTextDataTextResponseDiagnosis(diseaseEndpoint: string, data: { responseMsg: { prediction: string } }) {
+  async saveTextDataTextResponseDiagnosis(diseaseEndpoint: string, data: { responseMsg: { prediction: string }}, vote: boolean, voteWhichSkipsVoting: null | boolean ) {
     const s3Req = await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>(`${getGatewayUrl()}/data/data/${diseaseEndpoint}`, data, {
       headers: {
         "Authorization": "Bearer " + cookies.token.get()?.userId,
@@ -182,14 +182,15 @@ class Diagnoses extends Model {
           type: diseaseEndpoint,
           link_raw_data: s3Req.data.link_to_data_blob_which_holds_prediction_params,
           label: data.responseMsg.prediction,
-          vote: false,
-        }
+          vote: vote,
+        },
+        directVoteWhichSkipsVoting: voteWhichSkipsVoting
       }
     })
     return res;
   }
 
-  async saveImageDataTextResponse(diseaseEndpoint: string, data: { prediction: string,file: File }) {
+  async saveImageDataTextResponse(diseaseEndpoint: string, data: { prediction: string,file: File }, vote : boolean, voteWhichSkipsVoting: null | boolean) {
 const authToken2 = cookies.token.get()
         if (authToken2 === null) {
           throw new Error("invalid token")
@@ -208,8 +209,9 @@ const authToken2 = cookies.token.get()
                 type: diseaseEndpoint,
                 link_raw_data: s3uploadData.data.link_to_data_blob_which_holds_prediction_params,
                 label: data.prediction,
-                vote: false
-              }
+                vote: vote
+          },
+          directVoeWhichSkipsVoting: voteWhichSkipsVoting
         },
           {
             headers: {

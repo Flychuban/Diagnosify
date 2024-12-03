@@ -1,12 +1,13 @@
 import axios, {  } from "axios";
 import React,{ ReactNode, useState } from "react";
-import {PopUpWrapper} from "../../popup"
+import {PopUpWrapper, SuccesfulActionPopUp} from "../../popup"
+import { CreateNewDiagnosisPopUp } from "./createNewDiagnosisPopUp";
 interface PredictionFormProps<PredictionResponse,T> {
   title: string;
   endpoint: string;
   formFields: { key: keyof T; label: string; type?: string }[];
   componentToDisplayPrediction: (data: PredictionResponse) => ReactNode
-  SavePredictionInDbWithTheS3ReferenceHandler: (data: { dataForPrediction: T, responseMsg: PredictionResponse  }) => Promise<AxiosResponse>
+  SavePredictionInDbWithTheS3ReferenceHandler: (data: { dataForPrediction: T, responseMsg: PredictionResponse  }, vote: boolean, directVoteWhichSkipsVoting: boolean | null) => Promise<AxiosResponse>
 }
 
 
@@ -24,10 +25,10 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
       return acc;
     }, {} as FormDataStructure) // Ensure type safety for the accumulator
   );
-
+  const [isCreateNEwDiagnosisPopUpOPen, setIsCreateNewPopUpOpen] = useState(false)
   const [responseMessage, setResponseMessage] = useState<PredictionResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [succesfulAction,setSuccesfulAction] = useState("") 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -50,6 +51,19 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
 
   return (
     <div className="mx-auto max-w-2xl rounded-lg bg-secondary p-6 shadow">
+      <CreateNewDiagnosisPopUp
+        isOpen={isCreateDiagnosisPopUpOpen}
+        onClose={() => { setIsCreateNewPopUpOpen(false) }}
+        saveDiagnosis={async (vote, directVoteWhichSkipsVoting) => {
+          if (responseMessage === null) {
+            throw new Error("No prediction received");
+          }
+          const res = await SavePredictionInDbWithTheS3ReferenceHandler({dataForPrediction:formData,responseMsg: responseMessage },vote, directVoteWhichSkipsVoting)
+
+          setSuccesfulAction("created diagnosis")
+        }}
+      />
+      <SuccesfulActionPopUp text={succesfulAction } onClose={setSuccesfulAction("")} /> 
       <h2 className="mb-6 text-2xl font-bold text-primary">{title}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex flex-wrap gap-4">
@@ -88,21 +102,11 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
           if (!responseMessage) { 
             return;
           }
-          
-          const res = await SavePredictionInDbWithTheS3ReferenceHandler({dataForPrediction:formData,responseMsg: responseMessage })
-          console.dir("res",res)
+         setIsCreateDiagnosisPopUpOpen(true) 
+
         }}
       >create diagnosis</button>
-      <PopUpWrapper
-        onClose={() => { setIsCreateDiagnosisPopUpOpen(false) }} isOpen={isCreateDiagnosisPopUpOpen} ComponentToDisplay={() => {
-          return <div>
-            <button onClick={() => { }}>vote directly</button>
-            <button onClick={() => {
-
-            }}>send to feed</button>
-        </div>
-        }}
-      />
+      
 
       {responseMessage && componentToDisplayPrediction(responseMessage)}
     </div>

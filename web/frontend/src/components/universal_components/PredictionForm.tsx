@@ -3,7 +3,8 @@ import React,{ useState } from "react";
 import { api } from "~/utils/api/api";
 import { MainForm } from "../newDiagnosisPAgeComponents/baseComponents/MainForm";
 import { Cloud, Upload } from "lucide-react";
-import { PopUpWrapper } from "../popup";
+import { ErrorPopUp, PopUpWrapper, SuccesfulActionPopUp } from "../popup";
+import { CreateNewDiagnosisPopUp } from "../newDiagnosisPAgeComponents/baseComponents/createNewDiagnosisPopUp";
 
 
 export interface PredictionFormWithImageProps<T, RequestResponse> {
@@ -14,7 +15,9 @@ export interface PredictionFormWithImageProps<T, RequestResponse> {
     data: RequestResponse,
   ) => React.ReactElement;
   savePrediction: (
-    data: {prediction: string, file: File},
+    data: { prediction: string, file: File },
+    directVoteWhichSkipsVoting: boolean | null,
+    vote: boolean
   ) => Promise<{ isSaved: boolean; payloadWithAdditionalInfo: string }>;
 }
 
@@ -25,23 +28,15 @@ export const PredictionForm = <T extends object, RequestResponse>({
   anotherComponentToDisplayPrediction,
   savePrediction,
 }: PredictionFormWithImageProps<T, RequestResponse>) => {
-  const [
-    isRateDiagnosisDirectlyPopUpOpen,
-    setIsRateDiagnosisDirectlyPopUpOpen,
-  ] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState("")
   const [responseMessage, setResponseMessage] = useState<{
     errMsg?: string;
     predictionData?: T;
   } | null>(null);
-  const [diagnosisId, setDignosisId] = useState<number | null>(null);
+  const [succesfulAction, setIsSuccesfullaction] = useState("")
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const popUpVoteHander = (vote: boolean) => {
-    setIsRateDiagnosisDirectlyPopUpOpen(false);
-    api.diagnoses.votings;
-  };
-
+  const [isCreatenewDiagOpen, setIsCreatenewDiagOpen] = useState(false)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files ? e.target.files[0] : null;
     if (selectedFile) {
@@ -119,6 +114,8 @@ export const PredictionForm = <T extends object, RequestResponse>({
             : () => <div>hi</div>
         }
       >
+        <SuccesfulActionPopUp text={succesfulAction} onClose={ () => {setIsSuccesfullaction("")}}/>
+        <ErrorPopUp isOpen={error.length > 0} error={ error} />
         <div
           className="relative rounded-lg border-2 border-dashed border-gray-300 bg-gray-900 p-6 transition-colors hover:border-gray-400"
           onDragEnter={handleDragEnter}
@@ -147,41 +144,33 @@ export const PredictionForm = <T extends object, RequestResponse>({
           </div>
         </div>
         <div>
-          <button
-            onClick={async () => {
-              const userId = cookies.token.get();
-              if (userId === null) {
-                throw new Error("user id is not set");
-              }
-              const data = responseMessage!.predictionData;
-              if (data === undefined) {
-                throw new Error("Prediction data is not set");
-              }
-              await api.diagnoses.createDiagnosis(
-                userId.userId.toString(),
-                data,
-              );
-            }}
-          >
-            publish diagnosis for review
-          </button>
         </div>
         <div>
-          <PopUpWrapper
+          <CreateNewDiagnosisPopUp
+            isOpen={isCreatenewDiagOpen}
             onClose={() => {
-              setIsRateDiagnosisDirectlyPopUpOpen(false);
+                setIsCreatenewDiagOpen(false);
+              }
+            }
+          
+            saveDiagnosis={(vote: boolean, skipVoting: boolean | null) => {
+              if (file === null) {
+                setError("no file uploaded")
+                throw new Error("no file uploaded")
+              }
+              return savePrediction({
+                file: file,
+                prediction: JSON.stringify(responseMessage!.predictionData!),
+              },skipVoting, vote).then(
+                () => {
+                  setIsSuccesfullaction("created diagnosis");
+                  return;
+                }).catch((e) => {
+                setError("error creating prediction, pls try again")
+                return 
+              })
             }}
-            isOpen={isRateDiagnosisDirectlyPopUpOpen}
-            ComponentToDisplay={() => {
-              return (
-                <div className="flex flex-auto gap-3">
-                  <button onClick={() => {}}>its correct</button>
-                  <button onClick={() => {}}>its not correct</button>
-                </div>
-              );
-            }}
-          />
-          <div>hi2</div>
+          /> 
         </div>
         {responseMessage !== null &&
           responseMessage !== undefined &&
@@ -196,21 +185,10 @@ export const PredictionForm = <T extends object, RequestResponse>({
             if (file === null) {
               throw new Error("Please select a file first");
             }
-            await savePrediction({
-              file: file,
-              prediction: JSON.stringify(responseMessage!.predictionData!)
-            });
+            setIsCreatenewDiagOpen(true)
           }}
         >
           Send to feed
-        </button>
-        <button
-          className="bg-primary"
-          onClick={async () => {
-            await setIsRateDiagnosisDirectlyPopUpOpen(true);
-          }}
-        >
-          Vote directly
         </button>
       </div>
     </>

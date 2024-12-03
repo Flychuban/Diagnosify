@@ -19,111 +19,6 @@ import { PredictionForm } from "~/components/universal_components/PredictionForm
 import { Env } from "~/utils/env";
 
 
-const RatePrediction = <T,>({ predictionData, diagnosisId }: { predictionData: T, diagnosisId: number }) => { 
-  const [reequestRespones, setRequestResponse] = useState<{ wasVotingSuccessful: boolean }>() 
- 
- 
-  const vote = async (vote: boolean) => {
-      const res = await api.diagnoses.votings.vote(diagnosisId,cookies.token.get()!.userId,vote)
-  }
-
-  return <div>
-  <p>What do you think about this prediction</p>
-    <p>Its</p>
-    <div className="flex flex-auto"><button onClick={async () => {await vote(false)}}>True</button><button onClick={async() => {await vote(false)}}>False</button></div>
-
-</div>
-}
-
-
-const CancerPredictionForm: React.FC = () => {
-  return (
-    <PredictionForm<{},{}>
-      title="Cancer Prediction"
-      endpoint="http://127.0.0.1:5000/cancer-segmentation"
-      componentToDisplayPrediction={(data) => <div>{data}</div>}
-      anotherComponentToDisplayPrediction={(data) => { return <div>{(JSON.stringify(data))}</div> }}
-
-    />
-  );
-}
-
-
-async function saveImageDataTextResponse(diseaseEndpoint: string,data: {prediction: string, file: File}) {
-  const authToken2 = cookies.token.get()
-        if (authToken2 === null) {
-          throw new Error("invalid token")
-        }
-
-        const formDdata = new FormData()
-        formDdata.append("data", data.file)
-  const s3uploadData = await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>(Env.upload_url+"/" + diseaseEndpoint, formDdata, {
-    headers: {
-            "Authorization": "Bearer " + cookies.token.get()?.userId,
-            "authorization": "Bearer " + cookies.token.get()?.userId
-          }
-        })
-        const res = await axios.post<object>(`${getGatewayUrl()}/diag/diag/diagnosis/user/${authToken2.userId}/diagnoses`, {
-              newDiagInfo: {
-                type: diseaseEndpoint,
-                link_raw_data: s3uploadData.data.link_to_data_blob_which_holds_prediction_params,
-                label: data.prediction,
-                vote: false
-              }
-            }, {
-    headers: {
-            "Authorization": "Bearer " + cookies.token.get()?.userId,
-            "authorization": "Bearer " + cookies.token.get()?.userId
-          }
-        })
-        return res
-
-        // return api.diagnoses.saveImageDataTextResponse(diseaseEndpoint,data)
-
-}
-
-
-const PneumoniaPredictionForm: React.FC = () => {
-  return (
-    <PredictionForm<
-      object,
-      { prediction: { message: string; confidence: string } }
-    >
-      title="Pneumonia Prediction"
-      endpoint={`${mlPredictionUrl}/predict_pneumonia`}
-      componentToDisplayPrediction={(data) => <div>{JSON.stringify(data)}</div>}
-      anotherComponentToDisplayPrediction={(data) => {
-        console.log("dat", data);
-        return <div>{data.prediction.message}</div>;
-      }}
-      savePrediction={async (data) => {
-        await saveImageDataTextResponse("pneumonia", data);
-        const authToken2 = cookies.token.get();
-      }}
-    />
-  );
-};
-
-const MAlari = () => {
-  return (
-    <PredictionForm<{prediction: {message: string, malaria_probability: string}},{prediction: {message: string, malaria_probability: string}}>
-      title="Malaria Prediction"
-      endpoint={`${mlPredictionUrl}/predict-malaria`}
-      componentToDisplayPrediction={(data: { message: string }) => <div>{data.message}</div>}
-      anotherComponentToDisplayPrediction={(data) => { return <div>{ data.prediction.message}</div>}}
-      savePrediction={async (data) => {
-        await saveImageDataTextResponse("malaria", data)
-      }}
-    />
-  )
-}
-
-enum requestCompletionStatus{
-  OK,
-  ERRORED
-}
-
-
 const bodyFatFields = [
      { key: "Weight" , label: "Weight" },
    { key: "Height"  , label: "Height" },
@@ -227,9 +122,57 @@ const LiverDisease = [
   { key: "ag_ratio", label: "A/G Ratio" }
 ];
 
-async function textDataTextResponseUpload(diseaseEndpoint: string,data: {responseMsg: {prediction: string}}): Promise<object> {
+
+const CancerPredictionForm: React.FC = () => {
+  return (
+    <PredictionForm<{},{}>
+      title="Cancer Prediction"
+      endpoint="http://127.0.0.1:5000/cancer-segmentation"
+      componentToDisplayPrediction={(data) => <div>{data}</div>}
+      anotherComponentToDisplayPrediction={(data) => { return <div>{(JSON.stringify(data))}</div> }}
+
+    />
+  );
+}
+
+
+async function saveImageDataTextResponse(diseaseEndpoint: string,data: {prediction: string, file: File},directVoteWhichSkipsVoting: boolean | null, vote: boolean) {
+  const authToken2 = cookies.token.get()
+        if (authToken2 === null) {
+          throw new Error("invalid token")
+        }
+
+        const formDdata = new FormData()
+        formDdata.append("data", data.file)
+  const s3uploadData = await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>(Env.upload_url+"/" + diseaseEndpoint, formDdata, {
+    headers: {
+            "Authorization": "Bearer " + cookies.token.get()?.userId,
+            "authorization": "Bearer " + cookies.token.get()?.userId
+          }
+        })
+        const res = await axios.post<object>(`${getGatewayUrl()}/diag/diag/diagnosis/user/${authToken2.userId}/diagnoses`, {
+              newDiagInfo: {
+                type: diseaseEndpoint,
+                link_raw_data: s3uploadData.data.link_to_data_blob_which_holds_prediction_params,
+                label: data.prediction,
+                vote: vote
+          },
+          directVoteWhichSkipsVoting: directVoteWhichSkipsVoting
+            }, {
+    headers: {
+            "Authorization": "Bearer " + cookies.token.get()?.userId,
+            "authorization": "Bearer " + cookies.token.get()?.userId
+          }
+        })
+        return res
+
+        // return api.diagnoses.saveImageDataTextResponse(diseaseEndpoint,data)
+
+}
+
+async function textDataTextResponseUpload(diseaseEndpoint: string,data: {responseMsg: {prediction: string}}, vote: boolean, voteWhichSkipsVoting: null | boolean): Promise<object> {
             try {
-            const res = await api.diagnoses.saveTextDataTextResponseDiagnosis(diseaseEndpoint, data)
+            const res = await api.diagnoses.saveTextDataTextResponseDiagnosis(diseaseEndpoint, data, vote, voteWhichSkipsVoting)
           
             return res
           } catch (error) { 
@@ -237,7 +180,46 @@ async function textDataTextResponseUpload(diseaseEndpoint: string,data: {respons
               return {error: error.message}
           }
 }
+
+
+
+const PneumoniaPredictionForm: React.FC = () => {
+  return (
+    <PredictionForm<
+      object,
+      { prediction: { message: string; confidence: string } }
+    >
+      title="Pneumonia Prediction"
+      endpoint={`${mlPredictionUrl}/predict_pneumonia`}
+      componentToDisplayPrediction={(data) => <div>{JSON.stringify(data)}</div>}
+      anotherComponentToDisplayPrediction={(data) => {
+        console.log("dat", data);
+        return <div>{data.prediction.message}</div>;
+      }}
+      savePrediction={async (data, directVoteWhichSkipsVoting: boolean | null, vote: boolean) => {
+        await saveImageDataTextResponse("pneumonia", data, directVoteWhichSkipsVoting ,vote);
+        const authToken2 = cookies.token.get();
+      }}
+    />
+  );
+};
+
+const MAlari = () => {
+  return (
+    <PredictionForm<{prediction: {message: string, malaria_probability: string}},{prediction: {message: string, malaria_probability: string}}>
+      title="Malaria Prediction"
+      endpoint={`${mlPredictionUrl}/predict-malaria`}
+      componentToDisplayPrediction={(data: { message: string }) => <div>{data.message}</div>}
+      anotherComponentToDisplayPrediction={(data) => { return <div>{ data.prediction.message}</div>}}
+      savePrediction={async (data,directVoteWhichSkipsVoting: boolean | null, vote: boolean) => {
+        await saveImageDataTextResponse("malaria", data, directVoteWhichSkipsVoting,vote)
+      }}
+    />
+  )
+}
+
 const mlPredictionUrl = Env.prediction_service_url
+
 const App = () => {
   const [current, setCurrent] = useState(0);
   const authToken = useGetAuthToken()
@@ -249,13 +231,13 @@ const App = () => {
         endpoint={mlPredictionUrl+"/diabetes"}
         formFields={diabetesFields}
         componentToDisplayPrediction={(data) => { return <div>{ data.prediction }</div> }}
-        SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
+        SavePredictionInDbWithTheS3ReferenceHandler={async (data,vote: boolean,voteWhichSkipsVoting: boolean | null) => {
           // upload to the s3 bucket 
           try {
             
         
 
-            return await textDataTextResponseUpload("diabetes", data)
+            return await textDataTextResponseUpload("diabetes", data, vote, voteWhichSkipsVoting)
           } catch (error) { 
             console.error("Error saving prediction:", error);
             return {data: {error: error.message}, status: 500, statusText: "Error saving prediction" , config: {}, headers: {}} // as axios response
@@ -269,8 +251,13 @@ const App = () => {
         endpoint={mlPredictionUrl + "/body-fat-predict"}
         formFields={bodyFatFields}
         componentToDisplayPrediction={(data) => { return <div>{data.prediction}</div> }}
-        SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
-          return await textDataTextResponseUpload("bodyfat",data, authToken)
+        SavePredictionInDbWithTheS3ReferenceHandler={async (data,vote: boolean,voteWhichSkipsVoting: boolean | null) => {
+          return await textDataTextResponseUpload(
+            "bodyfat",
+            data,
+            vote,
+            voteWhichSkipsVoting,
+          );
         }}
       />
     },
@@ -280,8 +267,13 @@ const App = () => {
         endpoint={mlPredictionUrl+"/kidney-disease-predict"}
         formFields={kidneyDiseaseFields}
         componentToDisplayPrediction={(data) => { return <div>{data.prediction}</div> }}
-        SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
-          return await textDataTextResponseUpload("kidney-disease", data, authToken)
+        SavePredictionInDbWithTheS3ReferenceHandler={async (data,vote: boolean,voteWhichSkipsVoting: boolean | null) => {
+          return await textDataTextResponseUpload(
+            "kidney-disease",
+            data,
+            vote,
+            voteWhichSkipsVoting,
+          );
         }}
       />
     },
@@ -292,8 +284,13 @@ const App = () => {
         endpoint={mlPredictionUrl + "/heart-disease-predict"}
         formFields={heartDiseaseFields}
         componentToDisplayPrediction={(data) => { return <div>{ data.prediction }</div> }}
-        SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
-          return await textDataTextResponseUpload("heart-disease", data, authToken)
+        SavePredictionInDbWithTheS3ReferenceHandler={async (data,vote: boolean,voteWhichSkipsVoting: boolean | null) => {
+          return await textDataTextResponseUpload(
+            "heart-disease",
+            data,
+            vote,
+            voteWhichSkipsVoting,
+          );
         }}
       />
     },
@@ -305,8 +302,8 @@ const App = () => {
         endpoint={mlPredictionUrl + "/liver-disease-predict"}
         formFields={ LiverDisease}
         componentToDisplayPrediction={(data) => { return <div>{data.prediction}</div> }}
-        SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
-           return await textDataTextResponseUpload("liver-disease", data)
+        SavePredictionInDbWithTheS3ReferenceHandler={async (data,vote: boolean,voteWhichSkipsVoting: boolean | null) => {
+           return await textDataTextResponseUpload("liver-disease", data, vote,voteWhichSkipsVoting)
          }}
       />
     },
@@ -317,8 +314,13 @@ const App = () => {
         endpoint={mlPredictionUrl + "/breast-cancer-predict"}
         formFields={breastCancerFields}
         componentToDisplayPrediction={(data) => { return <div>{data.prediction}</div> }}
-        SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
-          return await textDataTextResponseUpload("breast-cancer", data, authToken)
+        SavePredictionInDbWithTheS3ReferenceHandler={async (data,vote: boolean,voteWhichSkipsVoting: boolean | null) => {
+          return await textDataTextResponseUpload(
+            "breast-cancer",
+            data,
+            vote,
+            voteWhichSkipsVoting,
+          );
         }}
       />
     },
@@ -331,8 +333,8 @@ const App = () => {
         endpoint={mlPredictionUrl + "/predict_parkinson"}
         formFields={parkinsonFields}
         componentToDisplayPrediction={(data) => { return <div>{data.prediction}</div> }}
-        SavePredictionInDbWithTheS3ReferenceHandler={async (data) => {
-          return await textDataTextResponseUpload("parkinson", data, authToken)
+        SavePredictionInDbWithTheS3ReferenceHandler={async (data,vote: boolean,voteWhichSkipsVoting: boolean | null) => {
+          return await textDataTextResponseUpload("parkinson", data, vote,voteWhichSkipsVoting )
         }}
 
       />

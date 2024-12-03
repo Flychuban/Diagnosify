@@ -1,5 +1,25 @@
 import React, { ReactNode, useEffect, useState } from "react";
 
+export const PopUpWrapper2: React.FC<{ onClose: () => void, isOpen: boolean, children: ReactNode }> = ({ onClose, isOpen, children }) => {
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="bg-secondary rounded p-4 shadow-md border-primary border-x-4 border-y-4">
+        {children}
+        <button
+          onClick={onClose}
+          className="bg-9fb5b3 text-f6fcfc mt-2 rounded px-4 py-2 hover:bg-opacity-80 focus:outline-none"
+          type="button"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
 export const PopUpWrapper: React.FC<{ ComponentToDisplay: () => ReactNode, onClose: () => void, isOpen: boolean}> = ({ ComponentToDisplay, onClose, isOpen }) => {
   
   
@@ -76,3 +96,22 @@ export const SuccesfulPopUp: React.FC<{
     </div>
   );
 };
+
+
+
+
+export const ErrorPopUp: React.FC<{ error: string, isOpen: boolean }> = ({ error, isOpen }) => { 
+  return <PopUpWrapper2 onClose={() => {return} }  isOpen={isOpen} >
+    <div className="bg-red-500">
+    <div>Error happend</div>
+    <div>{error}</div>
+</div>
+  </PopUpWrapper2>
+}
+
+export const SuccesfulActionPopUp: React.FC<{ text: string, onClose: () => void }> = ({ text, onClose }) => {
+  return <PopUpWrapper2 onClose={() => { onClose() }} isOpen={text.length > 0}>
+    <div>Succesfully {text }
+  </div>
+  </PopUpWrapper2>
+}

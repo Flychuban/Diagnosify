@@ -23,10 +23,7 @@ const Login: React.FC = () => {
     if (stateForTriggeringRerender === 0) {
       return
     }
-    if (cookies.token.get() !== undefined && cookies.token.get() !== null && cookies.token.get() !== {} as AuthToken) {
-     console.log("host",getBaseUrl(window.location.href)); 
-    window.location.href = `${getBaseUrl(window.location.href)}` 
-    }
+    
   },[stateForTriggeringRerender])
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900 text-white">
@@ -59,14 +56,18 @@ const Login: React.FC = () => {
 
             try {
               const tokenObj = await api.user.login(objToSend);
-              if ("errMsg" in tokenObj) {
-                setIsError(tokenObj.errMsg)
-              } else {
+              if ("token" in tokenObj) {
                 cookies.token.set(tokenObj.token);
-              }
-
+if (cookies.token.get() !== undefined && cookies.token.get() !== null && cookies.token.get() !== {} as AuthToken) {
+     console.log("host",getBaseUrl(window.location.href)); 
+    window.location.href = `${getBaseUrl(window.location.href)}/diagnoses/new` 
+    }
               setIsPopUpOpen(true);
               setStateForTriggeringRerender(stateForTriggeringRerender + 1)
+              } else {
+                setIsError("inavalid password")
+              }
+              
             }catch(err){}
           }}
         />
