@@ -63,7 +63,7 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
           setSuccesfulAction("created diagnosis")
         }}
       />
-      <SuccesfulActionPopUp text={succesfulAction } onClose={setSuccesfulAction("")} /> 
+      <SuccesfulActionPopUp text={succesfulAction} onClose={() => { setSuccesfulAction("") }} /> 
       <h2 className="mb-6 text-2xl font-bold text-primary">{title}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex flex-wrap gap-4">
@@ -96,14 +96,10 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
       </form>
       <button
         onClick={async () => {
-        setTimeout(() => {
-          setIsCreateDiagnosisPopUpOpen(true)
-        }, 1)
           if (!responseMessage) { 
             return;
           }
          setIsCreateDiagnosisPopUpOpen(true) 
-
         }}
       >create diagnosis</button>
       

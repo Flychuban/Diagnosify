@@ -125,61 +125,32 @@ createRouteForTextDataResponseData("heart-disease")
 createRouteForTextDataResponseData("kidney-disease")
 createRouteForTextDataResponseData("bodyfat")
 
-dataCollectionRouter.post(
-  "/cancer-segmentation",
-  upload.single('data'), // Add multer middleware here
-  async (req, res: express.Response<ApiResponse>) => {
-    try {
-      if (!req.file) { // Correct the check
-        return res.status(400).json({ err: "File not found" });
-      }
-
-      const params = {
-        Bucket: S3_BUCKET_NAME,
-        Key: `diag/cancer-segmentation/${generateFileName()}`,
-        Body: req.file.buffer, // Use file buffer
-        ContentType: req.file.mimetype, // Ensure correct content type
-        ACL: "public-read",
-      };
-
-      const uploadResult = await s3.upload(params).promise();
-
-      res.status(200).json({ link_to_data_blob_which_holds_prediction_params: uploadResult.Location });
-    } catch (e) {
-      res.status(500).json({ err: e.message });
-    }
-  }
-);
-
-app.post("/canc",upload.single('data'), async (req: Request<{file: File}, {}, {file: File}>, res) => { 
+app.post("/canc", upload.single('data'), async (req: Request<{ file: File }, {}, { file: File }>, res) => {
   try {
-    console.log("hit endpoint")
-    console.log("data",req.file)
+    console.log("hit endpoint");
+    console.log("data", req.file);
+
     if (!req.file) {
-      res.status(500).json({ err: "file not found"})
+      return res.status(500).json({ err: "file not found" });
     }
 
-   const params = {
+    const params = {
       Bucket: S3_BUCKET_NAME,
       Key: `diag/predictions/${JSON.stringify(new Date())}`,
       Body: req.file.buffer,
-      ContentType: req.filter.mimetype,
+      ContentType: req.file.mimetype,  // Correct usage
       ACL: "public-read"
-    }
-
+    };
 
     const uploadResult = await s3.upload(params).promise();
-
-    res.status(200).json({ s3_loc: uploadResult.Location})
-
-    return 
-
-
+    console.log(uploadResult)
+    res.status(200).json({s3_loc: uploadResult.Location });
+    return;
   } catch (e) {
-    console.log(e)
-    res.status(500).json({err: e})
+    console.log(e);
+    res.status(500).json({ err: e });
   }
-})
+});
 
 
 function ImageDataTextReposnseHandler(diseaseEndpoint: string) {

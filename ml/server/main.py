@@ -224,48 +224,54 @@ def resize_image(image, size):
         image = image.convert("RGB")
     return image.resize(size)
 
-
-# Route for Cancer Segmentation
 @app.route('/cancer-segmentation', methods=['POST'])
 def cancer_segmentation():
     try:
         if 'file' not in request.files:
             return jsonify({"error": "No file provided"}), 400
         
+        # Get the file from request
         file = request.files['file']
-
+        
+        # Process the image
         image = Image.open(file.stream)
-
         resized_image = resize_image(image, (256, 256))
-
+        
+        # Convert to tensor and make prediction
         image_stream = io.BytesIO()
         resized_image.save(image_stream, format="PNG")
         image_stream.seek(0)
-
         bytes_data = image_stream.getvalue()
-        image_tensor = tf.io.decode_image(bytes_data, channels=3)  # Ensure 3 channels (RGB)
+        
+        image_tensor = tf.io.decode_image(bytes_data, channels=3)
         image_tensor = tf.image.resize(image_tensor, (256, 256))
-        image_tensor = tf.expand_dims(image_tensor, axis=0)  # Add batch dimension
-
+        image_tensor = tf.expand_dims(image_tensor, axis=0)
+        
         prediction = cancer_segmentation_model.predict(image_tensor)
-
         yhat = np.squeeze(np.where(prediction > 0.5, 1.0, 0.0))
-
-        segmented_image = (yhat[:, :, 0] * 255).astype(np.uint8)  # Convert to uint8 for visualization
+        segmented_image = (yhat[:, :, 0] * 255).astype(np.uint8)
+        
+        # Convert segmented image to bytes
         _, buffer = cv2.imencode('.png', segmented_image)
-        io_buffer = io.BytesIO(buffer)
-        print()
-        form_data = {'file': file}
-
-        response = requests.post('http://localhost:4001/canc', files=form_data)
-
-        print(response)
-        return jsonify({"res": response.s3_loc}) 
-
+        
+        # Create a file-like object that mimics a file upload
+        files = {
+            'data': (
+                'segmented.png',  # filename
+                buffer.tobytes(),  # file content
+                'image/png'       # mimetype
+            )
+        }
+        
+        # Send to remote server
+        response = requests.post('http://localhost:4001/canc', files=files)
+        
+        # Return the s3 location from the response
+        return jsonify(response.json())
+        
     except Exception as e:
         print(f"Error in cancer_segmentation: {e}")
         return jsonify({"error": str(e)}), 500
-
 
 
 

@@ -125,11 +125,16 @@ const LiverDisease = [
 
 const CancerPredictionForm: React.FC = () => {
   return (
-    <PredictionForm<{},{}>
+    <PredictionForm<{},  {s3_loc: string}
+>
       title="Cancer Prediction"
       endpoint="http://127.0.0.1:5000/cancer-segmentation"
       componentToDisplayPrediction={(data) => <div>{data}</div>}
-      anotherComponentToDisplayPrediction={(data) => { return <div>{(JSON.stringify(data))}</div> }}
+      anotherComponentToDisplayPrediction={(data) => {
+        return <div>
+          <img src={data.s3_loc} />
+          {(JSON.stringify(data))}</div>
+      }}
 
     />
   );
@@ -353,7 +358,7 @@ const App = () => {
       <Sidebar
         options={allPredictions.map((pred) => pred.type)}
         selected_option_index={current}
-        onSelectDisease={handleSelectDisease}
+        onSelectDisease={(number) => { handleSelectDisease(number) }}
       />
       <div className="flex-1 overflow-y-auto p-6">
         {allPredictions[current]?.form()}
