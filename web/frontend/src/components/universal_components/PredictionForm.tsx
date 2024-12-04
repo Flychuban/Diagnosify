@@ -5,6 +5,7 @@ import { MainForm } from "../newDiagnosisPAgeComponents/baseComponents/MainForm"
 import { Cloud, Upload } from "lucide-react";
 import { ErrorPopUp, PopUpWrapper, SuccesfulActionPopUp } from "../popup";
 import { CreateNewDiagnosisPopUp } from "../newDiagnosisPAgeComponents/baseComponents/createNewDiagnosisPopUp";
+import FileVisualizer from "../inPageImgVisulizer";
 
 
 export interface PredictionFormWithImageProps<T, RequestResponse> {
@@ -142,6 +143,7 @@ export const PredictionForm = <T extends object, RequestResponse>({
               </div>
             )}
           </div>
+          {file !== null && <FileVisualizer file={file} />}
         </div>
         <div>
         </div>
