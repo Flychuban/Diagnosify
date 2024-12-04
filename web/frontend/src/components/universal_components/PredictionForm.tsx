@@ -143,9 +143,10 @@ export const PredictionForm = <T extends object, RequestResponse>({
               </div>
             )}
           </div>
-          {file !== null && <FileVisualizer file={file} />}
         </div>
         <div>
+
+          {file !== null && <FileVisualizer file={file} />}
         </div>
         <div>
           <CreateNewDiagnosisPopUp
