@@ -8,5 +8,7 @@ export type Disease =
   | "breast Cancer"
   | "cancer Segmentation"
   | "diabetes"
-  | "pneumonia";
-
+  | "pneumonia"
+  | "malaria"
+  | "liver disease"
+  | "bodyfat"

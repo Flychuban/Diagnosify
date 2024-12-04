@@ -29,7 +29,7 @@ const JsonViewer: React.FC<{ jsonUrl: string }> = ({ jsonUrl }) => {
     return (
         <ComponentReliantOnRequestWrapper isLoading={isLoading} error={errorMsg}>
             <div className="max-w-3xl mx-auto p-6">
-                <h2 className="text-2xl font-bold text-center mb-4">JSON Viewer</h2>
+                <h2 className="text-2xl font-bold text-center mb-4">Patient Data </h2>
                 {error ? (
                     <div className="text-red-500 font-semibold text-center">{error}</div>
                 ) : (

@@ -250,7 +250,7 @@ def cancer_segmentation():
         prediction = cancer_segmentation_model.predict(image_tensor)
         yhat = np.squeeze(np.where(prediction > 0.5, 1.0, 0.0))
         segmented_image = (yhat[:, :, 0] * 255).astype(np.uint8)
-        
+
         # Convert segmented image to bytes
         _, buffer = cv2.imencode('.png', segmented_image)
         

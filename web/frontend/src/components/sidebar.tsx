@@ -7,24 +7,26 @@ import {
   Scale,
   FileHeart,
 } from 'lucide-react';
+import { Kidneys, Liver, Lungs, Malaria } from './icons/icons';
+import { Disease } from '~/utils/types';
 
 type SidebarProps = {
   onSelectDisease: (index: number) => void;
   selected_option_index: number;
-  options: string[];
+  options: Disease[];
 };
 
-const diseaseIcons: Record<string, () => ReactNode> = {
-  "Cancer Segmentation": () => <FileHeart className="h-4 w-4" />,
-  Diabetes: () => <Droplets className="h-4 w-4" />,
-  "Heart Disease": () => <Heart className="h-4 w-4" />,
-  Parkinson: () => <Activity className="h-4 w-4" />,
-  "Kidney Disease": () => <Droplets className="h-4 w-4" />,
-  "Breast Cancer": () => <Ghost className="h-4 w-4" />,
-  Pneumonia: () => <div className="h-4 w-4" >hii</div>,
-  Malaria: () => <div className="h-4 w-4" >jooo</div>,
-  "Liver Disease": () => <div className="h-4 w-4">kook</div>,
-  "Body Fat Percentage": () => <Scale className="h-4 w-4" />,
+const diseaseIcons: Record<Disease, () => ReactNode> = {
+  "cancer Segmentation": () => <FileHeart className="h-4 w-4" />,
+  "diabetes": () => <Droplets className="h-4 w-4" />,
+  "heart Disease": () => <Heart className="h-4 w-4" />,
+  "parkinson": () => <Activity className="h-4 w-4" />,
+  "kidney Disease": () => <Kidneys/>,
+  "breast Cancer": () => <Ghost className="h-4 w-4" />,
+  "pneumonia": () => <Lungs/>,
+  "malaria": () => <Malaria/>,
+  "liver disease": () =><Liver/> ,
+  "bodyfat": () => <Scale className="h-4 w-4" />,
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({

@@ -27,7 +27,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   },[])
   return (
-    <div className={`bg-black h-[100vh] ${roboto.className}`}>
+    <div className={`bg-black h-[100vh] ${roboto.className} font-bold`}>
           <Component {...pageProps} />
     </div>
   );
