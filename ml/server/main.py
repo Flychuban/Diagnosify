@@ -15,8 +15,7 @@ from flask import Flask, request, jsonify, send_file
 import tensorflow as tf
 import io
 import requests
-from OpenSSL import SSL
-
+import matplotlib.pyplot as plt
 
 context = (
     "/etc/letsencrypt/live/diagnosify.tech/cert.pem", 
@@ -257,16 +256,36 @@ def cancer_segmentation():
         
         prediction = cancer_segmentation_model.predict(image_tensor)
         yhat = np.squeeze(np.where(prediction > 0.5, 1.0, 0.0))
+        
         segmented_image = (yhat[:, :, 0] * 255).astype(np.uint8)
 
         # Convert segmented image to bytes
         _, buffer = cv2.imencode('.png', segmented_image)
         
+        fig, ax = plt.subplots(1, 7, figsize=(20, 10))
+        
+        ax[0].imshow(image)
+        ax[0].set_title("Input Image")
+        ax[0].axis('off')
+    
+    # Show each predicted mask
+        for i in range(6):
+            ax[i + 1].imshow(yhat[:, :, i])
+            ax[i + 1].set_title(f"Mask {i + 1}")
+            ax[i + 1].axis('off')
+    
+    # Save the figure into a buffer
+        buffer = io.BytesIO()
+        plt.tight_layout()
+        plt.savefig(buffer, format='png')
+        buffer.seek(0)
+        plt.close(fig)
+
         # Create a file-like object that mimics a file upload
         files = {
             'data': (
                 'segmented.png',  # filename
-                buffer.tobytes(),  # file content
+                buffer.getvalue(),  # file content
                 'image/png'       # mimetype
             )
         }
@@ -280,7 +299,6 @@ def cancer_segmentation():
     except Exception as e:
         print(f"Error in cancer_segmentation: {e}")
         return jsonify({"error": str(e)}), 500
-
 
 
 
@@ -568,4 +586,4 @@ def predict_parkinson():
 
 
 if __name__ == '__main__':
-    app.run(ssl_context=context,debug=True, port=2083)
+    app.run(debug=True, port=5000)

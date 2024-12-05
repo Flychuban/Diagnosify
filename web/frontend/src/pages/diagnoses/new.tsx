@@ -123,12 +123,13 @@ const LiverDisease = [
 ];
 
 
+const mlPredictionUrl = Env.prediction_service_url
 const CancerPredictionForm: React.FC = () => {
   return (
     <PredictionForm<{},  {s3_loc: string}
 >
       title="Cancer Prediction"
-      endpoint="http://127.0.0.1:5000/cancer-segmentation"
+      endpoint={mlPredictionUrl+"/cancer-segmentation"}
       componentToDisplayPrediction={(data) => <div>{data}</div>}
       anotherComponentToDisplayPrediction={(data) => {
         return <div>
@@ -223,7 +224,6 @@ const MAlari = () => {
   )
 }
 
-const mlPredictionUrl = Env.prediction_service_url
 
 const App = () => {
   const [current, setCurrent] = useState(0);
