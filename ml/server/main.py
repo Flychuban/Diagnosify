@@ -15,6 +15,14 @@ from flask import Flask, request, jsonify, send_file
 import tensorflow as tf
 import io
 import requests
+from OpenSSL import SSL
+
+
+context = (
+    "/etc/letsencrypt/live/diagnosify.tech/cert.pem", 
+    "/etc/letsencrypt/live/diagnosify.tech/privkey.pem"
+)
+
 
 def create_response_object(data):
     return jsonify({"prediction" : data}), 200
@@ -560,4 +568,4 @@ def predict_parkinson():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(ssl_context=context,debug=True, port=2083)
