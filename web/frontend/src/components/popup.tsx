@@ -10,7 +10,7 @@ export const PopUpWrapper2: React.FC<{ onClose: () => void, isOpen: boolean, chi
       <div className="bg-secondary rounded p-4 shadow-md border-primary border-x-4 border-y-4">
         {children}
         <button
-          onClick={onClose}
+          onClick={() => { onClose() }}
           className="bg-9fb5b3 text-f6fcfc mt-2 rounded px-4 py-2 hover:bg-opacity-80 focus:outline-none"
           type="button"
         >
@@ -82,7 +82,7 @@ export const SuccesfulPopUp: React.FC<{
   };
 
   if (hasActiveTimeExpired) {
-    return null;
+    return <div></div>;
   }
 
   return (
@@ -100,8 +100,8 @@ export const SuccesfulPopUp: React.FC<{
 
 
 
-export const ErrorPopUp: React.FC<{ error: string, isOpen: boolean }> = ({ error, isOpen }) => { 
-  return <PopUpWrapper2 onClose={() => {return} }  isOpen={isOpen} >
+export const ErrorPopUp: React.FC<{ error: string, isOpen: boolean, onClose: () => void }> = ({ error, isOpen, onClose }) => { 
+  return <PopUpWrapper2 onClose={() => { console.log("jijiijjijij"); onClose() }}  isOpen={isOpen} >
     <div className="bg-red-500">
     <div>Error happend</div>
     <div>{error}</div>

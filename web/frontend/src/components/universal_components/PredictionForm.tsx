@@ -116,7 +116,7 @@ export const PredictionForm = <T extends object, RequestResponse>({
         }
       >
         <SuccesfulActionPopUp text={succesfulAction} onClose={ () => {setIsSuccesfullaction("")}}/>
-        <ErrorPopUp isOpen={error.length > 0} error={ error} />
+        <ErrorPopUp isOpen={error.length > 0} error={ error} onClose={() => setError("")} />
         <div
           className="relative rounded-lg border-2 border-dashed border-gray-300 bg-gray-900 p-6 transition-colors hover:border-gray-400"
           onDragEnter={handleDragEnter}
