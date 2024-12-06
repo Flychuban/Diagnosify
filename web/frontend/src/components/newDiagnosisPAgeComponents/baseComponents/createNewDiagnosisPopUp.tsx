@@ -35,7 +35,7 @@ export const CreateNewDiagnosisPopUp: React.FC<{
         <ErrorPopUp
           error={error}
           isOpen={error.length > 0}
-          onClose={() => { console.log("hi this is de")}}
+          onClose={() => {setError("")}}
         />
         <div className="mb-6">
           <p className="text-primaryText text-lg mb-4">What do you think about the diagnosis?</p>

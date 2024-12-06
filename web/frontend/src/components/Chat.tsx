@@ -7,6 +7,7 @@ import { ComponentReliantOnRequestWrapper } from "./universal_components/Compoen
 import { MessageBox } from "./MessageBox";
 import { useTraceUpdate } from "~/hooks/debug/checkPropCausingRerender";
 import { api } from "~/utils/api/api";
+import { Dots } from "./newDiagnosisPAgeComponents/baseComponents/createNewDiagnosisPopUp";
 
 export type FullChat = Chat & {
   messages: (Message & { user: User; MsgWeAreReplyingTo: Message & User })[];
@@ -18,11 +19,12 @@ type apiResponse<T> = T | { errMsg: string };
 
 function useGetState<T>(
   functionToFetchState: () => Promise<apiResponse<T>>
-): apiResponse<T> {
+) {
   const [state, setState] = useState<apiResponse<T>>({
     errMsg: "Data hasn't been fetched yet",
   });
 
+  const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
     const interval = setInterval(() => {
       timelimitedProxy
@@ -31,6 +33,7 @@ function useGetState<T>(
           if (data !== Statuses.BUSY) {
             setState(data);
           }
+          setIsLoading(false)
         })
         .catch(() => {});
     }, 5000);
@@ -38,7 +41,7 @@ function useGetState<T>(
     return () => clearInterval(interval);
   }, [functionToFetchState]);
 
-  return state;
+  return [state, isLoading];
 }
 
 const Msg: React.FC<{
@@ -97,10 +100,23 @@ export const ChatComponent: React.FC<{ diagnosisId: number }> = ({
   useTraceUpdate(diagnosisId);
   const authToken = useGetAuthToken();
   const [selectedMsgIndex, setSelectedMsgIndex] = useState<number | null>(null);
-  const chat = useGetState<{ chat: FullChat }>(() =>
+  const [chat, isLoading] = useGetState<{ chat: FullChat }>(() =>
     getDiagnosisReviewChat(diagnosisId)
   );
 
+
+
+  if (!authToken?.userId) {
+    return <div>Loading<Dots/></div>;
+  }
+  if (isLoading) {
+    return <div>Loading <Dots/></div>;
+  }
+
+
+  if (chat === undefined) {
+    return <div>Loading  <Dots/></div>
+  }
   if ("errMsg" in chat) {
     return (
       <div className="p-4 text-primarytext bg-primary border-red-400 rounded-md">
@@ -108,13 +124,8 @@ export const ChatComponent: React.FC<{ diagnosisId: number }> = ({
       </div>
     );
   }
-
-  if (!authToken?.userId) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <div className="p-6 bg-secondary rounded-lg shadow-lg">
+    <div className="p-6 bg-secondary rounded-lg shadow-lg text-primarytext">
       <div className="overflow-y-auto max-h-[50vh] mb-6">
         {chat.chat.messages.map((msg, idx) => (
           <Msg

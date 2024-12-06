@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { SendHorizontal, MessageCircleHeart } from "lucide-react"; // Update this with the actual import
 import { Message } from "~/types/apiTypes";
 import { api } from "~/utils/api/api";
+import { Dots } from "./newDiagnosisPAgeComponents/baseComponents/createNewDiagnosisPopUp";
 
 export const MessageBox: React.FC<{
   chatId: number;
@@ -12,7 +13,7 @@ export const MessageBox: React.FC<{
 }> = ({ chatId, userId, isReply, msgWeAreReplyingTo , onRemoveReplyingToMsg }) => {
   const [msg, setMsg] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
-
+  const [isReqBeingSent, setIsRequestBeingSent] = useState(false);
   // Scroll the message box to the bottom when the message input changes
   useEffect(() => {
     if (messageBoxRef.current) {
@@ -65,15 +66,21 @@ export const MessageBox: React.FC<{
               if (msgWeAreReplyingTo === null) {
                 throw new Error("No message to reply to");
               }
+              setIsRequestBeingSent(true)
               await api.chat.replyToMsg(chatId, msgWeAreReplyingTo.id,userId, msg) 
             } else {
+
+              setIsRequestBeingSent(true)
               await api.chat.postMsg(chatId, userId, msg)
             }
+            setIsRequestBeingSent(false)
+            setMsg("")
           }}
           className="flex items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          disabled={isReqBeingSent}
         >
           <SendHorizontal className="h-4 w-4 mr-2" />
-          <span>Send</span>
+          <span>{isReqBeingSent ? <Dots/> : "Send"}</span>
         </button>
       </div>
     </div>
