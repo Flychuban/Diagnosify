@@ -11,8 +11,8 @@ chatRouter.get('/', async (req: express.Request, res: express.Response<CustomRes
         res.status(400).json({ errMsg: 'Missing both chatId and diagnosisID' });
         return;
     }
-    
-    if (typeof chatId === 'string') { 
+
+    if (typeof chatId === 'string') {
         const chat = await db.chats.getChat(parseInt(chatId), undefined)
         if (chat === null || chat === undefined) {
             res.status(404).json({ errMsg: 'Chat not found' });
@@ -21,7 +21,7 @@ chatRouter.get('/', async (req: express.Request, res: express.Response<CustomRes
         res.status(201).json({ chat: chat })
     }
 
-    if (typeof diagnosisID === 'string') { 
+    if (typeof diagnosisID === 'string') {
         const chat = await db.chats.getChat(undefined, parseInt(diagnosisID))
             if (chat === null || chat === undefined) {
             res.status(404).json({ errMsg: 'Chat not found' });
@@ -37,13 +37,13 @@ chatRouter.post("/", async (req: express.Request<{}, {}, { diagnosisId: number }
         await db.chats.createChat(req.body.diagnosisId)
     } catch (e) {
         res.status(500).json({errMsg: e.message})
-    } 
+    }
 })
 
 chatRouter.post(
     "/:chatId/message",
-    async (req: express.Request<{ chatId: string }, {}, { userId: number; message: string }>, res: express.Response<{}>) => { 
-
+    async (req: express.Request<{ chatId: string }, {}, { userId: number; message: string }>, res: express.Response<{}>) => {
+    console.log(req.body,req.params)
     try {
         await db.chats.createMessage(parseInt(req.params.chatId), req.body.message,req.body.userId)
         res.status(201).json({})
@@ -61,7 +61,7 @@ chatRouter.post("/:chatId/reply",
 
             await db.chats.reply(parseInt(req.params.chatId), req.body.msgContent , req.body.idOfMsgWeAreReplyingTo, req.body.userId )
             res.status(201).json({})
-        } catch (e) { 
+        } catch (e) {
             res.status(500).json({errMsg: e.message})
         }
     }
