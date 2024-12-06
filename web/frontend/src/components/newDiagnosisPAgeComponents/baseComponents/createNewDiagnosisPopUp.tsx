@@ -58,6 +58,7 @@ export const CreateNewDiagnosisPopUp: React.FC<{
                 setError("Please make a vote");
                 return;
               }
+                          set
                           await saveDiagnosis(vote, null);
                           onClose()
             }}
