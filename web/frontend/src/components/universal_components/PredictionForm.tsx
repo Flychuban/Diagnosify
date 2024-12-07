@@ -156,28 +156,30 @@ export const PredictionForm = <T extends object, RequestResponse>({
               }
             }
           
-            saveDiagnosis={(vote: boolean, skipVoting: boolean | null) => {
+            saveDiagnosis={async (vote: boolean, skipVoting: boolean | null) => {
               if (file === null) {
                 setError("no file uploaded")
                 throw new Error("no file uploaded")
               }
-              return savePrediction({
-                file: file,
-                prediction: JSON.stringify(responseMessage!.predictionData!),
-              },skipVoting, vote).then(
-                () => {
-                  setIsSuccesfullaction("created diagnosis");
-                  return;
-                }).catch((e) => {
-                setError("error creating prediction, pls try again")
-                return 
-              })
+              try {
+                console.log("mjioijjo",savePrediction)
+                const data_1 = await savePrediction({
+                  file: file,
+                  prediction: JSON.stringify(responseMessage!.predictionData!),
+                }, skipVoting, vote);
+                console.log("new diag", data_1);
+                setIsSuccesfullaction("created diagnosis");
+                return;
+              } catch (e) {
+                setError("error creating prediction, pls try again");
+                return;
+              }
             }}
           /> 
         </div>
         {responseMessage !== null &&
           responseMessage !== undefined &&
-          anotherComponentToDisplayPrediction<RequestResponse>(
+          anotherComponentToDisplayPrediction(
             responseMessage.predictionData,
           )}
       </MainForm>

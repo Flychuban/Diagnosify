@@ -22,7 +22,7 @@ export const MainForm = <T,>({
 
   return (
     <div className="rounded-lg bg-secondary p-6 shadow-md">
-      <h1 className="mb-4 text-2xl font-semibold text-gray-800">{title}</h1>
+      <h1 className="mb-4 text-2xl font-semibold ">{title}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         {children}
         <div>

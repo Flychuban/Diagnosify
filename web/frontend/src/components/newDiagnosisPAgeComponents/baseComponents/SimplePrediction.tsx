@@ -25,7 +25,6 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
       return acc;
     }, {} as FormDataStructure) // Ensure type safety for the accumulator
   );
-  const [isCreateNEwDiagnosisPopUpOPen, setIsCreateNewPopUpOpen] = useState(false)
   const [responseMessage, setResponseMessage] = useState<PredictionResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [succesfulAction,setSuccesfulAction] = useState("") 
@@ -53,7 +52,7 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
     <div className="mx-auto max-w-2xl rounded-lg bg-secondary p-6 shadow">
       <CreateNewDiagnosisPopUp
         isOpen={isCreateDiagnosisPopUpOpen}
-        onClose={() => { setIsCreateNewPopUpOpen(false) }}
+        onClose={() => { setIsCreateDiagnosisPopUpOpen(false) }}
         saveDiagnosis={async (vote, directVoteWhichSkipsVoting) => {
           if (responseMessage === null) {
             throw new Error("No prediction received");
@@ -64,36 +63,37 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
         }}
       />
       <SuccesfulActionPopUp text={succesfulAction} onClose={() => { setSuccesfulAction("") }} /> 
-      <h2 className="mb-6 text-2xl font-bold text-primary">{title}</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex flex-wrap gap-4">
-          {formFields.map(({ key, label, type = "text" }) => (
-            <div key={key as string} className="basis-1/3">
-              <label
-                htmlFor={key as string}
-                className="block text-sm font-medium text-primary-dark"
-              >
-                {label}
-              </label>
-              <input
-                id={key as string}
-                name={key as string}
-                type={type}
-                value={formData[key]}
-                onChange={handleInputChange}
-                className="w-full rounded border bg-secondary p-2 text-primary-dark"
-              />
-            </div>
-          ))}
-        </div>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full rounded bg-primary p-2 text-white hover:bg-primary-dark disabled:bg-gray-400"
+      <h2 className="mb-6 text-2xl font-bold text-primarytext">{title}</h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
+  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {formFields.map(({ key, label, type = "text" }) => (
+      <div key={key as string} className="space-y-2">
+        <label
+          htmlFor={key as string}
+          className="block text-sm font-medium text-primary-dark"
         >
-          {isLoading ? "Processing..." : "Predict"}
-        </button>
-      </form>
+          {label}
+        </label>
+        <input
+          id={key as string}
+          name={key as string}
+          type={type}
+          value={formData[key]}
+          onChange={handleInputChange}
+          className="w-full rounded-lg border border-gray-300 bg-secondary px-3 py-2 text-primary-dark shadow-sm focus:border-primary focus:ring-2 focus:ring-primary-dark transition"
+        />
+      </div>
+    ))}
+  </div>
+  <button
+    type="submit"
+    disabled={isLoading}
+    className="w-full rounded-lg bg-primary py-3 text-white font-semibold hover:bg-primary-dark disabled:bg-gray-400 transition"
+  >
+    {isLoading ? "Processing..." : "Predict"}
+  </button>
+</form>
+
       <button
         onClick={async () => {
           if (!responseMessage) { 

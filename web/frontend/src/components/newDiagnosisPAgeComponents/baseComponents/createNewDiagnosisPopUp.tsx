@@ -90,7 +90,7 @@ export const CreateNewDiagnosisPopUp: React.FC<{
               }
                           setIsRequestBeingSent(true)
                           await saveDiagnosis(vote, null);
-                          onClose()
+              onClose()
 
                           setIsRequestBeingSent(true)
             }}

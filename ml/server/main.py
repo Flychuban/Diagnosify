@@ -513,7 +513,7 @@ def heart_disease_predict():
 
         # we do this since the fields are in string format
         for i in range(0,len(input_data[0]),1):
-            input_data[0][i] = int(input_data[0][i])
+            input_data[0][i] = float(input_data[0][i])
 
         # Make a prediction
         print(input_data)

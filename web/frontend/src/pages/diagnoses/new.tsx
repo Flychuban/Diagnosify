@@ -124,22 +124,7 @@ const LiverDisease = [
 
 
 const mlPredictionUrl = Env.prediction_service_url
-const CancerPredictionForm: React.FC = () => {
-  return (
-    <PredictionForm<{},  {s3_loc: string}
->
-      title="Cancer Prediction"
-      endpoint={mlPredictionUrl+"/cancer-segmentation"}
-      componentToDisplayPrediction={(data) => <div>{data}</div>}
-      anotherComponentToDisplayPrediction={(data) => {
-        return <div>
-          <img src={data.s3_loc} />
-          {(JSON.stringify(data))}</div>
-      }}
 
-    />
-  );
-}
 
 
 async function saveImageDataTextResponse(diseaseEndpoint: string,data: {prediction: string, file: File},directVoteWhichSkipsVoting: boolean | null, vote: boolean) {
@@ -204,12 +189,31 @@ const PneumoniaPredictionForm: React.FC = () => {
       }}
       savePrediction={async (data, directVoteWhichSkipsVoting: boolean | null, vote: boolean) => {
         await saveImageDataTextResponse("pneumonia", data, directVoteWhichSkipsVoting ,vote);
-        const authToken2 = cookies.token.get();
       }}
     />
   );
 };
 
+const CancerPredictionForm: React.FC = () => {
+  return (
+    <PredictionForm<
+      object,
+      { s3_loc: string }
+    >
+      title="Cancer Prediction"
+      endpoint={`${mlPredictionUrl}/cancer-segmentation`}
+      componentToDisplayPrediction={(data) => <div>{data}</div>}
+      anotherComponentToDisplayPrediction={(data) => {
+        return <div>
+          <img src={data.s3_loc} />
+          {(JSON.stringify(data))}</div>
+      }}
+      savePrediction={async (data, directVoteWhichSkipsVoting: boolean | null, vote: boolean) => {
+        await saveImageDataTextResponse("canc",data, directVoteWhichSkipsVoting, vote)
+      }}
+    />
+  );
+}
 const MAlari = () => {
   return (
     <PredictionForm<{prediction: {message: string, malaria_probability: string}},{prediction: {message: string, malaria_probability: string}}>
