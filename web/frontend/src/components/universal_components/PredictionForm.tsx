@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import React,{ useState } from "react";
 import { api } from "~/utils/api/api";
 import { MainForm } from "../newDiagnosisPAgeComponents/baseComponents/MainForm";
@@ -6,6 +6,7 @@ import { Cloud, Upload } from "lucide-react";
 import { ErrorPopUp, PopUpWrapper, SuccesfulActionPopUp } from "../popup";
 import { CreateNewDiagnosisPopUp } from "../newDiagnosisPAgeComponents/baseComponents/createNewDiagnosisPopUp";
 import FileVisualizer from "../inPageImgVisulizer";
+import { getBaseUrl } from "~/utils/getHost";
 
 
 export interface PredictionFormWithImageProps<T, RequestResponse> {
@@ -19,7 +20,7 @@ export interface PredictionFormWithImageProps<T, RequestResponse> {
     data: { prediction: string, file: File },
     directVoteWhichSkipsVoting: boolean | null,
     vote: boolean
-  ) => Promise<{ isSaved: boolean; payloadWithAdditionalInfo: string }>;
+  ) => Promise<AxiosResponse<{ newDiag: {diagnosis: {id: number}} }>>;
 }
 
 export const PredictionForm = <T extends object, RequestResponse>({
@@ -44,6 +45,7 @@ export const PredictionForm = <T extends object, RequestResponse>({
       setFile(selectedFile);
     }
   };
+  const [succesfulDiagnosisCreationId, setSuccesfulDiagnosisCreationId] = useState<null | number>(null)
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
@@ -115,7 +117,19 @@ export const PredictionForm = <T extends object, RequestResponse>({
             : () => <div>hi</div>
         }
       >
-        <SuccesfulActionPopUp text={succesfulAction} onClose={ () => {setIsSuccesfullaction("")}}/>
+        <SuccesfulActionPopUp text={succesfulAction} onClose={() => { setIsSuccesfullaction("") }}>
+{succesfulDiagnosisCreationId !== null && (
+  <div className="flex justify-center items-center mt-4">
+    <a
+      href={`${getBaseUrl(window.location.href)}/diagnoses/${succesfulDiagnosisCreationId}`}
+      className="bg-primary text-white font-semibold py-2 px-4 rounded shadow-md hover:bg-primary-dark hover:shadow-lg transition duration-200"
+    >
+      Go to Diagnosis
+    </a>
+  </div>
+)}
+        </SuccesfulActionPopUp>
+        
         <ErrorPopUp isOpen={error.length > 0} error={ error} onClose={() => setError("")} />
         <div
           className="relative rounded-lg border-2 border-dashed border-gray-300 bg-gray-900 p-6 transition-colors hover:border-gray-400"
@@ -145,7 +159,7 @@ export const PredictionForm = <T extends object, RequestResponse>({
           </div>
         </div>
         <div>
-
+          
           {file !== null && <FileVisualizer file={file} />}
         </div>
         <div>
@@ -167,10 +181,12 @@ export const PredictionForm = <T extends object, RequestResponse>({
                   file: file,
                   prediction: JSON.stringify(responseMessage!.predictionData!),
                 }, skipVoting, vote);
-                console.log("new diag", data_1);
+                console.log("new diag", data_1.data);
+                setSuccesfulDiagnosisCreationId(data_1.data.newDiag.diagnosis.id)
                 setIsSuccesfullaction("created diagnosis");
                 return;
               } catch (e) {
+                console.error("Error creating prediction:", e);
                 setError("error creating prediction, pls try again");
                 return;
               }

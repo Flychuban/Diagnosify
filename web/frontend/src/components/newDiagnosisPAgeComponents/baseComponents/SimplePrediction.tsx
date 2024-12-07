@@ -2,12 +2,13 @@ import axios, {  } from "axios";
 import React,{ ReactNode, useState } from "react";
 import {PopUpWrapper, SuccesfulActionPopUp} from "../../popup"
 import { CreateNewDiagnosisPopUp } from "./createNewDiagnosisPopUp";
+import { getBaseUrl } from "~/utils/getHost";
 interface PredictionFormProps<PredictionResponse,T> {
   title: string;
   endpoint: string;
   formFields: { key: keyof T; label: string; type?: string }[];
   componentToDisplayPrediction: (data: PredictionResponse) => ReactNode
-  SavePredictionInDbWithTheS3ReferenceHandler: (data: { dataForPrediction: T, responseMsg: PredictionResponse  }, vote: boolean, directVoteWhichSkipsVoting: boolean | null) => Promise<AxiosResponse>
+  SavePredictionInDbWithTheS3ReferenceHandler: (data: { dataForPrediction: T, responseMsg: PredictionResponse }, vote: boolean, directVoteWhichSkipsVoting: boolean | null) => Promise<{newDiag: {diagnosis: {id:number}}}> 
 }
 
 
@@ -18,7 +19,8 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
   componentToDisplayPrediction,
   SavePredictionInDbWithTheS3ReferenceHandler
 }: PredictionFormProps<PredictionResponse, FormDataStructure>) => {
-  const [isCreateDiagnosisPopUpOpen,setIsCreateDiagnosisPopUpOpen] = useState(false)
+  const [isCreateDiagnosisPopUpOpen, setIsCreateDiagnosisPopUpOpen] = useState(false)
+  const [idOfCreatedPrediction,setIdOfCreatedPrediction] = useState<null | number>(0)
   const [formData, setFormData] = useState<FormDataStructure>(
     formFields.reduce((acc, field) => {
       acc[field.key] = ""; // Correctly assign an empty string to each field key
@@ -58,11 +60,24 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
             throw new Error("No prediction received");
           }
           const res = await SavePredictionInDbWithTheS3ReferenceHandler({dataForPrediction:formData,responseMsg: responseMessage },vote, directVoteWhichSkipsVoting)
-
+          console.log("6t6t",res);
+          setIdOfCreatedPrediction(res.newDiag.diagnosis.id)
           setSuccesfulAction("created diagnosis")
         }}
       />
-      <SuccesfulActionPopUp text={succesfulAction} onClose={() => { setSuccesfulAction("") }} /> 
+      <SuccesfulActionPopUp text={succesfulAction} onClose={() => { setSuccesfulAction("") }} >
+      {idOfCreatedPrediction !== null && (
+  <div className="flex justify-center items-center mt-4">
+    <a
+      href={`${getBaseUrl(window.location.href)}/diagnoses/${idOfCreatedPrediction}`}
+      className="bg-primary text-white font-semibold py-2 px-4 rounded shadow-md hover:bg-primary-dark hover:shadow-lg transition duration-200"
+    >
+      Go to Diagnosis
+    </a>
+  </div>
+)}
+
+      </SuccesfulActionPopUp> 
       <h2 className="mb-6 text-2xl font-bold text-primarytext">{title}</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

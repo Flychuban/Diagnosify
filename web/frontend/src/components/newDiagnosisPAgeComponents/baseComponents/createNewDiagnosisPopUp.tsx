@@ -72,7 +72,7 @@ export const CreateNewDiagnosisPopUp: React.FC<{
                           await saveDiagnosis(vote, true);
                           onClose()
 
-                          setIsRequestBeingSent(true)
+                          setIsRequestBeingSent(false)
             }}
             type="button"
             className="bg-primary text-white py-2 px-4 rounded-md w-full hover:bg-blue-700 focus:outline-none"
@@ -92,7 +92,7 @@ export const CreateNewDiagnosisPopUp: React.FC<{
                           await saveDiagnosis(vote, null);
               onClose()
 
-                          setIsRequestBeingSent(true)
+                          setIsRequestBeingSent(false)
             }}
             type="button"
             className="bg-primary text-white py-2 px-4 rounded-md w-full hover:bg-blue-700 focus:outline-none"

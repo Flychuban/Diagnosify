@@ -109,9 +109,10 @@ export const ErrorPopUp: React.FC<{ error: string, isOpen: boolean, onClose: () 
   </PopUpWrapper2>
 }
 
-export const SuccesfulActionPopUp: React.FC<{ text: string, onClose: () => void }> = ({ text, onClose }) => {
+export const SuccesfulActionPopUp: React.FC<{ text: string, onClose: () => void, children: ReactNode }> = ({ text, onClose, children }) => {
   return <PopUpWrapper2 onClose={() => { onClose() }} isOpen={text.length > 0}>
     <div>Succesfully {text }
-  </div>
+    </div>
+    {children}
   </PopUpWrapper2>
 }

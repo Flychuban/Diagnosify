@@ -184,11 +184,10 @@ const PneumoniaPredictionForm: React.FC = () => {
       endpoint={`${mlPredictionUrl}/predict_pneumonia`}
       componentToDisplayPrediction={(data) => <div>{JSON.stringify(data)}</div>}
       anotherComponentToDisplayPrediction={(data) => {
-        console.log("dat", data);
         return <div>{data.prediction.message}</div>;
       }}
       savePrediction={async (data, directVoteWhichSkipsVoting: boolean | null, vote: boolean) => {
-        await saveImageDataTextResponse("pneumonia", data, directVoteWhichSkipsVoting ,vote);
+        return await saveImageDataTextResponse("pneumonia", data, directVoteWhichSkipsVoting ,vote);
       }}
     />
   );
@@ -206,10 +205,10 @@ const CancerPredictionForm: React.FC = () => {
       anotherComponentToDisplayPrediction={(data) => {
         return <div>
           <img src={data.s3_loc} />
-          {(JSON.stringify(data))}</div>
+        </div>
       }}
       savePrediction={async (data, directVoteWhichSkipsVoting: boolean | null, vote: boolean) => {
-        await saveImageDataTextResponse("canc",data, directVoteWhichSkipsVoting, vote)
+        return await saveImageDataTextResponse("canc",data, directVoteWhichSkipsVoting, vote)
       }}
     />
   );
@@ -222,7 +221,7 @@ const MAlari = () => {
       componentToDisplayPrediction={(data: { message: string }) => <div>{data.message}</div>}
       anotherComponentToDisplayPrediction={(data) => { return <div>{ data.prediction.message}</div>}}
       savePrediction={async (data,directVoteWhichSkipsVoting: boolean | null, vote: boolean) => {
-        await saveImageDataTextResponse("malaria", data, directVoteWhichSkipsVoting,vote)
+        return await saveImageDataTextResponse("malaria", data, directVoteWhichSkipsVoting,vote)
       }}
     />
   )

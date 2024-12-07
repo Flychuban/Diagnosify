@@ -135,9 +135,9 @@ const ReadingPage: React.FC = () => {
       <Card
         className="mb-8 shadow-lg bg-secondary text-primarytext"
         bodyStyle={{ padding: "20px" }}
-        title={<Title level={4} color="white">Vote on This Prediction</Title>}
+        title={<p level={4} color="white" className="text-primarytext">Vote on This Prediction</p>}
       >
-        <Text color="white">What do you think about this prediction?</Text>
+        <p color="white" className="text-primarytext">What do you think about this prediction?</p>
         {diagnosisId && (
           <VotingSection
             diagnosisId={diagnosisId}
@@ -152,12 +152,12 @@ const ReadingPage: React.FC = () => {
       <Card
         className="mb-8 shadow-lg bg-secondary text-white"
         bodyStyle={{ padding: "20px" }}
-        title={<Title level={4} color="white">Vote Results</Title>}
+        title={<p  className="text-primarytext">Vote Results</p>}
       >
         <ProgressBar
           fill={getVotingPercentage(diagnosis.diagnosis.voting.votes)}
         />
-        <Text className="">
+        <Text className="text-primarytext">
           Total Votes: {diagnosis.diagnosis.voting.votes.length}
         </Text>
       </Card>
@@ -167,7 +167,7 @@ const ReadingPage: React.FC = () => {
         <Card
           className="shadow-lg bg-secondary"
           bodyStyle={{ padding: "20px" }}
-          title={<Title level={4} color="white">Discussion</Title>}
+          title={<p level={4} color="white" className="text-primarytext">Discussion</p>}
         >
           <ChatComponent diagnosisId={parseInt(diagnosisId)} />
         </Card>

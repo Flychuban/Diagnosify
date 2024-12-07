@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { cookies } from "~/utils/cookies";
 import { Roboto } from "next/font/google";
 import EventEmitter from "events";
+import { NavMenu } from "~/components/Navmenu";
 
 // Create a global event emitter instance
 export const globalEventEmitter = new EventEmitter();
@@ -66,6 +67,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <div className={`bg-black h-[100vh] ${roboto.className} font-bold relative`}>
+      <NavMenu/>
       {shouldGlobalLoadingShow && <Loading />}
       <Component {...pageProps} />
     </div>
