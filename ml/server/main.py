@@ -374,7 +374,7 @@ def liver_disease_predict():
         prediction = liver_disease_model.predict([input_data])
 
         # Return the result
-        result = "Person has Liver Disease" if prediction[0] == 0 else "Person does not have Liver Disease"
+        result = "Person has Liver Disease" if prediction[0] == 1 else "Person does not have Liver Disease"
         return jsonify({"prediction": result})
 
     except Exception as e:
