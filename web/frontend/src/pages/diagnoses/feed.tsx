@@ -4,6 +4,55 @@ import Link from 'next/link';
 import { Reading } from '~/components/reading';
 import type { Diagnosis } from '~/utils/api/types';
 import { api } from '~/utils/api/api';
+import { useExecuteRequest } from '~/hooks/requestHook';
+import axios from 'axios';
+import { Env } from '~/utils/env';
+import { User } from '~/types/apiTypes';
+import { Dots } from '~/components/newDiagnosisPAgeComponents/baseComponents/createNewDiagnosisPopUp';
+import { cookies } from '~/utils/cookies';
+
+const Card: React.FC<{ diagnosis: Diagnosis }> = ({diagnosis }) => {
+  const [userData, isLoading, isError] = useExecuteRequest(null, async () => {
+    return await axios.get<{ user: User }>(`${Env.gateway_url}/diag/diag/user/getById/${diagnosis.id}`, {
+      headers: {
+        Authorization: `Bearer ${cookies.token.get()!.userId}`,
+        authorization: `Bearer ${cookies.token.get()!.userId}`
+      },
+    })
+  })
+  if (isError) {
+    return <div>{ isError }</div>
+  }
+
+  return <div>
+    <div 
+            className="overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 text-gray-100"
+          >
+            <div className="border-b border-zinc-700 p-4">
+              <h2 className="text-xl font-medium text-white">
+                {diagnosis.type} Prediction
+              </h2>
+            </div>
+            
+            <div className="p-6">
+        Created by {isLoading && <div>  Loading  <Dots/></div>} {userData?.data.user.username} 
+            </div>
+            <div className=""> {diagnosis.is_correct === null ? "voting closed" : "voting open"}</div>
+            <div className="border-t border-zinc-700 bg-zinc-800/50 p-4">
+              <Link 
+                href={`/diagnoses/${diagnosis.id}`}
+                className="block w-full rounded-lg bg-red-500 px-4 py-2 text-center 
+                         font-medium text-white transition-colors hover:bg-red-600 
+                         focus:outline-none focus:ring-2 focus:ring-red-500 
+                         focus:ring-offset-2 focus:ring-offset-zinc-800"
+              >
+                View Details
+              </Link>
+            </div>
+          </div>
+  </div>
+}
+
 
 const Feed: React.FC = () => {
   const [feed, setFeed] = useState<Diagnosis[] | null>(null);
@@ -16,6 +65,7 @@ const Feed: React.FC = () => {
         if ("errMsg" in data) {
           setFeed(null);
         } else {
+          console.log(data.diagnoses)
           setFeed(data.diagnoses);
         }
       } catch (error) {
@@ -53,48 +103,11 @@ const Feed: React.FC = () => {
     );
   }
 
-  const parseRawData = (rawData: any) => {
-    try {
-      return JSON.parse(rawData?.toString() ?? '{"error":"data undefined"}');
-    } catch (err) {
-      return {};
-    }
-  };
-
   return (
     <div className="min-h-screen bg-zinc-900 p-4">
       <div className="mx-auto max-w-3xl space-y-4">
         {feed.map((reading, index) => (
-          <div 
-            key={index} 
-            className="overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 text-gray-100"
-          >
-            <div className="border-b border-zinc-700 p-4">
-              <h2 className="text-xl font-medium text-white">
-                {reading.type} Prediction
-              </h2>
-            </div>
-            
-            <div className="p-6">
-              <Reading
-                rawData={parseRawData(reading.raw_data)}
-                type={reading.type}
-                prediction={reading.prediction}
-              />
-            </div>
-
-            <div className="border-t border-zinc-700 bg-zinc-800/50 p-4">
-              <Link 
-                href={`/diagnoses/${reading.id}`}
-                className="block w-full rounded-lg bg-red-500 px-4 py-2 text-center 
-                         font-medium text-white transition-colors hover:bg-red-600 
-                         focus:outline-none focus:ring-2 focus:ring-red-500 
-                         focus:ring-offset-2 focus:ring-offset-zinc-800"
-              >
-                View Details
-              </Link>
-            </div>
-          </div>
+          <Card diagnosis={reading} key={reading.id}/>
         ))}
       </div>
     </div>

@@ -226,7 +226,7 @@ const authToken2 = cookies.token.get()
 
   }
 
-  async getAllDiagnoses(): Promise<RequestResponse<{ diagnoses: Diagnosis[] }>> {
+  async getAllDiagnoses(): Promise<RequestResponse<{ diagnoses: (Diagnosis)[] }>> {
     return this.request<{ diagnoses: Diagnosis[] }>({
       method: "GET",
       url: "/diagnosis/diagnoses",

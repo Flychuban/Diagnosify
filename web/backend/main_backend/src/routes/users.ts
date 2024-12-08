@@ -38,3 +38,21 @@ async  (req: Request<{username: string}, {}, {}>, res: Response<{user: User | nu
     }
   }
 )
+
+userRouter.get(
+  "/getById/:id", // we do it like this to not interfere with the above url
+  async (req: Request<{ id: string }>, res: Response<{ user: User } | {}>) => {
+    try {
+      const user = await db.users.get({
+        userId: parseInt(req.params.id),
+        username: null
+      })
+      if (user === null) {
+        return res.status(404).json({})
+      }
+      return res.json({user: user})
+    } catch (e) { 
+      return res.status(500).json({error: e.message})
+    }
+  }
+)
