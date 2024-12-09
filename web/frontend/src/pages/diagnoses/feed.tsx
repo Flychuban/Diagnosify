@@ -1,8 +1,7 @@
-// Feed.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Reading } from '~/components/reading';
-import type { Diagnosis } from '~/utils/api/types';
+import { Diagnosis } from '~/utils/api/types';
 import { api } from '~/utils/api/api';
 import { useExecuteRequest } from '~/hooks/requestHook';
 import axios from 'axios';
@@ -11,54 +10,50 @@ import { User } from '~/types/apiTypes';
 import { Dots } from '~/components/newDiagnosisPAgeComponents/baseComponents/createNewDiagnosisPopUp';
 import { cookies } from '~/utils/cookies';
 import { getBaseUrl } from '~/utils/getHost';
+import { FeedFilter } from '~/components/FilterMenu';
 
-const Card: React.FC<{ diagnosis: Diagnosis }> = ({diagnosis }) => {
+const Card: React.FC<{ diagnosis: Diagnosis }> = ({ diagnosis }) => {
   const [userData, isLoading, isError] = useExecuteRequest(null, async () => {
     return await axios.get<{ user: User }>(`${Env.gateway_url}/diag/diag/user/getById/${diagnosis.userId}`, {
       headers: {
         Authorization: `Bearer ${cookies.token.get()!.userId}`,
         authorization: `Bearer ${cookies.token.get()!.userId}`
       },
-    })
-  })
+    });
+  });
+
   if (isError) {
-    return <div>{ isError }</div>
+    return <div>{isError}</div>;
   }
 
-  return <div>
-    <div 
-            className="overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 text-gray-100"
-          >
-            <div className="border-b border-zinc-700 p-4">
-              <h2 className="text-xl font-medium text-white">
-                {diagnosis.type} Prediction
-              </h2>
-            </div>
-            
-            <div className="p-6 flex justify-around">
-        <div>Created by {isLoading && <div>  Loading  <Dots/></div>} {userData?.data.user.username} </div>
+  return (
+    <div className="overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 text-gray-100">
+      <div>Debug delete if you see this: {diagnosis.id}</div>
+      <div className="border-b border-zinc-700 p-4">
+        <h2 className="text-xl font-medium text-white">{diagnosis.type} Prediction</h2>
+      </div>
+      <div className="p-6 flex justify-around">
+        <div>
+          Created by {isLoading && <div>Loading <Dots /></div>} {userData?.data.user.username}
+        </div>
+        <div>{diagnosis.is_correct === null ? "voting closed" : "voting open"}</div>
+      </div>
+      <div className="border-t border-zinc-700 bg-zinc-800/50 p-4">
+        <Link
+          href={`${getBaseUrl(window.location.href)}/diagnoses/${diagnosis.id}`}
+          className="block w-full rounded-lg bg-red-500 px-4 py-2 text-center font-medium text-white transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-zinc-800"
+        >
+          View Details
+        </Link>
+      </div>
+    </div>
+  );
+};
 
-            <div className=""> {diagnosis.is_correct === null ? "voting closed" : "voting open"}</div>
-            </div>
-            <div className="border-t border-zinc-700 bg-zinc-800/50 p-4">
-              <Link 
-                href={`/diagnoses/${diagnosis.id}`}
-                className="block w-full rounded-lg bg-red-500 px-4 py-2 text-center 
-                         font-medium text-white transition-colors hover:bg-red-600 
-                         focus:outline-none focus:ring-2 focus:ring-red-500 
-                         focus:ring-offset-2 focus:ring-offset-zinc-800"
-              >
-                View Details
-              </Link>
-            </div>
-          </div>
-  </div>
-}
-
-async function getDiagnosisHotness(diagnosisId: number) {
+async function getDiagnosisHotness(diagnosisId: number): Promise<number> {
   try {
-    const res = await axios.post(`${getBaseUrl(window.location.href)}/api/getHotness`)
-    return res.data.hotness;
+    const res = await axios.post<{ count: number }>(`${getBaseUrl(window.location.href)}/api/getHotness`, { id: diagnosisId });
+    return res.data.count;
   } catch (error) {
     console.error(error);
     return 0;
@@ -66,68 +61,71 @@ async function getDiagnosisHotness(diagnosisId: number) {
 }
 
 const Feed: React.FC = () => {
-
-
-
-
   const [feed, setFeed] = useState<Diagnosis[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentFilter, setFilter] = useState(0)
-  function baseFilter(diagnoses: Diagnosis[], filter: (diagnoses: Diagnosis[]) => Diagnosis[]) {
-    setLoading(true)
-    const new_diagnoses = JSON.parse(JSON.stringify(diagnoses)) as Diagnosis[] // to make a deep copy
-  const filteredDiagnoses = filter(new_diagnoses)
-    setLoading(false)
-    return filteredDiagnoses
-}
+  const [currentFilter, setFilter] = useState(0);
+  const [diagnosesHotness, setDiagnosesHotness] = useState<null | (Diagnosis & { hotness: number })[]>(null);
 
-  const filters: { name: string, execute: (diagnoses: Diagnosis[]) => Diagnosis[] }[] = [
+  const baseFilter = useCallback((diagnoses: Diagnosis[], filter: (diagnoses: Diagnosis[]) => Diagnosis[]) => {
+    const newDiagnoses = [...diagnoses]; // simpler deep copy
+    const filtered = filter(newDiagnoses);
+    return filtered;
+  }, []);
+
+  const filters = useCallback(() => [
     {
       name: "none",
-      execute: (diagnoses: Diagnosis[]) => {
-        return diagnoses;
-      }
+      execute: (diagnoses: Diagnosis[]) => baseFilter(diagnoses, (diagnoses) => diagnoses),
     },
     {
       name: "hottest",
       execute: (diagnoses: Diagnosis[]) => {
-        return baseFilter(diagnoses, (diagnoses) => {
-          for (let i = 0; i < diagnoses.length; i++) { 
-            for (let j = i; j < diagnoses.length; j++){
-              if (getDiagnosisHotness(diagnoses[i].id) < getDiagnosisHotness(diagnoses[j].id)) {
-                const temp = diagnoses[i];
-                diagnoses[i] = diagnoses[j];
-                diagnoses[j] = temp;
-              }
-            }
-          }
-        })
-       } 
+        if (!diagnosesHotness) return diagnoses;
+        return baseFilter(diagnoses, (diagnoses) => diagnosesHotness.sort((a, b) =>   b.hotness - a.hotness));
+      },
     },
-  ]
-
-
+  ], [baseFilter, diagnosesHotness]);
 
   useEffect(() => {
     const fetchDiagnoses = async () => {
       try {
         const data = await api.diagnoses.getAllDiagnoses();
         if ("errMsg" in data) {
-          setFeed(null);
+          setFeed([]);
         } else {
-          console.log(data.diagnoses)
           setFeed(data.diagnoses);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        setFeed(null);
+        setFeed([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDiagnoses();
+  }, []);
+
+  useEffect(() => {
+    const fetchHotness = async () => {
+      if (!feed) return;
+      try {
+        const diagnosesWithHotness = await Promise.all(
+          feed.map(async (diag) => ({
+            ...diag,
+            hotness: await getDiagnosisHotness(diag.id),
+          }))
+        );
+        setDiagnosesHotness(diagnosesWithHotness);
+      } catch (error) {
+        console.error("Error fetching hotness data:", error);
+        setDiagnosesHotness(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDiagnoses();
-  }, []);
+    fetchHotness();
+  }, [feed]);
 
   if (loading) {
     return (
@@ -153,11 +151,19 @@ const Feed: React.FC = () => {
     );
   }
 
+  const currentFilters = filters();
+  const filteredData = currentFilters[currentFilter]?.execute(feed.slice(0, 20)) ?? [];
+
   return (
     <div className="min-h-screen bg-zinc-900 p-4">
+      <FeedFilter
+        options={currentFilters.map((filter) => filter.name)}
+        indexOfSelectedElement={currentFilter}
+        setIndexOfSelectedElements={setFilter}
+      />
       <div className="mx-auto max-w-3xl space-y-4">
-        {filters[currentFilter]?.execute(feed).map((reading, index) => (
-          <Card diagnosis={reading} key={reading.id}/>
+        {filteredData.map((reading) => (
+          <Card diagnosis={reading} key={reading.id} />
         ))}
       </div>
     </div>
@@ -165,3 +171,4 @@ const Feed: React.FC = () => {
 };
 
 export default Feed;
+

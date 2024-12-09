@@ -7,8 +7,12 @@ import { Env } from './utils/env';
  
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
-  const diagnosisId = request.url.slice(request.url.indexOf('diagnoses') + "diagnoses".length + 1)
+  let diagnosisId = request.url.slice(request.url.indexOf('diagnoses') + "diagnoses".length + 1)
   console.log("diag", diagnosisId)
+  const indexOfMalformedPathIndicator = diagnosisId.indexOf("?")
+  if (indexOfMalformedPathIndicator > -1) {
+   diagnosisId = diagnosisId.slice(0,indexOfMalformedPathIndicator)
+ } 
   console.log()
   const res = await fetch("http://localhost:"+Env.frontend_port+"/api/updateHotness", {
     method: "POST",
