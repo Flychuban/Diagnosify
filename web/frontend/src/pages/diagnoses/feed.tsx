@@ -10,10 +10,11 @@ import { Env } from '~/utils/env';
 import { User } from '~/types/apiTypes';
 import { Dots } from '~/components/newDiagnosisPAgeComponents/baseComponents/createNewDiagnosisPopUp';
 import { cookies } from '~/utils/cookies';
+import { getBaseUrl } from '~/utils/getHost';
 
 const Card: React.FC<{ diagnosis: Diagnosis }> = ({diagnosis }) => {
   const [userData, isLoading, isError] = useExecuteRequest(null, async () => {
-    return await axios.get<{ user: User }>(`${Env.gateway_url}/diag/diag/user/getById/${diagnosis.id}`, {
+    return await axios.get<{ user: User }>(`${Env.gateway_url}/diag/diag/user/getById/${diagnosis.userId}`, {
       headers: {
         Authorization: `Bearer ${cookies.token.get()!.userId}`,
         authorization: `Bearer ${cookies.token.get()!.userId}`
@@ -34,10 +35,11 @@ const Card: React.FC<{ diagnosis: Diagnosis }> = ({diagnosis }) => {
               </h2>
             </div>
             
-            <div className="p-6">
-        Created by {isLoading && <div>  Loading  <Dots/></div>} {userData?.data.user.username} 
-            </div>
+            <div className="p-6 flex justify-around">
+        <div>Created by {isLoading && <div>  Loading  <Dots/></div>} {userData?.data.user.username} </div>
+
             <div className=""> {diagnosis.is_correct === null ? "voting closed" : "voting open"}</div>
+            </div>
             <div className="border-t border-zinc-700 bg-zinc-800/50 p-4">
               <Link 
                 href={`/diagnoses/${diagnosis.id}`}
@@ -53,10 +55,58 @@ const Card: React.FC<{ diagnosis: Diagnosis }> = ({diagnosis }) => {
   </div>
 }
 
+async function getDiagnosisHotness(diagnosisId: number) {
+  try {
+    const res = await axios.post(`${getBaseUrl(window.location.href)}/api/getHotness`)
+    return res.data.hotness;
+  } catch (error) {
+    console.error(error);
+    return 0;
+  }
+}
 
 const Feed: React.FC = () => {
+
+
+
+
   const [feed, setFeed] = useState<Diagnosis[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [currentFilter, setFilter] = useState(0)
+  function baseFilter(diagnoses: Diagnosis[], filter: (diagnoses: Diagnosis[]) => Diagnosis[]) {
+    setLoading(true)
+    const new_diagnoses = JSON.parse(JSON.stringify(diagnoses)) as Diagnosis[] // to make a deep copy
+  const filteredDiagnoses = filter(new_diagnoses)
+    setLoading(false)
+    return filteredDiagnoses
+}
+
+  const filters: { name: string, execute: (diagnoses: Diagnosis[]) => Diagnosis[] }[] = [
+    {
+      name: "none",
+      execute: (diagnoses: Diagnosis[]) => {
+        return diagnoses;
+      }
+    },
+    {
+      name: "hottest",
+      execute: (diagnoses: Diagnosis[]) => {
+        return baseFilter(diagnoses, (diagnoses) => {
+          for (let i = 0; i < diagnoses.length; i++) { 
+            for (let j = i; j < diagnoses.length; j++){
+              if (getDiagnosisHotness(diagnoses[i].id) < getDiagnosisHotness(diagnoses[j].id)) {
+                const temp = diagnoses[i];
+                diagnoses[i] = diagnoses[j];
+                diagnoses[j] = temp;
+              }
+            }
+          }
+        })
+       } 
+    },
+  ]
+
+
 
   useEffect(() => {
     const fetchDiagnoses = async () => {
@@ -106,7 +156,7 @@ const Feed: React.FC = () => {
   return (
     <div className="min-h-screen bg-zinc-900 p-4">
       <div className="mx-auto max-w-3xl space-y-4">
-        {feed.map((reading, index) => (
+        {filters[currentFilter]?.execute(feed).map((reading, index) => (
           <Card diagnosis={reading} key={reading.id}/>
         ))}
       </div>

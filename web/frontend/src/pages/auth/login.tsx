@@ -7,6 +7,7 @@ import { DefaultError, DismissableError } from "~/components/error";
 import { useRouter } from "next/router";
 import { ErrorState } from "~/utils/types";
 import { getBaseUrl } from "~/utils/getHost";
+import { ErrorPopUp } from "~/components/popup";
 
 const Login: React.FC = () => {
   const { token } = useContext(AuthContext);
@@ -76,7 +77,11 @@ if (cookies.token.get() !== undefined && cookies.token.get() !== null && cookies
             <p>Redirecting ... </p>
           </div>
         )}
-        {isError.length > 0 && <DismissableError message={isError } />}
+        <ErrorPopUp error={isError} isOpen={isError.length > 0} onClose={() => {
+          setIsError("")
+          setIsPopUpOpen(false)
+          setStateForTriggeringRerender(stateForTriggeringRerender + 1)
+        }}/>
       </div>
     </div>
   );

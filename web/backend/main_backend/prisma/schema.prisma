@@ -28,6 +28,7 @@ model Diagnosis {
   voting            Voting?
   chatId            Int      @unique
   chat              Chat     @relation(fields: [chatId], references: [id])
+  createdAt           DateTime? @default(now())
 }
 
 model Message {
