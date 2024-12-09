@@ -24,6 +24,7 @@ model Diagnosis {
   user              User     @relation(fields: [userId], references: [id])
   link_to_prediction_info String 
   link_to_data_blob String
+  description String?
   is_correct        Boolean?
   voting            Voting?
   chatId            Int      @unique

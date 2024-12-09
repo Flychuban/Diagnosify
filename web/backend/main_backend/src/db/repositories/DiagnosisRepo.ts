@@ -8,6 +8,7 @@ export type NewDiagnosisInfo = {
   link_raw_data: string;
   label: string;
   vote: boolean
+  description: string
 };
 
 
@@ -20,6 +21,7 @@ async create(
   data: NewDiagnosisInfo, 
   directVoteWhichSkipsVoting: boolean | null
 ) {
+
   try {
     const result = await prisma.$transaction(async (prisma) => {
       const user = await prisma.user.findUniqueOrThrow({
@@ -44,6 +46,7 @@ async create(
           link_to_data_blob: data.link_raw_data,
           link_to_prediction_info: data.label,
           chatId: chat.id,
+          description: data.description === undefined ? null : data.description
         },
       });
 
