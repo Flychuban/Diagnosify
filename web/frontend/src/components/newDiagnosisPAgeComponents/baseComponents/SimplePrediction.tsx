@@ -60,7 +60,7 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
           if (responseMessage === null) {
             throw new Error("No prediction received");
           }
-          const res = await SavePredictionInDbWithTheS3ReferenceHandler({dataForPrediction:formData,responseMsg: responseMessage },vote, directVoteWhichSkipsVoting)
+          const res = await SavePredictionInDbWithTheS3ReferenceHandler({dataForPrediction:formData,responseMsg: responseMessage, description: description},vote, directVoteWhichSkipsVoting)
           console.log("6t6t",res);
           setIdOfCreatedPrediction(res.newDiag.diagnosis.id)
           setSuccesfulAction("created diagnosis")
@@ -68,6 +68,7 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
       />
       <SuccesfulActionPopUp text={succesfulAction} onClose={() => { setSuccesfulAction("") }} >
       {idOfCreatedPrediction !== null && (
+
   <div className="flex justify-center items-center mt-4">
     <a
       href={`${getBaseUrl(window.location.href)}/diagnoses/${idOfCreatedPrediction}`}
@@ -77,7 +78,7 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
     </a>
   </div>
 )}
-<input placeholder="description (optional)" value={description} onChange={e => setDescription(e.target.value)}/>
+
       </SuccesfulActionPopUp> 
       <h2 className="mb-6 text-2xl font-bold text-primarytext">{title}</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -100,7 +101,10 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
         />
       </div>
     ))}
+
   </div>
+
+        <textarea placeholder="description (optional)" value={description} className="bg-secondary text-primarytext rounded-md border-y-[1px] border-x-[1px] border-primarytext w-[100%]" onChange={e => setDescription(e.target.value)} />
   <button
     type="submit"
     disabled={isLoading}

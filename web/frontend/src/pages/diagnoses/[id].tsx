@@ -114,6 +114,8 @@ const ReadingPage: React.FC = () => {
     return (trueVotes / votes.length) * 100;
   }
 
+  console.log("fnjknkew",diagnosis)
+
   return (
     <div className="min-h-screen bg-primary p-8">
       {/* Reading Section */}
@@ -129,6 +131,13 @@ const ReadingPage: React.FC = () => {
         />
         <Divider />
         <DisplayReadingComponent data={diagnosis.diagnosis} />
+        <Divider />
+        <div className="flex flex-auto justify-center items-center bg-primary rounded-md py-8">
+          <div>
+            <Title className="text-primarytext"><p className="text-primarytext">Description </p></Title>
+            <p>{diagnosis.diagnosis.description !== null && diagnosis.diagnosis.description}</p>
+          </div>
+        </div>
       </Card>
 
       {/* Voting Section */}

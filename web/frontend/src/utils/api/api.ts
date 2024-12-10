@@ -183,6 +183,7 @@ class Diagnoses extends Model {
           link_raw_data: s3Req.data.link_to_data_blob_which_holds_prediction_params,
           label: data.responseMsg.prediction,
           vote: vote,
+          description: data.description
         },
         directVoteWhichSkipsVoting: voteWhichSkipsVoting
       }

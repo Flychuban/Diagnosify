@@ -195,6 +195,8 @@ export const PredictionForm = <T extends object, RequestResponse>({
               }
             }}
           /> 
+
+        <textarea placeholder="description (optional)" value={description} className="bg-secondary text-primarytext rounded-md border-y-[1px] border-x-[1px] border-primarytext w-[100%]" onChange={e => setDescription(e.target.value)} />
         </div>
         {responseMessage !== null &&
           responseMessage !== undefined &&
@@ -202,7 +204,6 @@ export const PredictionForm = <T extends object, RequestResponse>({
             responseMessage.predictionData,
           )}
       </MainForm>
-      <input placeholder="description (optional)" value={description} onChange={(e) => setDescription(e.target.value)}/>
       <div className="flex flex-auto gap-2">
         <button
           className="bg-primary"
