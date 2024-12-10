@@ -157,11 +157,11 @@ const Feed: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-zinc-900 p-4">
-      <FeedFilter
+      {diagnosesHotness === null ? <div>fetching data for filter <Dots/></div>: <FeedFilter
         options={currentFilters.map((filter) => filter.name)}
         indexOfSelectedElement={currentFilter}
         setIndexOfSelectedElements={setFilter}
-      />
+      />}
       <div className="mx-auto max-w-3xl space-y-4">
         {filteredData.map((reading) => (
           <Card diagnosis={reading} key={reading.id} />
