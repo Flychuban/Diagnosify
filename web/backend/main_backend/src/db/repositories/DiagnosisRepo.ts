@@ -38,7 +38,7 @@ async create(
           },
         },
       });
-
+      console.log("diag",data.description)
       const diag = await prisma.diagnosis.create({
         data: {
           type: data.type,

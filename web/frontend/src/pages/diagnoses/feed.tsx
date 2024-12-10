@@ -38,6 +38,7 @@ const Card: React.FC<{ diagnosis: Diagnosis }> = ({ diagnosis }) => {
         </div>
         <div>{diagnosis.is_correct === null ? "voting closed" : "voting open"}</div>
       </div>
+      {diagnosis.description !== null && <div>{ diagnosis.description }</div>}
       <div className="border-t border-zinc-700 bg-zinc-800/50 p-4">
         <Link
           href={`${getBaseUrl(window.location.href)}/diagnoses/${diagnosis.id}`}
@@ -150,9 +151,9 @@ const Feed: React.FC = () => {
       </div>
     );
   }
-
+  const paginationIndex = feed.length
   const currentFilters = filters();
-  const filteredData = currentFilters[currentFilter]?.execute(feed.slice(0, 20)) ?? [];
+  const filteredData = currentFilters[currentFilter]?.execute(feed.slice(0, paginationIndex)) ?? [];
 
   return (
     <div className="min-h-screen bg-zinc-900 p-4">

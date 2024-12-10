@@ -19,7 +19,8 @@ export interface PredictionFormWithImageProps<T, RequestResponse> {
   savePrediction: (
     data: { prediction: string, file: File },
     directVoteWhichSkipsVoting: boolean | null,
-    vote: boolean
+    vote: boolean,
+    description: string
   ) => Promise<AxiosResponse<{ newDiag: {diagnosis: {id: number}} }>>;
 }
 
@@ -32,6 +33,7 @@ export const PredictionForm = <T extends object, RequestResponse>({
 }: PredictionFormWithImageProps<T, RequestResponse>) => {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("")
+  const [description, setDescription] = useState("")
   const [responseMessage, setResponseMessage] = useState<{
     errMsg?: string;
     predictionData?: T;
@@ -180,7 +182,8 @@ export const PredictionForm = <T extends object, RequestResponse>({
                 const data_1 = await savePrediction({
                   file: file,
                   prediction: JSON.stringify(responseMessage!.predictionData!),
-                }, skipVoting, vote);
+                  
+                }, skipVoting, vote, description);
                 console.log("new diag", data_1.data);
                 setSuccesfulDiagnosisCreationId(data_1.data.newDiag.diagnosis.id)
                 setIsSuccesfullaction("created diagnosis");
@@ -199,6 +202,7 @@ export const PredictionForm = <T extends object, RequestResponse>({
             responseMessage.predictionData,
           )}
       </MainForm>
+      <input placeholder="description (optional)" value={description} onChange={(e) => setDescription(e.target.value)}/>
       <div className="flex flex-auto gap-2">
         <button
           className="bg-primary"

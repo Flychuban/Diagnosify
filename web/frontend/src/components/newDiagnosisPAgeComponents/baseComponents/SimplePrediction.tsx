@@ -27,6 +27,7 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
       return acc;
     }, {} as FormDataStructure) // Ensure type safety for the accumulator
   );
+  const [description, setDescription] = useState("")
   const [responseMessage, setResponseMessage] = useState<PredictionResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [succesfulAction,setSuccesfulAction] = useState("") 
@@ -76,7 +77,7 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
     </a>
   </div>
 )}
-
+<input placeholder="description (optional)" value={description} onChange={e => setDescription(e.target.value)}/>
       </SuccesfulActionPopUp> 
       <h2 className="mb-6 text-2xl font-bold text-primarytext">{title}</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -117,7 +118,6 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
          setIsCreateDiagnosisPopUpOpen(true) 
         }}
       >create diagnosis</button>
-      
 
       {responseMessage && componentToDisplayPrediction(responseMessage)}
     </div>

@@ -127,7 +127,7 @@ const mlPredictionUrl = Env.prediction_service_url
 
 
 
-async function saveImageDataTextResponse(diseaseEndpoint: string,data: {prediction: string, file: File},directVoteWhichSkipsVoting: boolean | null, vote: boolean) {
+async function saveImageDataTextResponse(diseaseEndpoint: string,data: {prediction: string, file: File},directVoteWhichSkipsVoting: boolean | null, vote: boolean, description: string) {
   const authToken2 = cookies.token.get()
         if (authToken2 === null) {
           throw new Error("invalid token")
@@ -146,7 +146,8 @@ async function saveImageDataTextResponse(diseaseEndpoint: string,data: {predicti
                 type: diseaseEndpoint,
                 link_raw_data: s3uploadData.data.link_to_data_blob_which_holds_prediction_params,
                 label: data.prediction,
-                vote: vote
+                vote: vote,
+                description: description
           },
           directVoteWhichSkipsVoting: directVoteWhichSkipsVoting
             }, {
@@ -186,8 +187,8 @@ const PneumoniaPredictionForm: React.FC = () => {
       anotherComponentToDisplayPrediction={(data) => {
         return <div>{data.prediction.message}</div>;
       }}
-      savePrediction={async (data, directVoteWhichSkipsVoting: boolean | null, vote: boolean) => {
-        return await saveImageDataTextResponse("pneumonia", data, directVoteWhichSkipsVoting ,vote);
+      savePrediction={async (data, directVoteWhichSkipsVoting: boolean | null, vote: boolean,description: string) => {
+        return await saveImageDataTextResponse("pneumonia", data, directVoteWhichSkipsVoting ,vote, description);
       }}
     />
   );
