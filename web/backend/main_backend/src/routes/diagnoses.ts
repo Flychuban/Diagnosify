@@ -73,7 +73,7 @@ diagnosisRouter.get(
     try {
       const { page } = req.query;
       if (!page) {
-        return await db.diagnoses.getAll(0)
+        return res.status(200).json({ diagnoses: await db.diagnoses.getAll(0)})
       }
       const diagnoses = await db.diagnoses.getAll(parseInt(page));
       res.status(200).json({ diagnoses });
