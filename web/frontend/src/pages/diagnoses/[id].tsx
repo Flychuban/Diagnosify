@@ -16,6 +16,11 @@ import axios from "axios";
 
 // Ant Design Imports
 const { Title, Text } = Typography;
+export function getVotingPercentage(votes) {
+    if (votes.length === 0) return 0;
+    const trueVotes = votes.filter((vote) => vote.vote.indexOf("false") > -1).length;
+    return (trueVotes / votes.length) * 100;
+  }
 
 // Voting component
 const VotingSection: React.FC<{
@@ -108,12 +113,7 @@ const ReadingPage: React.FC = () => {
     return <Loading />;
   }
 
-  function getVotingPercentage(votes) {
-    if (votes.length === 0) return 0;
-    const trueVotes = votes.filter((vote) => vote.vote.indexOf("false") > -1).length;
-    return (trueVotes / votes.length) * 100;
-  }
-
+  
   console.log("fnjknkew",diagnosis)
 
   return (

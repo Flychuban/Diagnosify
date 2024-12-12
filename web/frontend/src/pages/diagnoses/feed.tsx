@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Reading } from '~/components/reading';
-import { Diagnosis } from '~/utils/api/types';
+import { Diagnosis, Vote, Voting } from '~/utils/api/types';
 import { api } from '~/utils/api/api';
 import { useExecuteRequest } from '~/hooks/requestHook';
 import axios from 'axios';
@@ -11,8 +11,10 @@ import { Dots } from '~/components/newDiagnosisPAgeComponents/baseComponents/cre
 import { cookies } from '~/utils/cookies';
 import { getBaseUrl } from '~/utils/getHost';
 import { FeedFilter } from '~/components/FilterMenu';
+import { ProgressBar } from '~/components/progressBar';
+import { getVotingPercentage } from './[id]';
 
-const Card: React.FC<{ diagnosis: Diagnosis }> = ({ diagnosis }) => {
+const Card: React.FC<{ diagnosis: Diagnosis & {voting: Voting & {votes: Vote[]}} }> = ({ diagnosis }) => {
   const [userData, isLoading, isError] = useExecuteRequest(null, async () => {
     return await axios.get<{ user: User }>(`${Env.gateway_url}/diag/diag/user/getById/${diagnosis.userId}`, {
       headers: {
@@ -28,7 +30,8 @@ const Card: React.FC<{ diagnosis: Diagnosis }> = ({ diagnosis }) => {
 
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 text-gray-100">
-      <div>Debug delete if you see this: {diagnosis.id}</div>
+      <div>{diagnosis.id}</div>
+      <div><ProgressBar fill={getVotingPercentage(diagnosis.voting.votes)}/></div>
       <div className="border-b border-zinc-700 p-4">
         <h2 className="text-xl font-medium text-white">{diagnosis.type} Prediction</h2>
       </div>
