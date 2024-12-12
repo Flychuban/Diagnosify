@@ -1,47 +1,73 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Reading } from '~/components/reading';
-import { Diagnosis, Vote, Voting } from '~/utils/api/types';
+import type { Diagnosis, Vote, Voting } from '~/utils/api/types';
 import { api } from '~/utils/api/api';
 import { useExecuteRequest } from '~/hooks/requestHook';
 import axios from 'axios';
 import { Env } from '~/utils/env';
-import { User } from '~/types/apiTypes';
+import type { User } from '~/types/apiTypes';
 import { Dots } from '~/components/newDiagnosisPAgeComponents/baseComponents/createNewDiagnosisPopUp';
 import { cookies } from '~/utils/cookies';
 import { getBaseUrl } from '~/utils/getHost';
 import { FeedFilter } from '~/components/FilterMenu';
 import { ProgressBar } from '~/components/progressBar';
 import { getVotingPercentage } from './[id]';
+import { Divider } from 'antd';
 
-const Card: React.FC<{ diagnosis: Diagnosis & {voting: Voting & {votes: Vote[]}} }> = ({ diagnosis }) => {
+const Card: React.FC<{
+  diagnosis: Diagnosis & { voting: Voting & { votes: Vote[] } };
+}> = ({ diagnosis }) => {
   const [userData, isLoading, isError] = useExecuteRequest(null, async () => {
-    return await axios.get<{ user: User }>(`${Env.gateway_url}/diag/diag/user/getById/${diagnosis.userId}`, {
-      headers: {
-        Authorization: `Bearer ${cookies.token.get()!.userId}`,
-        authorization: `Bearer ${cookies.token.get()!.userId}`
+    return await axios.get<{ user: User }>(
+      `${Env.gateway_url}/diag/diag/user/getById/${diagnosis.userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${cookies.token.get()!.userId}`,
+          authorization: `Bearer ${cookies.token.get()!.userId}`,
+        },
       },
-    });
+    );
   });
 
   if (isError) {
     return <div>{isError}</div>;
   }
 
+  function ErrorableToNull<T>(func: () => T | {err: string}): T | {err: string} {
+    try {
+      return func();
+    } catch (e) { 
+      return {err: e.message}
+    }
+  }
+
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 text-gray-100">
-      <div>{diagnosis.id}</div>
-      <div><ProgressBar fill={getVotingPercentage(diagnosis.voting.votes)}/></div>
+      <div className='flex flex-auto pt-4 mt-4 justify-around text-primarytext'><p> { diagnosis.id }</p> <p>{ JSON.stringify((diagnosis.createdAt)).slice(1,11)  }</p></div>
+      <div>
+        <ProgressBar fill={getVotingPercentage(diagnosis.voting.votes)} />
+      </div>
       <div className="border-b border-zinc-700 p-4">
-        <h2 className="text-xl font-medium text-white">{diagnosis.type} Prediction</h2>
+        <h2 className="text-xl font-medium text-white">
+          {diagnosis.type} Prediction
+        </h2>
       </div>
-      <div className="p-6 flex justify-around">
+      <div className="flex justify-around p-6">
         <div>
-          Created by {isLoading && <div>Loading <Dots /></div>} {userData?.data.user.username}
+          Created by{' '}
+          {isLoading && (
+            <div>
+              Loading <Dots />
+            </div>
+          )}{' '}
+          {userData?.data.user.username}
         </div>
-        <div>{diagnosis.is_correct === null ? "voting closed" : "voting open"}</div>
+        <div>
+          {diagnosis.is_correct === null ? 'voting closed' : 'voting open'}
+        </div>
       </div>
-      {diagnosis.description !== null && <div>{ diagnosis.description }</div>}
+      {diagnosis.description !== null && <div>{diagnosis.description}</div>}
       <div className="border-t border-zinc-700 bg-zinc-800/50 p-4">
         <Link
           href={`${getBaseUrl(window.location.href)}/diagnoses/${diagnosis.id}`}
@@ -56,7 +82,10 @@ const Card: React.FC<{ diagnosis: Diagnosis & {voting: Voting & {votes: Vote[]}}
 
 async function getDiagnosisHotness(diagnosisId: number): Promise<number> {
   try {
-    const res = await axios.post<{ count: number }>(`${getBaseUrl(window.location.href)}/api/getHotness`, { id: diagnosisId });
+    const res = await axios.post<{ count: number }>(
+      `${getBaseUrl(window.location.href)}/api/getHotness`,
+      { id: diagnosisId },
+    );
     return res.data.count;
   } catch (error) {
     console.error(error);
@@ -65,43 +94,57 @@ async function getDiagnosisHotness(diagnosisId: number): Promise<number> {
 }
 
 const Feed: React.FC = () => {
-  const [page,setPage] = useState(1)
+  const [page, setPage] = useState(1);
   const [feed, setFeed] = useState<Diagnosis[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentFilter, setFilter] = useState(0);
-  const [diagnosesHotness, setDiagnosesHotness] = useState<null | (Diagnosis & { hotness: number })[]>(null);
+  const [diagnosesHotness, setDiagnosesHotness] = useState<
+    null | (Diagnosis & { hotness: number })[]
+  >(null);
 
-  const baseFilter = useCallback((diagnoses: Diagnosis[], filter: (diagnoses: Diagnosis[]) => Diagnosis[]) => {
-    const newDiagnoses = [...diagnoses]; // simpler deep copy
-    const filtered = filter(newDiagnoses);
-    return filtered;
-  }, []);
-
-  const filters = useCallback(() => [
-    {
-      name: "none",
-      execute: (diagnoses: Diagnosis[]) => baseFilter(diagnoses, (diagnoses) => diagnoses),
+  const baseFilter = useCallback(
+    (
+      diagnoses: Diagnosis[],
+      filter: (diagnoses: Diagnosis[]) => Diagnosis[],
+    ) => {
+      const newDiagnoses = [...diagnoses]; // simpler deep copy
+      const filtered = filter(newDiagnoses);
+      return filtered;
     },
-    {
-      name: "hottest",
-      execute: (diagnoses: Diagnosis[]) => {
-        if (!diagnosesHotness) return diagnoses;
-        return baseFilter(diagnoses, (diagnoses) => diagnosesHotness.sort((a, b) =>   b.hotness - a.hotness));
+    [],
+  );
+
+  const filters = useCallback(
+    () => [
+      {
+        name: 'none',
+        execute: (diagnoses: Diagnosis[]) =>
+          baseFilter(diagnoses, (diagnoses) => diagnoses),
       },
-    },
-  ], [baseFilter, diagnosesHotness]);
+      {
+        name: 'hottest',
+        execute: (diagnoses: Diagnosis[]) => {
+          if (!diagnosesHotness) return diagnoses;
+          return baseFilter(diagnoses, (diagnoses) =>
+            diagnosesHotness.sort((a, b) => b.hotness - a.hotness),
+          );
+        },
+      },
+    ],
+    [baseFilter, diagnosesHotness],
+  );
 
   useEffect(() => {
     const fetchDiagnoses = async () => {
       try {
         const data = await api.diagnoses.getAllDiagnoses(page);
-        if ("errMsg" in data) {
+        if ('errMsg' in data) {
           setFeed([]);
         } else {
           setFeed(data.diagnoses);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
         setFeed([]);
       } finally {
         setLoading(false);
@@ -118,11 +161,11 @@ const Feed: React.FC = () => {
           feed.map(async (diag) => ({
             ...diag,
             hotness: await getDiagnosisHotness(diag.id),
-          }))
+          })),
         );
         setDiagnosesHotness(diagnosesWithHotness);
       } catch (error) {
-        console.error("Error fetching hotness data:", error);
+        console.error('Error fetching hotness data:', error);
         setDiagnosesHotness(null);
       } finally {
         setLoading(false);
@@ -149,50 +192,72 @@ const Feed: React.FC = () => {
         <div className="mx-auto max-w-2xl rounded-lg bg-zinc-800 p-4 text-gray-300">
           <div className="flex items-center gap-2">
             <div className="text-lg">⚠️</div>
-            <p>No diagnosis data available. Start by selecting a disease to predict.</p>
+            <p>
+              No diagnosis data available. Start by selecting a disease to
+              predict.
+            </p>
           </div>
         </div>
       </div>
     );
   }
-  const paginationIndex = feed.length
+  const paginationIndex = feed.length;
   const currentFilters = filters();
-  const filteredData = currentFilters[currentFilter]?.execute(feed.slice(0, paginationIndex)) ?? [];
+  const filteredData =
+    currentFilters[currentFilter]?.execute(feed.slice(0, paginationIndex)) ??
+    [];
 
   return (
     <div className="min-h-screen bg-zinc-900 p-4">
-      {diagnosesHotness === null ? <div>fetching data for filter <Dots/></div>: <FeedFilter
-        options={currentFilters.map((filter) => filter.name)}
-        indexOfSelectedElement={currentFilter}
-        setIndexOfSelectedElements={setFilter}
-      />}
+      {diagnosesHotness === null ? (
+        <div className='text-primarytext'>
+          fetching data for filter <Dots />
+        </div>
+      ) : (
+        <FeedFilter
+          options={currentFilters.map((filter) => filter.name)}
+          indexOfSelectedElement={currentFilter}
+          setIndexOfSelectedElements={setFilter}
+        />
+      )}
       <div className="mx-auto max-w-3xl space-y-4">
         {filteredData.map((reading) => (
           <Card diagnosis={reading} key={reading.id} />
         ))}
       </div>
-      <div>
-        <button onClick={() => setPage(1)}>{"<<"}</button>
+      <Divider />
+      <div className="flex w-full flex-auto items-center justify-center">
+        <button
+          onClick={() => {
+            setPage(1);
+            setLoading(true);
+          }}
+        >
+          {'<<'}
+        </button>
         {[page - 2, page - 1, page, page + 1, page + 2].map((v, idx) => {
-  if (v > 0) {
-    return (
-      <button
-        key={idx}
-        onClick={() => setPage(v)}
-        className={`${
-          v === page ? 'bg-primary text-primarytext' : 'bg-secondary text-primarytext'
-        } p-2 rounded mx-1`}
-      >
-        {v}
-      </button>
-    );
-  }
-})}
-
+          if (v > 0) {
+            return (
+              <button
+                key={idx}
+                onClick={() => {
+                  setPage(v);
+                  setLoading(true);
+                }}
+                className={`${
+                  v === page
+                    ? 'bg-primary text-primarytext'
+                    : 'bg-secondary text-primarytext'
+                } mx-1 rounded p-2`}
+              >
+                {v}
+              </button>
+            );
+          }
+        })}
       </div>
     </div>
   );
 };
 
 export default Feed;
-

@@ -1,26 +1,28 @@
-"use client";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
-import { api } from "~/utils/api/api";
-import { Reading } from "~/components/reading";
-import { Loading } from "~/components/loading";
-import { BaseError } from "~/components/error";
-import { cookies } from "~/utils/cookies";
-import { ChatComponent } from "~/components/Chat";
-import { DisplayReadingComponent } from "~/components/newDiagnosisPAgeComponents/baseComponents/DisplayReading";
-import { useExecuteRequest } from "~/hooks/requestHook";
-import { useTraceUpdate } from "~/hooks/debug/checkPropCausingRerender";
-import { ProgressBar } from "~/components/progressBar";
-import { Button, Card, Divider, Space, Typography } from "antd";
-import axios from "axios";
+'use client';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+import { api } from '~/utils/api/api';
+import { Reading } from '~/components/reading';
+import { Loading } from '~/components/loading';
+import { BaseError } from '~/components/error';
+import { cookies } from '~/utils/cookies';
+import { ChatComponent } from '~/components/Chat';
+import { DisplayReadingComponent } from '~/components/newDiagnosisPAgeComponents/baseComponents/DisplayReading';
+import { useExecuteRequest } from '~/hooks/requestHook';
+import { useTraceUpdate } from '~/hooks/debug/checkPropCausingRerender';
+import { ProgressBar } from '~/components/progressBar';
+import { Button, Card, Divider, Space, Typography } from 'antd';
+import axios from 'axios';
 
 // Ant Design Imports
 const { Title, Text } = Typography;
 export function getVotingPercentage(votes) {
-    if (votes.length === 0) return 0;
-    const trueVotes = votes.filter((vote) => vote.vote.indexOf("false") > -1).length;
-    return (trueVotes / votes.length) * 100;
-  }
+  if (votes.length === 0) return 0;
+  const trueVotes = votes.filter(
+    (vote) => vote.vote.indexOf('false') > -1,
+  ).length;
+  return (trueVotes / votes.length) * 100;
+}
 
 // Voting component
 const VotingSection: React.FC<{
@@ -33,14 +35,14 @@ const VotingSection: React.FC<{
     if (!diagnosisId || !cookies.token.get()) return;
     try {
       const res = api.votings.vote(votingId, cookies.token.get()?.userId, vote);
-      if ("errMsg" in res) {
-        console.log("Unsuccessful vote");
+      if ('errMsg' in res) {
+        console.log('Unsuccessful vote');
       } else {
-        console.log("Successful vote");
+        console.log('Successful vote');
         onVote(true);
       }
     } catch (err) {
-      console.error("Voting failed", err);
+      console.error('Voting failed', err);
     }
   };
 
@@ -86,22 +88,19 @@ const ReadingPage: React.FC = () => {
 
   const [diagnosis, isLoading, errorMsg] = useExecuteRequest<{
     diagnosis: Diagnosis & { prediction: boolean };
-  } | null>(
-    null,
-    async () => {
-      if (!diagnosisId) return null;
-      const data = await api.diagnoses.getDiagnosis(diagnosisId);
-      if (!data) throw new Error("Diagnosis not found");
-      if ("errMsg" in data) throw new Error("No voting available");
+  } | null>(null, async () => {
+    if (!diagnosisId) return null;
+    const data = await api.diagnoses.getDiagnosis(diagnosisId);
+    if (!data) throw new Error('Diagnosis not found');
+    if ('errMsg' in data) throw new Error('No voting available');
 
-      setHaveAlreadyVoted(
-        data.diagnosis.voting.votes.some(
-          (vote) => vote.user.id === cookies.token.get()?.userId
-        )
-      );
-      return data;
-    }
-  );
+    setHaveAlreadyVoted(
+      data.diagnosis.voting.votes.some(
+        (vote) => vote.user.id === cookies.token.get()?.userId,
+      ),
+    );
+    return data;
+  });
 
   useTraceUpdate({ diagnosisId });
 
@@ -113,16 +112,19 @@ const ReadingPage: React.FC = () => {
     return <Loading />;
   }
 
-  
-  console.log("fnjknkew",diagnosis)
+  console.log('fnjknkew', diagnosis);
 
   return (
     <div className="min-h-screen bg-primary p-8">
       {/* Reading Section */}
       <Card
-        className="mb-8 shadow-lg bg-secondary text-primarytext"
-        bodyStyle={{ padding: "20px" }}
-        title={<Title level={4}><p className="text-primarytext">Reading Analysis</p></Title>}
+        className="mb-8 bg-secondary text-primarytext shadow-lg"
+        bodyStyle={{ padding: '20px' }}
+        title={
+          <Title level={4}>
+            <p className="text-primarytext">Reading Analysis</p>
+          </Title>
+        }
       >
         <Reading
           type={diagnosis.diagnosis.type}
@@ -132,21 +134,32 @@ const ReadingPage: React.FC = () => {
         <Divider />
         <DisplayReadingComponent data={diagnosis.diagnosis} />
         <Divider />
-        <div className="flex flex-auto justify-center items-center bg-primary rounded-md py-8">
+        <div className="flex flex-auto items-center justify-center rounded-md bg-primary py-8">
           <div>
-            <Title className="text-primarytext"><p className="text-primarytext">Description </p></Title>
-            <p>{diagnosis.diagnosis.description !== null && diagnosis.diagnosis.description}</p>
+            <Title className="text-primarytext">
+              <p className="text-primarytext">Description </p>
+            </Title>
+            <p>
+              {diagnosis.diagnosis.description !== null &&
+                diagnosis.diagnosis.description}
+            </p>
           </div>
         </div>
       </Card>
 
       {/* Voting Section */}
       <Card
-        className="mb-8 shadow-lg bg-secondary text-primarytext"
-        bodyStyle={{ padding: "20px" }}
-        title={<p level={4} color="white" className="text-primarytext">Vote on This Prediction</p>}
+        className="mb-8 bg-secondary text-primarytext shadow-lg"
+        bodyStyle={{ padding: '20px' }}
+        title={
+          <p level={4} color="white" className="text-primarytext">
+            Vote on This Prediction
+          </p>
+        }
       >
-        <p color="white" className="text-primarytext">What do you think about this prediction?</p>
+        <p color="white" className="text-primarytext">
+          What do you think about this prediction?
+        </p>
         {diagnosisId && (
           <VotingSection
             diagnosisId={diagnosisId}
@@ -159,9 +172,9 @@ const ReadingPage: React.FC = () => {
 
       {/* Progress Section */}
       <Card
-        className="mb-8 shadow-lg bg-secondary text-white"
-        bodyStyle={{ padding: "20px" }}
-        title={<p  className="text-primarytext">Vote Results</p>}
+        className="mb-8 bg-secondary text-white shadow-lg"
+        bodyStyle={{ padding: '20px' }}
+        title={<p className="text-primarytext">Vote Results</p>}
       >
         <ProgressBar
           fill={getVotingPercentage(diagnosis.diagnosis.voting.votes)}
@@ -174,9 +187,13 @@ const ReadingPage: React.FC = () => {
       {/* Chat Section */}
       {diagnosisId && (
         <Card
-          className="shadow-lg bg-secondary"
-          bodyStyle={{ padding: "20px" }}
-          title={<p level={4} color="white" className="text-primarytext">Discussion</p>}
+          className="bg-secondary shadow-lg"
+          bodyStyle={{ padding: '20px' }}
+          title={
+            <p level={4} color="white" className="text-primarytext">
+              Discussion
+            </p>
+          }
         >
           <ChatComponent diagnosisId={parseInt(diagnosisId)} />
         </Card>
@@ -186,4 +203,3 @@ const ReadingPage: React.FC = () => {
 };
 
 export default ReadingPage;
-

@@ -6,7 +6,7 @@ const Filter: React.FC<{
   setSelectedOption: (idx: number) => void;
 }> = ({ options, setSelectedOption, indexOfSelectedOption }) => {
   return (
-    <div className="filter-container bg-secondary p-4 rounded-md">
+    <div className="filter-container bg-zinc-900 p-4 rounded-md flex items-center justify-center">
       {options.map((option, idx) => (
         <button
           key={idx}
@@ -42,6 +42,7 @@ export const FeedFilter: React.FC<{
           <FilterOption key={option} name={option} />
         ))}
         indexOfSelectedOption={indexOfSelectedElement}
+
         setSelectedOption={setIndexOfSelectedElements}
       />
     </div>

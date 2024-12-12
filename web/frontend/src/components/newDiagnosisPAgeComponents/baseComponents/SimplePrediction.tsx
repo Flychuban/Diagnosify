@@ -3,6 +3,8 @@ import React,{ ReactNode, useState } from "react";
 import {PopUpWrapper, SuccesfulActionPopUp} from "../../popup"
 import { CreateNewDiagnosisPopUp } from "./createNewDiagnosisPopUp";
 import { getBaseUrl } from "~/utils/getHost";
+import Title from "antd/es/skeleton/Title";
+import { Button, Divider } from "antd";
 interface PredictionFormProps<PredictionResponse,T> {
   title: string;
   endpoint: string;
@@ -103,7 +105,7 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
     ))}
 
   </div>
-
+        <title><span className="text-primarytext">Description</span></title>
         <textarea placeholder="description (optional)" value={description} className="bg-secondary text-primarytext rounded-md border-y-[1px] border-x-[1px] border-primarytext w-[100%]" onChange={e => setDescription(e.target.value)} />
   <button
     type="submit"
@@ -113,17 +115,20 @@ export const SimplePredictionForm = <PredictionResponse, FormDataStructure exten
     {isLoading ? "Processing..." : "Predict"}
   </button>
 </form>
-
-      <button
+    <Divider />
+<div className="flex flex-auto justify-between">
+      {responseMessage && componentToDisplayPrediction(responseMessage)}
+      {responseMessage && <Button
+        className="bg-secondary text-primarytext"
         onClick={async () => {
-          if (!responseMessage) { 
+          if (!responseMessage) {
             return;
           }
-         setIsCreateDiagnosisPopUpOpen(true) 
+          setIsCreateDiagnosisPopUpOpen(true)
         }}
-      >create diagnosis</button>
+      >create diagnosis</Button>}
+</div>
 
-      {responseMessage && componentToDisplayPrediction(responseMessage)}
     </div>
   );
 };

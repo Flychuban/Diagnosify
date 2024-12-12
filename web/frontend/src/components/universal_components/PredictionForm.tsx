@@ -7,6 +7,8 @@ import { ErrorPopUp, PopUpWrapper, SuccesfulActionPopUp } from "../popup";
 import { CreateNewDiagnosisPopUp } from "../newDiagnosisPAgeComponents/baseComponents/createNewDiagnosisPopUp";
 import FileVisualizer from "../inPageImgVisulizer";
 import { getBaseUrl } from "~/utils/getHost";
+import Title from "antd/es/typography/Title";
+import { Button } from "antd";
 
 
 export interface PredictionFormWithImageProps<T, RequestResponse> {
@@ -196,6 +198,7 @@ export const PredictionForm = <T extends object, RequestResponse>({
             }}
           /> 
 
+        <Title><span className="text-primarytext">Description</span></Title>
         <textarea placeholder="description (optional)" value={description} className="bg-secondary text-primarytext rounded-md border-y-[1px] border-x-[1px] border-primarytext w-[100%]" onChange={e => setDescription(e.target.value)} />
         </div>
         {responseMessage !== null &&
@@ -203,10 +206,8 @@ export const PredictionForm = <T extends object, RequestResponse>({
           anotherComponentToDisplayPrediction(
             responseMessage.predictionData,
           )}
-      </MainForm>
-      <div className="flex flex-auto gap-2">
-        <button
-          className="bg-primary"
+          {responseMessage && <Button
+          className="bg-secondary text-primarytext"
           onClick={async () => {
             if (file === null) {
               throw new Error("Please select a file first");
@@ -215,7 +216,10 @@ export const PredictionForm = <T extends object, RequestResponse>({
           }}
         >
           Send to feed
-        </button>
+        </Button>}
+      </MainForm>
+      <div className="flex flex-auto gap-2">
+        
       </div>
     </>
   );
