@@ -230,7 +230,7 @@ const authToken2 = cookies.token.get()
   async getAllDiagnoses(pageIndex: number): Promise<RequestResponse<{ diagnoses: (Diagnosis)[] }>> {
     return this.request<{ diagnoses: Diagnosis[] }>({
       method: "GET",
-      url: "/diagnosis/diagnoses",
+      url: `/diagnosis/diagnoses?page=${pageIndex}`,
     });
   }
 
