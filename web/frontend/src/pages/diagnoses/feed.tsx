@@ -105,7 +105,7 @@ const Feed: React.FC = () => {
       }
     };
     fetchDiagnoses();
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     const fetchHotness = async () => {

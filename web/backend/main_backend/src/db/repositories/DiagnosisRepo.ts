@@ -97,13 +97,14 @@ async create(
 
 
   async getAll(page: number): Promise<Diagnosis[]> {
+    const pageJump = 25
     try {
       if (page == 0) {
         return await prisma.diagnosis.findMany()
       }
       return await prisma.diagnosis.findMany({
-        skip: (page - 1) * 10, // we do this since if page 1 will skip the first 10 elements
-        take: 25 
+        skip: (page - 1) * pageJump  // we do this since if page 1 will skip the first 10 elements
+        take: pageJump 
       });
     } catch (error) {
       throw new Error(`Error fetching all diagnoses: ${error.message}`);
