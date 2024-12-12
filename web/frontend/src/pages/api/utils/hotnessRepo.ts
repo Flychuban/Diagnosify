@@ -1,12 +1,7 @@
+import Redis from "ioredis";
 
 
-import Redis from 'ioredis';
-
-interface IHotnessRepo{
-    oneUpHotness(id: string): Promise<void>
-    getHotness(id: string): Promise<number>
-}
-class HotnessRepo implements IHotnessRepo {
+class HotnessRepo {
   public redisClient: Redis;
 
   constructor() {
@@ -38,10 +33,10 @@ class HotnessRepo implements IHotnessRepo {
   }
 }
 
-export const hotnessRepo = new HotnessRepo()
-process.on('SIGINT', async () => {
-    console.log('\nSIGINT received. Closing Redis connection...');
-    await hotnessRepo.close();
-    process.exit(0);
+export const hotnessRepo = new HotnessRepo();
+await hotnessRepo.connect()
+process.on("SIGINT", async () => {
+  console.log("\nSIGINT received. Closing Redis connection...");
+  await hotnessRepo.close();
+  process.exit(0);
 });
-

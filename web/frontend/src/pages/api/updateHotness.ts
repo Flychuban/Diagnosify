@@ -2,9 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { hotnessRepo } from './utils/hotnessRepo';
 
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-    if (!hotnessRepo.redisClient.isReady) {
-        await hotnessRepo.connect(); // Ensuring the connection is established
-    }
+
 
     if (req.method === 'POST') {
         try {

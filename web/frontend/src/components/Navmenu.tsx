@@ -6,7 +6,6 @@ import { FaHamburger } from "react-icons/fa";
 
 export const NavMenu: React.FC = () => {
   const [host, setHost] = useState<string | null>(null);
-  const [isToggled, setIsToggled] = useState(false);
   useEffect(() => {
     setHost(getBaseUrl(window.location.href));
   }, []);
@@ -24,12 +23,9 @@ export const NavMenu: React.FC = () => {
   return (
   <div>
     <div>
-      <button
-        onClick={() => setIsToggled(!isToggled)}
-        className="flex items-center justify-center w-16 h-10 rounded-full bg-primary hover:bg-primary-dark text-white transition-colors duration-200"
-      ><FaHamburger/></button>
+
     </div>
-      {isToggled && <nav className="bg-primary text-white shadow-lg">
+      {true && <nav className="bg-primary text-white shadow-lg">
         <div className="container mx-auto p-4">
           <ul className="flex justify-center space-x-6">
             <li>

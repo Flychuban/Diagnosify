@@ -37,6 +37,6 @@
     "**/*.cjs",
     "**/*.js",
     ".next/types/**/*.ts"
-  ],
+, "../backend/main_backend/src/db/repositories/hotnessRepo.ts"  ],
   "exclude": ["node_modules"]
 }
