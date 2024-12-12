@@ -62,6 +62,7 @@ async function getDiagnosisHotness(diagnosisId: number): Promise<number> {
 }
 
 const Feed: React.FC = () => {
+  const [page,setPage] = useState(1)
   const [feed, setFeed] = useState<Diagnosis[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentFilter, setFilter] = useState(0);
@@ -90,7 +91,7 @@ const Feed: React.FC = () => {
   useEffect(() => {
     const fetchDiagnoses = async () => {
       try {
-        const data = await api.diagnoses.getAllDiagnoses();
+        const data = await api.diagnoses.getAllDiagnoses(page);
         if ("errMsg" in data) {
           setFeed([]);
         } else {
@@ -166,6 +167,25 @@ const Feed: React.FC = () => {
         {filteredData.map((reading) => (
           <Card diagnosis={reading} key={reading.id} />
         ))}
+      </div>
+      <div>
+        <button onClick={() => setPage(1)}>{"<<"}</button>
+        {[page - 2, page - 1, page, page + 1, page + 2].map((v, idx) => {
+  if (v > 0) {
+    return (
+      <button
+        key={idx}
+        onClick={() => setPage(v)}
+        className={`${
+          v === page ? 'bg-primary text-primarytext' : 'bg-secondary text-primarytext'
+        } p-2 rounded mx-1`}
+      >
+        {v}
+      </button>
+    );
+  }
+})}
+
       </div>
     </div>
   );

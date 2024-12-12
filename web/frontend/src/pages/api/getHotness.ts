@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { hotnessRepo } from '../../../../backend/main_backend/src/db/repositories/hotnessRepo';
+import { hotnessRepo } from './utils/hotnessRepo';
 
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
 
