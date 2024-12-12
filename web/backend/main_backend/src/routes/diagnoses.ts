@@ -20,7 +20,7 @@ diagnosisRouter.post(
       const userId = parseInt(req.params.userId);
       console.dir(req.body.newDiagInfo)
       const newDiagnosis = await db.diagnoses.create(userId, req.body.newDiagInfo, req.body.directVoteWhichSkipsVoting);
-      return res.status(201).json({});
+      return res.status(201).json({newDiag: newDiagnosis});
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: error.message } );

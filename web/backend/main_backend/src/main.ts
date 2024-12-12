@@ -7,6 +7,7 @@ import { userRouter } from './routes/users';
 import { votingRouter } from './routes/votings';
 import { diagnosisRouter } from './routes/diagnoses';
 import { chatRouter } from './routes/chat';
+import { hotnessRouter } from './routes/hotness';
 const app = express();
 const port = 3003;
 
@@ -22,7 +23,7 @@ diagRouter.use('/diagnosis', diagnosisRouter);
 diagRouter.use('/user', userRouter);
 diagRouter.use('/voting', votingRouter);
 diagRouter.use('/chat', chatRouter)
-
+diagRouter.use("/hotness", hotnessRouter)
 
 
 
