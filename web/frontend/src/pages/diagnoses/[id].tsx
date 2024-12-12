@@ -19,7 +19,7 @@ const { Title, Text } = Typography;
 export function getVotingPercentage(votes) {
   if (votes.length === 0) return 0;
   const trueVotes = votes.filter(
-    (vote) => vote.vote.indexOf('false') > -1,
+    (vote) => vote.vote.indexOf('true') > -1,
   ).length;
   return (trueVotes / votes.length) * 100;
 }
@@ -78,6 +78,11 @@ const ReadingPage: React.FC = () => {
   const router = useRouter();
   const [diagnosisId, setDiagnosisId] = useState<string | null>(null);
   const [haveAlreadyVoted, setHaveAlreadyVoted] = useState(false);
+  const [toRerun, setRerunReq] = useState(1)
+  
+  function rerunReq() {
+    setRerunReq(2)
+  }
 
   React.useEffect(() => {
     if (!router.isReady || !router.query.id || Array.isArray(router.query.id)) {
@@ -100,7 +105,7 @@ const ReadingPage: React.FC = () => {
       ),
     );
     return data;
-  });
+  }, [toRerun]);
 
   useTraceUpdate({ diagnosisId });
 
@@ -160,12 +165,13 @@ const ReadingPage: React.FC = () => {
         <p color="white" className="text-primarytext">
           What do you think about this prediction?
         </p>
-        {diagnosisId && (
+        {diagnosis.diagnosis.voting.is_closed === true && <div><Title><p className='text-primarytext text-center'>voting already closed</p></Title></div>}
+        {diagnosisId && diagnosis.diagnosis.voting.is_closed === false && (
           <VotingSection
             diagnosisId={diagnosisId}
             votingId={diagnosis.diagnosis.voting.id}
             haveAlreadyVoted={haveAlreadyVoted}
-            onVote={() => setHaveAlreadyVoted(true)}
+            onVote={() => { setHaveAlreadyVoted(true); rerunReq()}}
           />
         )}
       </Card>

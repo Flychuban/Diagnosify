@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { set } from "zod";
 
-export function useExecuteRequest<T>(refreshPeriod: number | null, funcToExecute: () => Promise<T>): [ data: T | null, isLoading: boolean, errorMsg: string | null] {
+export function useExecuteRequest<T>(refreshPeriod: number | null, funcToExecute: () => Promise<T>, statesToRerunRequestFetchingFor: string[]): [ data: T | null, isLoading: boolean, errorMsg: string | null] {
     const [state, setState] = useState<T | null>(null)
     const [errorMsg,setErrorMsg] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -23,7 +23,7 @@ export function useExecuteRequest<T>(refreshPeriod: number | null, funcToExecute
       setIsLoading(false);
       setErrorMsg(error.message);
     });
-  }, [funcToExecute,state])
+  }, [funcToExecute,state,...statesToRerunRequestFetchingFor])
 
     useEffect(() => {
   let intervalId: NodeJS.Timeout | null = null;
