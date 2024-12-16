@@ -185,7 +185,11 @@ const PneumoniaPredictionForm: React.FC = () => {
       endpoint={`${mlPredictionUrl}/predict_pneumonia`}
       componentToDisplayPrediction={(data) => <div>{JSON.stringify(data)}</div>}
       anotherComponentToDisplayPrediction={(data) => {
-        return <div>{data.prediction.message}</div>;
+        return <div>
+          <p>prediction : {data.prediction.message}</p>
+          <p>confidence: { data.prediction.confidence}</p>
+        
+        </div>;
       }}
       savePrediction={async (data, directVoteWhichSkipsVoting: boolean | null, vote: boolean,description: string) => {
         return await saveImageDataTextResponse("pneumonia", data, directVoteWhichSkipsVoting ,vote, description);
@@ -220,7 +224,12 @@ const MAlari = () => {
       title="Malaria Prediction"
       endpoint={`${mlPredictionUrl}/predict-malaria`}
       componentToDisplayPrediction={(data: { message: string }) => <div>{data.message}</div>}
-      anotherComponentToDisplayPrediction={(data) => { return <div>{ data.prediction.message}</div>}}
+      anotherComponentToDisplayPrediction={(data) => {
+        return <div>
+          <p>{data.prediction.message} </p>
+          <p> { data.prediction.malaria_probability } </p>
+        </div>
+      }}
       savePrediction={async (data,directVoteWhichSkipsVoting: boolean | null, vote: boolean) => {
         return await saveImageDataTextResponse("malaria", data, directVoteWhichSkipsVoting,vote)
       }}
