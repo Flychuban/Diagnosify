@@ -38,6 +38,7 @@ async create(
           },
         },
       });
+
       console.log("diag",data.description)
       const diag = await prisma.diagnosis.create({
         data: {
@@ -64,7 +65,7 @@ async create(
             },
           },
         });
-
+        console.log("ngioernvberionboiernbioernbiopenbeinbiebmieptbmipewbew", directVoteWhichSkipsVoting)
         await prisma.diagnosis.update({
           where: { id: diag.id },
           data: {

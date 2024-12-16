@@ -4,5 +4,9 @@
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  "editor.formatOnPaste": true
+  "editor.formatOnPaste": true,
+"powermode.enabled": true,
+"powermode.presets": "fireworks",
+"powermode.shake.enabled":true,
+"powermode.combo.location":"editor"
 }

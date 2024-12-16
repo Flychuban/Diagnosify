@@ -44,6 +44,11 @@ export const NavMenu: React.FC = () => {
                 New Diagnosis
               </a>
             </li>
+            <li>
+              <a href={`${host}/faq`}>
+                FAQ
+              </a>
+            </li>
           </ul>
         </div>
       </nav>}

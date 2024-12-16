@@ -14,6 +14,9 @@ import { FeedFilter } from '~/components/FilterMenu';
 import { ProgressBar } from '~/components/progressBar';
 import { getVotingPercentage } from './[id]';
 import { Divider } from 'antd';
+import Title from 'antd/es/typography/Title';
+
+
 
 const Card: React.FC<{
   diagnosis: Diagnosis & { voting: Voting & { votes: Vote[] } };
@@ -45,8 +48,14 @@ const Card: React.FC<{
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 text-gray-100">
       <div className='flex flex-auto pt-4 mt-4 justify-around text-primarytext'><p> { diagnosis.id }</p> <p>{ JSON.stringify((diagnosis.createdAt)).slice(1,11)  }</p></div>
-      <div>
+      <div >
         <ProgressBar fill={getVotingPercentage(diagnosis.voting.votes)} />
+        <div className='text-center h- w-full'>
+          <Title>
+            <p className='text-primarytext text-xl pt-4'>Current votes: {diagnosis.voting.votes.length}</p>
+          </Title>
+        </div>
+      
       </div>
       <div className="border-b border-zinc-700 p-4">
         <h2 className="text-xl font-medium text-white">
@@ -64,7 +73,7 @@ const Card: React.FC<{
           {userData?.data.user.username}
         </div>
         <div>
-          {diagnosis.is_correct === null ? 'voting closed' : 'voting open'}
+          {diagnosis.is_correct === null ? <p>voting closed (diagnosis established as {diagnosis.is_correct}) </p>: 'voting open'}
         </div>
       </div>
       {diagnosis.description !== null && <div>{diagnosis.description}</div>}
