@@ -1,0 +1,21 @@
+Pneumonia Prediction Using Chest X-Ray Images
+Our system provides an advanced tool for predicting pneumonia using chest X-ray images. Powered by cutting-edge machine learning algorithms, this feature is designed to assist medical professionals in diagnosing pneumonia more effectively. Below is a detailed guide to ensure proper use of the system:
+
+- Preparing the Chest X-Ray Image
+To achieve accurate predictions, ensure the following:
+
+Image Quality:
+The X-ray image should be clear, high-resolution, and devoid of artifacts (e.g., blurring, noise, or overexposure).
+
+Image Format:
+Accepted file formats include JPEG, PNG. Ensure the file size does not exceed the upload limit specified on the platform.
+
+Standard Views:
+The X-ray image should ideally be taken in the posteroanterior (PA) or anteroposterior (AP) view. Other views may reduce prediction accuracy.
+
+Proper Positioning:
+Ensure the patient’s positioning adheres to standard radiological practices to avoid distortions in the X-ray.
+
+Clinical Interpretation
+The prediction tool is designed to assist, not replace, clinical judgment. Always correlate the results with the patient’s clinical presentation, history, and other diagnostic findings.
+If the prediction conflicts with clinical observations, consider additional diagnostic measures and radiological reviews.

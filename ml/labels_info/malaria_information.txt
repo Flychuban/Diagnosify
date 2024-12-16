@@ -1,0 +1,24 @@
+Malaria Detection Using Microscopic Cell Images
+Our malaria detection tool utilizes advanced machine learning algorithms to analyze microscopic images of blood cells and predict whether the cells are infected with malaria. This feature is designed to assist healthcare professionals in the early and accurate identification of malaria, streamlining the diagnostic process. Below is a guide to effectively use this tool:
+
+ - About the Tool
+This predictive model is based on a dataset of labeled cell images, distinguishing between parasitized and non-parasitized cells. The system identifies key visual markers associated with malaria infection, providing reliable results to aid clinical diagnosis.
+
+Preparing the Cell Image
+To ensure accurate predictions, adhere to the following guidelines:
+
+Image Source:
+Use high-resolution microscopic images of blood smears, preferably captured with standard laboratory equipment.
+
+Image Quality:
+The image should be well-lit, free from blurring, and properly focused to ensure that cellular structures are clearly visible.
+
+Image Format:
+Accepted file formats include JPEG, PNG. Ensure the file size does not exceed the upload limit specified on the platform.
+
+Magnification Level:
+Images captured under the recommended magnification (e.g., 100x oil immersion) provide the best results.
+
+Clinical Application
+Use this tool as a preliminary diagnostic aid to support clinical decisions.
+Correlate the results with other diagnostic tests and patient history for a comprehensive evaluation.
