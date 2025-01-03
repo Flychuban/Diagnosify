@@ -244,9 +244,9 @@ const App = () => {
   const allPredictions: {
     type: Disease, form : () => ReactNode
   }[] = [
-    { type: "pneumonia", form: () => <PneumoniaPredictionForm /> },
+    { type: "Pneumonia", form: () => <PneumoniaPredictionForm /> },
     {
-      type: "diabetes", form: () => <SimplePredictionForm<{prediction: string},{Pregnancies:number, Glucose: number, BloodPRessure: number, SkinThickness: number, Insulin: number, BMI: number, DiabetesPedigreeFunction: number, Age: number}>
+      type: "Diabetes", form: () => <SimplePredictionForm<{prediction: string},{Pregnancies:number, Glucose: number, BloodPRessure: number, SkinThickness: number, Insulin: number, BMI: number, DiabetesPedigreeFunction: number, Age: number}>
         title="Diabetes Prediction"
         endpoint={mlPredictionUrl+"/diabetes"}
         formFields={diabetesFields}
@@ -266,7 +266,7 @@ const App = () => {
       />
     },
     {
-      type: "bodyfat", form: () => <SimplePredictionForm<{prediction: string}, {}>
+      type: "Bodyfat Percentage", form: () => <SimplePredictionForm<{prediction: string}, {}>
         title="Body Fat Prediction"
         endpoint={mlPredictionUrl + "/body-fat-predict"}
         formFields={bodyFatFields}
@@ -282,7 +282,7 @@ const App = () => {
       />
     },
     {
-      type: "kidney Disease", form: () => <SimplePredictionForm
+      type: "Kidney Disease", form: () => <SimplePredictionForm
         title="Kidney Disease Prediction"
         endpoint={mlPredictionUrl+"/kidney-disease-predict"}
         formFields={kidneyDiseaseFields}
@@ -298,7 +298,7 @@ const App = () => {
       />
     },
     {
-      type: "heart Disease",
+      type: "Heart Disease",
       form: () => <SimplePredictionForm<{ prediction: string }, { prediction: string }>
         title="Heart Disease Prediction"
         endpoint={mlPredictionUrl + "/heart-disease-predict"}
@@ -314,9 +314,9 @@ const App = () => {
         }}
       />
     },
-    { type: "malaria", form: () => <MAlari /> },
+    { type: "Malaria", form: () => <MAlari /> },
     {
-      type: "liver disease",
+      type: "Liver Disease",
       form: () => <SimplePredictionForm<{ prediction: string }, { prediction: string }>
         title="Liver Disease"
         endpoint={mlPredictionUrl + "/liver-disease-predict"}
@@ -328,7 +328,7 @@ const App = () => {
       />
     },
     {
-      type: "breast Cancer",
+      type: "Breast Cancer",
       form: () => <SimplePredictionForm<{ prediction: string }, { prediction: string }>
         title="Breast Cancer Prediction"
         endpoint={mlPredictionUrl + "/breast-cancer-predict"}
@@ -345,9 +345,9 @@ const App = () => {
       />
     },
 
-    { type: "cancer Segmentation", form: () => <CancerPredictionForm /> },
+    { type: "Cancer Segmentation", form: () => <CancerPredictionForm /> },
     {
-      type: "parkinson",
+      type: "Parkinson",
       form: () => <SimplePredictionForm<{ prediction: string }, { prediction: string }>
         title="Parkinson"
         endpoint={mlPredictionUrl + "/predict_parkinson"}

@@ -38,7 +38,7 @@ export const CreateNewDiagnosisPopUp: React.FC<{
           onClose={() => {setError("")}}
         />
         <div className="mb-6">
-          <p className="text-primaryText text-lg mb-4">What do you think about the diagnosis?</p>
+          <p className="text-primaryText text-lg mb-4">What do you think about this AI diagnosis? Was it true?</p>
           <button
             onClick={() => {
               setVote(true);
@@ -78,7 +78,7 @@ export const CreateNewDiagnosisPopUp: React.FC<{
             className="bg-primary text-white py-2 px-4 rounded-md w-full hover:bg-blue-700 focus:outline-none"
             disabled={isRequestBeingSent}
           >
-            {isRequestBeingSent ?  <Dots/>: "Direct vote without creating a vote"}
+            {isRequestBeingSent ?  <Dots/>: "Direct vote without creating a reviewable diagnosis" }
           </button>
         </div>
         <div>

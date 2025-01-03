@@ -17,16 +17,16 @@ type SidebarProps = {
 };
 
 const diseaseIcons: Record<Disease, () => ReactNode> = {
-  "cancer Segmentation": () => <FileHeart className="h-4 w-4" />,
-  "diabetes": () => <Droplets className="h-4 w-4" />,
-  "heart Disease": () => <Heart className="h-4 w-4" />,
-  "parkinson": () => <Activity className="h-4 w-4" />,
-  "kidney Disease": () => <Kidneys/>,
-  "breast Cancer": () => <Ghost className="h-4 w-4" />,
-  "pneumonia": () => <Lungs/>,
-  "malaria": () => <Malaria/>,
-  "liver disease": () =><Liver/> ,
-  "bodyfat": () => <Scale className="h-4 w-4" />,
+  "Cancer Segmentation": () => <FileHeart className="h-4 w-4" />,
+  "Diabetes": () => <Droplets className="h-4 w-4" />,
+  "Heart Disease": () => <Heart className="h-4 w-4" />,
+  "Parkinson": () => <Activity className="h-4 w-4" />,
+  "Kidney Disease": () => <Kidneys/>,
+  "Breast Cancer": () => <Ghost className="h-4 w-4" />,
+  "Pneumonia": () => <Lungs/>,
+  "Malaria": () => <Malaria/>,
+  "Liver Disease": () =><Liver/> ,
+  "Bodyfat Percentage": () => <Scale className="h-4 w-4" />,
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({

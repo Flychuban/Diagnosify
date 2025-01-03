@@ -2,13 +2,13 @@ export type ErrorState = string
 
 
 export type Disease =
-  | "heart Disease"
-  | "parkinson"
-  | "kidney Disease"
-  | "breast Cancer"
-  | "cancer Segmentation"
-  | "diabetes"
-  | "pneumonia"
-  | "malaria"
-  | "liver disease"
-  | "bodyfat"
+  | "Heart Disease"
+  | "Parkinson"
+  | "Kidney Disease"
+  | "Breast Cancer"
+  | "Cancer Segmentation"
+  | "Diabetes"
+  | "Pneumonia"
+  | "Malaria"
+  | "Liver Disease"
+  | "Bodyfat Percentage"
