@@ -47,7 +47,6 @@ const Card: React.FC<{
 
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 text-gray-100">
-      <div className='flex flex-auto pt-4 mt-4 justify-around text-primarytext'><p> { diagnosis.id }</p> <p>{ JSON.stringify((diagnosis.createdAt)).slice(1,11)  }</p></div>
       <div >
         <ProgressBar fill={getVotingPercentage(diagnosis.voting.votes)} />
         <div className='text-center h- w-full'>
