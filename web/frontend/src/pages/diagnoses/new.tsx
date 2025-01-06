@@ -17,7 +17,11 @@ import { SimplePredictionForm } from "~/components/newDiagnosisPAgeComponents/ba
 import { useGetAuthToken } from "~/hooks/cookieGetter";
 import { PredictionForm } from "~/components/universal_components/PredictionForm";
 import { Env } from "~/utils/env";
+import { CancerPredictionForm, MAlari, PneumoniaPredictionForm } from "~/components/newDiagnosisPAgeComponents/specificCompoents/diseaseForms/forms";
 
+
+
+const mlPredictionUrl = Env.prediction_service_url
 
 const bodyFatFields = [
      { key: "Weight" , label: "Weight" },
@@ -123,11 +127,11 @@ const LiverDisease = [
 ];
 
 
-const mlPredictionUrl = Env.prediction_service_url
 
 
 
-async function saveImageDataTextResponse(diseaseEndpoint: string,data: {prediction: string, file: File},directVoteWhichSkipsVoting: boolean | null, vote: boolean, description: string) {
+export async function saveImageDataTextResponse(diseaseEndpoint: string,data: {prediction: string, file: File},directVoteWhichSkipsVoting: boolean | null, vote: boolean, description: string) {
+  console.log("data",data)
   const authToken2 = cookies.token.get()
         if (authToken2 === null) {
           throw new Error("invalid token")
@@ -141,10 +145,11 @@ async function saveImageDataTextResponse(diseaseEndpoint: string,data: {predicti
             "authorization": "Bearer " + cookies.token.get()?.userId
           }
         })
+        console.log("s3",s3uploadData)
         const res = await axios.post<object>(`${getGatewayUrl()}/diag/diag/diagnosis/user/${authToken2.userId}/diagnoses`, {
               newDiagInfo: {
                 type: diseaseEndpoint,
-                link_raw_data: s3uploadData.data.link_to_data_blob_which_holds_prediction_params,
+                link_raw_data: s3uploadData.data.link_to_data_blob_which_holds_prediction_params ||s3uploadData.data.s3_loc,
                 label: data.prediction,
                 vote: vote,
                 description: description
@@ -162,7 +167,7 @@ async function saveImageDataTextResponse(diseaseEndpoint: string,data: {predicti
 
 }
 
-async function textDataTextResponseUpload(diseaseEndpoint: string,data: {responseMsg: {prediction: string}}, vote: boolean, voteWhichSkipsVoting: null | boolean): Promise<object> {
+export async function textDataTextResponseUpload(diseaseEndpoint: string,data: {responseMsg: {prediction: string}}, vote: boolean, voteWhichSkipsVoting: null | boolean): Promise<object> {
             try {
             const res = await api.diagnoses.saveTextDataTextResponseDiagnosis(diseaseEndpoint, data, vote, voteWhichSkipsVoting)
           
@@ -175,67 +180,6 @@ async function textDataTextResponseUpload(diseaseEndpoint: string,data: {respons
 
 
 
-const PneumoniaPredictionForm: React.FC = () => {
-  return (
-    <PredictionForm<
-      object,
-      { prediction: { message: string; confidence: string } }
-    >
-      title="Pneumonia Prediction"
-      endpoint={`${mlPredictionUrl}/predict_pneumonia`}
-      componentToDisplayPrediction={(data) => <div>{JSON.stringify(data)}</div>}
-      anotherComponentToDisplayPrediction={(data) => {
-        return <div>
-          <p>prediction : {data.prediction.message}</p>
-          <p>confidence: { data.prediction.confidence}</p>
-        
-        </div>;
-      }}
-      savePrediction={async (data, directVoteWhichSkipsVoting: boolean | null, vote: boolean,description: string) => {
-        return await saveImageDataTextResponse("pneumonia", data, directVoteWhichSkipsVoting ,vote, description);
-      }}
-    />
-  );
-};
-
-const CancerPredictionForm: React.FC = () => {
-  return (
-    <PredictionForm<
-      object,
-      { s3_loc: string }
-    >
-      title="Cancer Prediction"
-      endpoint={`${mlPredictionUrl}/cancer-segmentation`}
-      componentToDisplayPrediction={(data) => <div>{data}</div>}
-      anotherComponentToDisplayPrediction={(data) => {
-        return <div>
-          <img src={data.s3_loc} />
-        </div>
-      }}
-      savePrediction={async (data, directVoteWhichSkipsVoting: boolean | null, vote: boolean) => {
-        return await saveImageDataTextResponse("canc",data, directVoteWhichSkipsVoting, vote)
-      }}
-    />
-  );
-}
-const MAlari = () => {
-  return (
-    <PredictionForm<{prediction: {message: string, malaria_probability: string}},{prediction: {message: string, malaria_probability: string}}>
-      title="Malaria Prediction"
-      endpoint={`${mlPredictionUrl}/predict-malaria`}
-      componentToDisplayPrediction={(data: { message: string }) => <div>{data.message}</div>}
-      anotherComponentToDisplayPrediction={(data) => {
-        return <div>
-          <p>{data.prediction.message} </p>
-          <p> { data.prediction.malaria_probability } </p>
-        </div>
-      }}
-      savePrediction={async (data,directVoteWhichSkipsVoting: boolean | null, vote: boolean) => {
-        return await saveImageDataTextResponse("malaria", data, directVoteWhichSkipsVoting,vote)
-      }}
-    />
-  )
-}
 
 
 const App = () => {

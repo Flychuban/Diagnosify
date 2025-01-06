@@ -86,8 +86,12 @@ class User extends Model {
     });
   }
 
-  signup() {
-    // Implement signup logic here
+  async signup(username: string, password: string) {
+    return await this.request<{ success: boolean; message?: string }>({
+      method: "POST",
+      url: "/signup",
+      data: {username, password}
+    })
   }
 }
 

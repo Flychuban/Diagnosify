@@ -27,7 +27,6 @@ export function useGetCookie<T>(
     }
 
     const intervalId = setInterval(() => {
-      console.log("Retrying to fetch cookie...");
       handleGetCookie();
     }, interval);
 
@@ -40,7 +39,6 @@ export function useGetCookie<T>(
 export const useGetAuthToken = (): AuthToken | null => {
   const cookie = useGetCookie<AuthToken>(() => {
     const cookie = cookies.token.get(); // Assuming this function exists
-    console.log("Cookie fetched:", cookie);
     if (cookie === null) {
       throw new Error("Cookie not found");
     }

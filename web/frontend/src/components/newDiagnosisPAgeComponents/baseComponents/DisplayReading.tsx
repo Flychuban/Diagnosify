@@ -55,8 +55,15 @@ function getStrategy(
     if (type === "Diabetes" || type === "diabetes" || type === "heart-disease" || type === "bodyfat" || type === "liver-disease" || type ==="kidney-disease" ) {
         return TextDatatextResponse;
     }
-  if (type === "pneumonia" || type === "malaria") {
+  if (type === "pneumonia" || type === "malaria" ) {
       return ImageDataTextResponse 
+  } else {
+    return (data: { link_to_data_blob: string; prediction: string  }) => {
+      console.log("oo",data.data)
+      return <div>
+        <img src={ JSON.parse(data.data.prediction).s3_loc }  />
+      </div>
+    }
     }
     
 }
@@ -73,6 +80,9 @@ export const DisplayReadingComponent: React.FC<{
 }> = ({ data }) => {
   const DisplayingStrategy = getStrategy(data.type);
 
+  
+  console.log("jikijiki",data)
+  
   return (
     <div className="bg-primary p-8 rounded-lg shadow-lg">
       <h2 className="text-xl font-bold mb-6 text-primary-content text-primarytext">Reading Details</h2>

@@ -34,7 +34,7 @@ const VotingSection: React.FC<{
   const handleVote = async (vote: boolean) => {
     if (!diagnosisId || !cookies.token.get()) return;
     try {
-      const res = api.votings.vote(votingId, cookies.token.get()?.userId, vote);
+      const res = await api.votings.vote(votingId, cookies.token.get()?.userId, vote);
       if ('errMsg' in res) {
         console.log('Unsuccessful vote');
       } else {
@@ -43,7 +43,9 @@ const VotingSection: React.FC<{
       }
     } catch (err) {
       console.error('Voting failed', err);
+
     }
+    window.location.href = window.location.href
   };
 
   return (

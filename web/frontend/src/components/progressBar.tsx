@@ -18,7 +18,7 @@ export const ProgressBar: React.FC<{ fill: number}> = ({ fill }) => {
           style={{ width: `${fill}%`, transition: "width 0.3s ease" }}
         >
           {fill > 5 && (
-            <span className="text-sm font-medium">Yes {fill}%</span>
+            <span className="text-sm font-medium">Yes {fill.toString().slice(0,5)}%</span>
           )}
         </div>
 
@@ -28,7 +28,7 @@ export const ProgressBar: React.FC<{ fill: number}> = ({ fill }) => {
           style={{ width: `${fillB}%`, transition: "width 0.3s ease" }}
         >
           {fillB > 5 && (
-            <span className="text-sm font-medium">No {fillB}%</span>
+            <span className="text-sm font-medium">No {fillB.toString().slice(0,5)}%</span>
           )}
         </div>
       </div>

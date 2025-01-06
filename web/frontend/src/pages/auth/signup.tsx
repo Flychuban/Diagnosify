@@ -1,6 +1,6 @@
 import { InputForm } from "../../components/form";
 import { cookies } from "~/utils/cookies";
-import { Api } from "~/utils/api/api";
+import { api } from "~/utils/api/api";
 import { CustomError, DefaultError } from "~/components/error";
 import React, { useState } from "react";
 import { SuccesfulPopUp } from "~/components/popup";
@@ -21,7 +21,7 @@ const Signup: React.FC = () => {
           password: string;
         }) => {
           try {
-            const res = await Api.signup(objToSend);
+            const res = await api.user.signup(objToSend);
             if (res) {
               setIsPopUpOpen(true);
             }
