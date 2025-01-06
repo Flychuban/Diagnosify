@@ -9,7 +9,7 @@ const Card: React.FC<{ disease: string; content: string }> = ({ disease, content
             <Title>
                 <p className="text-primarytext">{disease.toUpperCase()}</p>
             </Title>
-            <div className="mt-2 text-primarytext text-2xl">
+            <div className="mt-2 text-primarytext text-2xl whitespace-break-spaces">
                 <p>{shouldShowMore ? content : `${content.slice(0, 100)}...`}</p>
                 <button
                     className="mt-2 text-blue-500 hover:underline"
@@ -74,8 +74,7 @@ Higher compactness may indicate malignancy, as cancer cells often have irregular
   },
   {
     disease: "diabetes",
-    content: `
-            Pregnancies: The number of pregnancies a person has had can affect the risk of developing gestational diabetes during pregnancy and type 2 diabetes later in life. 
+    content: `Pregnancies: The number of pregnancies a person has had can affect the risk of developing gestational diabetes during pregnancy and type 2 diabetes later in life. 
 Women with a history of gestational diabetes are at a higher risk of developing type 2 diabetes.
 
 \nGlucose: Glucose levels, typically measured after fasting, are crucial for diagnosing diabetes. High fasting glucose levels can indicate impaired fasting glucose, prediabetes, or diabetes. 
@@ -100,8 +99,7 @@ Managing body weight can help prevent the onset of diabetes or manage the condit
   },
   {
     disease: "heart-disease",
-    content: `
-            Age: Age is a significant risk factor for heart disease, with the risk increasing as individuals get older.
+    content: `Age: Age is a significant risk factor for heart disease, with the risk increasing as individuals get older.
 
 \nGender: Gender (male or female) can influence the risk profile for heart disease. Men tend to have a higher risk of heart disease at a younger age, while women's risk increases after menopause.
 
@@ -145,8 +143,7 @@ thal: 0 = normal; 1 = fixed defect; 2 = reversable defect
   },
   {
     disease: "kidney disease",
-    content: `
-            Specific Gravity: A measure of the density of urine compared to water. It can indicate the kidney's ability to concentrate urine. 
+    content: `Specific Gravity: A measure of the density of urine compared to water. It can indicate the kidney's ability to concentrate urine. 
 Abnormal values may suggest kidney dysfunction, as healthy kidneys typically filter waste to concentrate urine without losing too much or too little water.
 
 
@@ -172,8 +169,7 @@ and the amount of blood vessel constriction. When the kidneys are damaged, they 
   },
   {
     disease: "liver disease",
-    content: `
-            Age: Age can be a significant factor in liver disease, as the risk of developing conditions such as cirrhosis, liver cancer, and other liver-related problems can increase with age. 
+    content: `Age: Age can be a significant factor in liver disease, as the risk of developing conditions such as cirrhosis, liver cancer, and other liver-related problems can increase with age. 
 This is due to the cumulative effect of liver injury over time from various causes such as alcohol use, obesity, and viral hepatitis.
 
 
@@ -215,8 +211,7 @@ It is particularly useful in assessing liver function and nutritional status.
   },
   {
     disease: "parkinson",
-    content: `
-            MDVP:Jitter(%): Measures the variation in the frequency or pitch of the voice signal, expressed as a percentage. 
+    content: `MDVP:Jitter(%): Measures the variation in the frequency or pitch of the voice signal, expressed as a percentage. 
 Higher values may indicate greater vocal instability, which is common in Parkinson's disease due to impaired vocal cord control.
 
 
