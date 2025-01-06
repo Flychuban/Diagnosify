@@ -75,7 +75,7 @@ const Card: React.FC<{
           {diagnosis.is_correct === null ? <p>voting closed (diagnosis established as {diagnosis.is_correct}) </p>: 'voting open'}
         </div>
       </div>
-      {diagnosis.description !== null && <div>{diagnosis.description}</div>}
+      {diagnosis.description !== null && <div className='p-4'>{diagnosis.description}</div>}
       <div className="border-t border-zinc-700 bg-zinc-800/50 p-4">
         <Link
           href={`${getBaseUrl(window.location.href)}/diagnoses/${diagnosis.id}`}
