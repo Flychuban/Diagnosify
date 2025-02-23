@@ -4,29 +4,35 @@ import express,{Request, Response} from 'express';
 import { Diagnosis, Prisma, Voting } from '@prisma/client';
 import { db } from '../db/db';
 import { BaseResponse } from '../types';
+import { messageBroker } from '../utils/messagequeue';
 
 export const diagnosisRouter = express.Router();
 diagnosisRouter.post(
   '/user/:userId/diagnoses',
   async (
-    req: Request<{ userId: string }, {}, {newDiagInfo: NewDiagnosisInfo, directVoteWhichSkipsVoting: null | boolean}>,
+    req: Request<{ userId: string }, {}, { newDiagInfo: NewDiagnosisInfo, directVoteWhichSkipsVoting: null | boolean }>,
     res: Response<{}>
   ) => {
     try {
       if (req.body.newDiagInfo.type === undefined) {
-        res.status(402).json({err: "type is undefined", data : req.body})
-        return
+        res.status(402).json({ err: "type is undefined", data: req.body });
+        return;
       }
+
       const userId = parseInt(req.params.userId);
-      console.dir(req.body.newDiagInfo)
-      const newDiagnosis = await db.diagnoses.create(userId, req.body.newDiagInfo, req.body.directVoteWhichSkipsVoting);
-      return res.status(201).json({newDiag: newDiagnosis});
+      await messageBroker.publishMessage('diagnosis_queue', {
+        userId,
+        newDiagInfo: req.body.newDiagInfo,
+        directVoteWhichSkipsVoting: req.body.directVoteWhichSkipsVoting
+      });
+
+      return res.status(201).json({ message: 'Diagnosis information is queued for processing' });
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: error.message } );
+      return res.status(500).json({ error: error.message });
     }
   }
 );
+
 
 diagnosisRouter.get(
   '/user/:userId/diagnoses',
