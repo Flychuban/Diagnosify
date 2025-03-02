@@ -25,6 +25,22 @@ def resolveService(req: Request[IO]): String =
     .map(_.url)
     .getOrElse(Service.UNKNOWN.url)
 
+class OptionsRequestMiddleware extends IMiddleware {
+  override def apply(routes: HttpRoutes[IO]): HttpRoutes[IO] = {
+    HttpRoutes { request =>
+      if (request.method == Method.OPTIONS) {
+        // Return a successful response for OPTIONS requests
+        IO.pure(Response[IO](status = org.http4s.Status.Ok))
+      } else {
+        // If not an OPTIONS request, pass the request to the next handler
+        routes(request)
+      }
+    }
+  }
+}
+
+
+
 object Main extends IOApp.Simple:
   println("running server")
 
@@ -43,6 +59,7 @@ object Main extends IOApp.Simple:
         keystorePassword = "changeit",
         keyManagerPassword = "changeit"
           )
+        .addMiddleware(new OptionsRequestMiddleware())
         .withLogging(req => IO.println(s"Proxying request: ${req.method} ${req.uri}"))
         .build()
         .listen(port = 2053, host = "0.0.0.0", client)
