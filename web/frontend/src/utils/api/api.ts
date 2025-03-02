@@ -75,7 +75,7 @@ class Model {
 class User extends Model {
   constructor() {
     super();
-    this.baseUrl = `${this.baseUrl}/auth/auth`;
+    this.baseUrl = `${this.baseUrl}/auth`;
   }
 
   async login(args: { username: string; password: string }): Promise<RequestResponse<{ token: AuthToken }>> {

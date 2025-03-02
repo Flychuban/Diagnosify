@@ -1,0 +1,23 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(sbt -Dplugin.version=latest dependencyUpdates, None, None)[0m
+[0m[[0m[33mwarn[0m] [0m[0mbuild source files have changed[0m
+[0m[[0m[33mwarn[0m] [0m[0mmodified files: [0m
+[0m[[0m[33mwarn[0m] [0m[0m  /home/x-ae-x/Desktop/ReverseProzy/build.sbt[0m
+[0m[[0m[33mwarn[0m] [0m[0mApply these changes by running `reload`.[0m
+[0m[[0m[33mwarn[0m] [0m[0mAutomatically reload the build when source changes are detected by setting `Global / onChangedBuildSource := ReloadOnSourceChanges`.[0m
+[0m[[0m[33mwarn[0m] [0m[0mDisable this warning by setting `Global / onChangedBuildSource := IgnoreSourceChanges`.[0m
+[0m[[0m[31merror[0m] [0m[0mExpected ID character[0m
+[0m[[0m[31merror[0m] [0m[0mNot a valid command: sbt (similar: set, boot, last)[0m
+[0m[[0m[31merror[0m] [0m[0mExpected 'sbtRebootNetwork'[0m
+[0m[[0m[31merror[0m] [0m[0mExpected project ID[0m
+[0m[[0m[31merror[0m] [0m[0mExpected configuration[0m
+[0m[[0m[31merror[0m] [0m[0mExpected ':'[0m
+[0m[[0m[31merror[0m] [0m[0mExpected key[0m
+[0m[[0m[31merror[0m] [0m[0mNot a valid key: sbt (similar: test, state, ivySbt)[0m
+[0m[[0m[31merror[0m] [0m[0mExpected 'sbtPromptChannel'[0m
+[0m[[0m[31merror[0m] [0m[0mExpected 'sbtRebootImpl'[0m
+[0m[[0m[31merror[0m] [0m[0mExpected 'sbtReportResult'[0m
+[0m[[0m[31merror[0m] [0m[0mExpected 'sbtMapExec'[0m
+[0m[[0m[31merror[0m] [0m[0mExpected 'sbtCompleteExec'[0m
+[0m[[0m[31merror[0m] [0m[0msbt -Dplugin.version=latest dependencyUpdates[0m
+[0m[[0m[31merror[0m] [0m[0m   ^[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(idea-shell, None, None)[0m
