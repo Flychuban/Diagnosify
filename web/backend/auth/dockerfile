@@ -1,49 +1,20 @@
-# # Stage 1: Build environment
-# FROM node:alpine AS build
+# Use the official Bun image as base
+FROM oven/bun:latest
 
-# # Set working directory
-# WORKDIR /usr/src/app
+# Set working directory
+WORKDIR /app
 
-# # Copy package.json and package-lock.json
-# COPY package*.json ./
+# Copy package.json and bun.lockb (if they exist)
+COPY package*.json bun.lockb ./
 
-# # Install dependencies
-# RUN npm install
+# Install dependencies
+RUN bun install
 
-# # Copy the rest of the application code
-# COPY . .
-
-# # Build TypeScript to JavaScript
-# RUN npm run build
-
-# # Stage 2: Production environment
-# FROM node:14-alpine
-
-# # Set working directory
-# WORKDIR /usr/src/app
-
-# # Copy built JavaScript files and package.json
-# COPY --from=build /usr/src/app/dist ./dist
-# COPY --from=build /usr/src/app/package*.json ./
-
-# # Install only production dependencies
-# RUN npm install --production
-
-# # Expose port
-# EXPOSE 8080
-
-# # Start the server
-# CMD ["node", "dist/index.js"]
-# TODO fix this ^
-
-
-
-FROM node:alpine
-
+# Copy rest of the application code
 COPY . .
 
-RUN npm install
-EXPOSE 8080
-CMD ["npm","run","start_ts_dev"]
+# Expose the port your app runs on
+EXPOSE 3000
 
-
+# Start the application
+CMD ["bun", "run", "src/index.ts"]
