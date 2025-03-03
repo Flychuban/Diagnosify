@@ -64,6 +64,7 @@ authRouter.post("/login", async (req: Request<{}, {}, {username: string, passwor
     }
     res.status(400).json({ error: "username or password is invalid" })
   } catch (e) {
+	  console.log(e)
     res.status(404).json({msg: "user does not exist"})
   }
 })

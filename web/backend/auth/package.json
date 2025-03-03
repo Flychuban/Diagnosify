@@ -12,7 +12,9 @@
     "@types/express": "^5.0.0",
     "axios": "^1.7.7",
     "body-parser": "^1.20.3",
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "ioredis": "^5.5.0",
+    "otplib": "^12.0.1"
   },
   "scripts": {
     "file": "nodemon bun run"

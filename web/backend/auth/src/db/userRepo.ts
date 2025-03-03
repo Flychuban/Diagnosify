@@ -20,7 +20,7 @@ class UserRepo implements IUserRepo{
     }
 
     async getUser(username: string): Promise<{user: User | null} >{
-        return (await axios.get<{ user: User | null }>(`${gatewayUrl}/diag/user/${username}`)).data
+        return {user: {username: "exampleDoctor", password: "ExamplePassword", id: "1"}} 
     }
 }
 
