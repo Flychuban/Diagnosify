@@ -8,7 +8,6 @@ import { votingRouter } from './routes/votings';
 import { diagnosisRouter } from './routes/diagnoses';
 import { chatRouter } from './routes/chat';
 import { hotnessRouter } from './routes/hotness';
-import { startConsumer } from './workload-handlers/newDiagnosisCinsumer';
 const app = express();
 const port = 3003;
 
@@ -29,7 +28,6 @@ diagRouter.use("/hotness", hotnessRouter)
 
 
 app.use("/diag",diagRouter)
-startConsumer()  
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

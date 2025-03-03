@@ -98,7 +98,7 @@ class User extends Model {
 class Votings extends Model {
   constructor() {
     super();
-    this.baseUrl = `${this.baseUrl}/diag/diag/voting`;
+    this.baseUrl = `${this.baseUrl}/diag/voting`;
   }
   async vote(votingId: number, userId: number, vote: boolean) {
     return this.request({
@@ -121,7 +121,7 @@ class Votings extends Model {
 class Chat extends Model{
   constructor() {
     super();
-    this.baseUrl = `${this.baseUrl}/diag/diag/chat`;
+    this.baseUrl = `${this.baseUrl}/diag/chat`;
   }
 
   get(diagnosisID: number) {
@@ -158,7 +158,7 @@ class Diagnoses extends Model {
 
   constructor() {
     super();
-    this.baseUrl = `${this.baseUrl}/diag/diag`;
+    this.baseUrl = `${this.baseUrl}/diag`;
     
   }
 
@@ -209,7 +209,7 @@ const authToken2 = cookies.token.get()
             "authorization": "Bearer " + cookies.token.get()?.userId
           }
         })
-        const res = await axios.post<object>(`${getGatewayUrl()}/diag/diag/diagnosis/user/${authToken2.userId}/diagnoses`, {
+        const res = await axios.post<object>(`${getGatewayUrl()}/diag/diagnosis/user/${authToken2.userId}/diagnoses`, {
               newDiagInfo: {
                 type: diseaseEndpoint,
                 link_raw_data: s3uploadData.data.link_to_data_blob_which_holds_prediction_params,

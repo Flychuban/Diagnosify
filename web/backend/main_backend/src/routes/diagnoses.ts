@@ -10,30 +10,24 @@ export const diagnosisRouter = express.Router();
 diagnosisRouter.post(
   '/user/:userId/diagnoses',
   async (
-    req: Request<{ userId: string }, {}, { newDiagInfo: NewDiagnosisInfo, directVoteWhichSkipsVoting: null | boolean }>,
+    req: Request<{ userId: string }, {}, {newDiagInfo: NewDiagnosisInfo, directVoteWhichSkipsVoting: null | boolean}>,
     res: Response<{}>
   ) => {
     try {
       if (req.body.newDiagInfo.type === undefined) {
-        res.status(402).json({ err: "type is undefined", data: req.body });
-        return;
+        res.status(402).json({err: "type is undefined", data : req.body})
+        return
       }
-
       const userId = parseInt(req.params.userId);
-      await messageBroker.publishMessage('diagnosis_queue', {
-        userId,
-        newDiagInfo: req.body.newDiagInfo,
-        directVoteWhichSkipsVoting: req.body.directVoteWhichSkipsVoting
-      });
-
-      return res.status(201).json({ message: 'Diagnosis information is queued for processing' });
+      console.dir(req.body.newDiagInfo)
+      const newDiagnosis = await db.diagnoses.create(userId, req.body.newDiagInfo, req.body.directVoteWhichSkipsVoting);
+      return res.status(201).json({newDiag: newDiagnosis});
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      console.error(error);
+      return res.status(500).json({ error: error.message } );
     }
   }
 );
-
-
 diagnosisRouter.get(
   '/user/:userId/diagnoses',
   async (

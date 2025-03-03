@@ -23,7 +23,7 @@ const Card: React.FC<{
 }> = ({ diagnosis }) => {
   const [userData, isLoading, isError] = useExecuteRequest(null, async () => {
     return await axios.get<{ user: User }>(
-      `${Env.gateway_url}/diag/diag/user/getById/${diagnosis.userId}`,
+      `${Env.gateway_url}/diag/user/getById/${diagnosis.userId}`,
       {
         headers: {
           Authorization: `Bearer ${cookies.token.get()!.userId}`,

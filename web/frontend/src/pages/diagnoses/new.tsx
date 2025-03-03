@@ -146,7 +146,7 @@ export async function saveImageDataTextResponse(diseaseEndpoint: string,data: {p
           }
         })
         console.log("s3",s3uploadData)
-        const res = await axios.post<object>(`${getGatewayUrl()}/diag/diag/diagnosis/user/${authToken2.userId}/diagnoses`, {
+        const res = await axios.post<object>(`${getGatewayUrl()}/diag/diagnosis/user/${authToken2.userId}/diagnoses`, {
               newDiagInfo: {
                 type: diseaseEndpoint,
                 link_raw_data: s3uploadData.data.link_to_data_blob_which_holds_prediction_params ||s3uploadData.data.s3_loc,

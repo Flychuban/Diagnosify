@@ -15,11 +15,10 @@ import org.http4s.headers._
 enum Service(val name: String, val url: String):
   case AUTH extends Service("auth", "http://localhost:8080")
   case PREDICTION extends Service("prediction","http://localhost:5000")
-  case MAIN extends Service("main", "http://localhost3003")
   case UPLOAD extends Service("upload", "http://localhost:4001")
   case UNKNOWN extends Service("unknown", "http://unknown-service")
   case ML extends Service("ml", "http://localhost:5000")
-  case DIAG extends Service("diag", "http://localhost:3001")
+  case DIAG extends Service("diag", "http://localhost:3003")
 
 object Service:
   def fromString(name: String): Service =
