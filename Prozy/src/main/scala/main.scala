@@ -1,8 +1,9 @@
+import cats.data.OptionT
 import cats.effect.{IO, IOApp}
 import types.CORSConfig
 import org.http4s.ember.client.EmberClientBuilder
-import org.http4s.{Request, Uri}
-import webserver.ReverseProxy
+import org.http4s.{HttpRoutes, Method, Request, Response, Uri}
+import webserver.{IMiddleware, ReverseProxy}
 
 enum Service(val name: String, val url: String):
   case AUTH extends Service("auth", "http://localhost:8080")
@@ -29,10 +30,8 @@ class OptionsRequestMiddleware extends IMiddleware {
   override def apply(routes: HttpRoutes[IO]): HttpRoutes[IO] = {
     HttpRoutes { request =>
       if (request.method == Method.OPTIONS) {
-        // Return a successful response for OPTIONS requests
-        IO.pure(Response[IO](status = org.http4s.Status.Ok))
+        OptionT.some(Response[IO](status = org.http4s.Status.Ok))
       } else {
-        // If not an OPTIONS request, pass the request to the next handler
         routes(request)
       }
     }
@@ -54,15 +53,11 @@ object Main extends IOApp.Simple:
           Uri.unsafeFromString(baseUrl).withPath(req.uri.path)
         }
         .addCors(CORSConfig())
-        .withSSL(
-        keystorePath = "/root/flask-reverse-2/keystore.p12",
-        keystorePassword = "changeit",
-        keyManagerPassword = "changeit"
-          )
         .addMiddleware(new OptionsRequestMiddleware())
         .withLogging(req => IO.println(s"Proxying request: ${req.method} ${req.uri}"))
         .build()
-        .listen(port = 2053, host = "0.0.0.0", client)
+        .listen(port = 3003, host = "0.0.0.0", client)
         .as(())
     }
+
 
