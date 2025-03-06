@@ -64,12 +64,27 @@ object Main extends IOApp.Simple:
   def run: IO[Unit] =
     EmberClientBuilder.default[IO].build.use { client =>
       ReverseProxy()
-        .withResolver { req =>
-          val baseUrl = resolveService(req)
-          println("resolved")
-          println(baseUrl)
-          Uri.unsafeFromString(baseUrl).withPath(req.uri.path)
-        }
+.withResolver { req =>
+  val baseUrl = resolveService(req)
+  println("resolved")
+  println(baseUrl)
+  println(req.uri.path)
+  
+  // Get the current path segments
+  val segments = req.uri.path.segments
+  
+  // Remove "ml" segment if present
+  val newPathSegments = segments.filterNot(_.decoded() == "ml")
+  
+  // Create a new path from the filtered segments
+  val newPath = org.http4s.Uri.Path(newPathSegments)
+  
+  println(s"Original path: ${req.uri.path}")
+  println(s"New path: $newPath")
+  
+  // Use the new path without "ml"
+  Uri.unsafeFromString(baseUrl).withPath(newPath)
+}
         .withSSL(
           keystorePath = "/root/flask-reverse-2/keystore.p12",
           keystorePassword = "changeit",
