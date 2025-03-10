@@ -6,7 +6,16 @@ export const chatRouter = express.Router();
 
 
 chatRouter.get('/', async (req: express.Request, res: express.Response<CustomResponse<{ chat: (Chat & { messages: (Message & {user: User})[]  }) }>>) => {
-    const { chatId, diagnosisID } = req.query;
+    const { chatID, diagnosisID } = req.query;
+    console.log(req.query)
+    console.log(req.url)
+    const chatId = chatID
+    const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+    console.log(`Full URL: ${fullUrl}`);
+
+
+
+    console.log(chatId, diagnosisID)
     if (chatId === undefined && diagnosisID === undefined) {
         res.status(400).json({ errMsg: 'Missing both chatId and diagnosisID' });
         return;

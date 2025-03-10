@@ -170,7 +170,7 @@ class Diagnoses extends Model {
   }
 
   async saveTextDataTextResponseDiagnosis(diseaseEndpoint: string, data: { responseMsg: { prediction: string }}, vote: boolean, voteWhichSkipsVoting: null | boolean ) {
-    const s3Req = await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>(`${getGatewayUrl()}/data/data/${diseaseEndpoint}`, data, {
+    const s3Req = await axios.post<{ link_to_data_blob_which_holds_prediction_params: string }>(`${getGatewayUrl()}/data/${diseaseEndpoint}`, data, {
       headers: {
         "Authorization": "Bearer " + cookies.token.get()?.userId,
         "authorization": "Bearer " + cookies.token.get()?.userId

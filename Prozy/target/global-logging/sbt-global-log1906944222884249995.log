@@ -9,9 +9,9 @@
 [0m[[0m[0mdebug[0m] [0m[0m> Exec(onFailure loadFailed, None, None)[0m
 [0m[[0m[0mdebug[0m] [0m[0m> Exec(loadp, None, None)[0m
 [0m[[0m[0minfo[0m] [0m[0mwelcome to sbt 1.10.6 (Ubuntu Java 21.0.6)[0m
-[0m[[0m[0mdebug[0m] [0m[0mLoad.defaultLoad until apply took 214.409486ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m          Load.loadUnit: plugins took 166.772915ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m          Load.loadUnit: defsScala took 0.504224ms[0m
+[0m[[0m[0mdebug[0m] [0m[0mLoad.defaultLoad until apply took 112.75972ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m          Load.loadUnit: plugins took 76.666997ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m          Load.loadUnit: defsScala took 17.849028ms[0m
 [0m[[0m[0mdebug[0m] [0m[0m[Loading] Scanning directory /root/Diagnosify/Prozy/project[0m
 [0m[[0m[0mdebug[0m] [0m[0m[Loading] Found non-root projects [0m
 [0m[[0m[0mdebug[0m] [0m[0m[Loading] Done in /root/Diagnosify/Prozy/project, returning: ()[0m
@@ -28,26 +28,26 @@
 [0m[[0m[0mdebug[0m] [0m[0mClause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.Giter8TemplatePlugin)))[0m
 [0m[[0m[0mdebug[0m] [0m[0mClause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.MiniDependencyTreePlugin))))[0m
 [0m[[0m[0mdebug[0m] [0m[0m  :: deduced result: Matched(sbt.plugins.CorePlugin,sbt.plugins.Giter8TemplatePlugin,sbt.plugins.IvyPlugin,sbt.plugins.JvmPlugin,sbt.plugins.MiniDependencyTreePlugin,sbt.plugins.JUnitXmlReportPlugin,sbt.plugins.SemanticdbPlugin)[0m
-[0m[[0m[0mdebug[0m] [0m[0mPlugins.deducer#function took 46.427998 ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m              Load.resolveProject(prozy-build) took 169.41241ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m            Load.loadTransitive: finalizeProject(Project(id prozy-build, base: /root/Diagnosify/Prozy/project, plugins: List(<none>))) took 273.906676ms[0m
+[0m[[0m[0mdebug[0m] [0m[0mPlugins.deducer#function took 27.191658 ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m              Load.resolveProject(prozy-build) took 62.933238ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m            Load.loadTransitive: finalizeProject(Project(id prozy-build, base: /root/Diagnosify/Prozy/project, plugins: List(<none>))) took 130.406376ms[0m
 [0m[[0m[0mdebug[0m] [0m[0m[Loading] Done in /root/Diagnosify/Prozy/project, returning: (prozy-build)[0m
-[0m[[0m[0mdebug[0m] [0m[0m          Load.loadUnit: loadedProjectsRaw took 334.650355ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m          Load.loadUnit: cleanEvalClasses took 0.441708ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m        Load.loadUnit(file:/root/Diagnosify/Prozy/project/, ...) took 519.072154ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: load took 836.686897ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: resolveProjects took 8.010777ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: finalTransforms took 109.9223ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: config.delegates took 15.087603ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: Def.make(settings)... took 914.573428ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: structureIndex took 217.05464ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: mkStreams took 3.444517ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m          Load.loadUnit: loadedProjectsRaw took 164.73434ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m          Load.loadUnit: cleanEvalClasses took 0.889255ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m        Load.loadUnit(file:/root/Diagnosify/Prozy/project/, ...) took 269.170397ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: load took 648.529549ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: resolveProjects took 14.308326ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: finalTransforms took 138.710071ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: config.delegates took 17.469464ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: Def.make(settings)... took 680.7487ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: structureIndex took 133.220295ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m      Load.apply: mkStreams took 1.353747ms[0m
 [0m[[0m[0minfo[0m] [0m[0mloading project definition from /root/Diagnosify/Prozy/project[0m
 [0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
-[0m[[0m[0mdebug[0m] [0m[0m    Load.loadUnit: plugins took 3940.615659ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m    Load.loadUnit: defsScala took 0.015249ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Load.loadUnit: plugins took 2924.919063ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Load.loadUnit: defsScala took 0.005645ms[0m
 [0m[[0m[0mdebug[0m] [0m[0m[Loading] Scanning directory /root/Diagnosify/Prozy[0m
-[0m[[0m[0mdebug[0m] [0m[0m      Load.loadUnit: mkEval took 8.463783ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m      Load.loadUnit: mkEval took 4.858017ms[0m
 [0m[[0m[0mdebug[0m] [0m[0m[Loading] Found root project root w/ remaining [0m
 [0m[[0m[0mdebug[0m] [0m[0mdeducing auto plugins based on known facts Set(Atom(sbt.plugins.CorePlugin)) and clauses Clauses(Clause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.IvyPlugin)))[0m
 [0m[[0m[0mdebug[0m] [0m[0mClause(Atom(sbt.ScriptedPlugin),Set(Atom(sbt.plugins.JvmPlugin)))[0m
@@ -62,21 +62,21 @@
 [0m[[0m[0mdebug[0m] [0m[0mClause(Atom(sbt.plugins.CorePlugin),Set(Atom(sbt.plugins.Giter8TemplatePlugin)))[0m
 [0m[[0m[0mdebug[0m] [0m[0mClause(Atom(sbt.plugins.JvmPlugin),Set(Atom(sbt.plugins.MiniDependencyTreePlugin))))[0m
 [0m[[0m[0mdebug[0m] [0m[0m  :: deduced result: Matched(sbt.plugins.CorePlugin,sbt.plugins.Giter8TemplatePlugin,sbt.plugins.IvyPlugin,sbt.plugins.JvmPlugin,sbt.plugins.MiniDependencyTreePlugin,sbt.plugins.JUnitXmlReportPlugin,sbt.plugins.SemanticdbPlugin)[0m
-[0m[[0m[0mdebug[0m] [0m[0mPlugins.deducer#function took 1.987461 ms[0m
+[0m[[0m[0mdebug[0m] [0m[0mPlugins.deducer#function took 1.663456 ms[0m
 [0m[[0m[0minfo[0m] [0m[0mloading settings for project root from build.sbt...[0m
-[0m[[0m[0mdebug[0m] [0m[0m        Load.resolveProject(root) took 6.733101ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m      Load.loadTransitive: finalizeProject(Project(id root, base: /root/Diagnosify/Prozy, plugins: List(<none>))) took 9.990311ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m        Load.resolveProject(root) took 4.201502ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m      Load.loadTransitive: finalizeProject(Project(id root, base: /root/Diagnosify/Prozy, plugins: List(<none>))) took 6.791668ms[0m
 [0m[[0m[0mdebug[0m] [0m[0m[Loading] Done in /root/Diagnosify/Prozy, returning: (root)[0m
-[0m[[0m[0mdebug[0m] [0m[0m    Load.loadUnit: loadedProjectsRaw took 256.755893ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m    Load.loadUnit: cleanEvalClasses took 4.83693ms[0m
-[0m[[0m[0mdebug[0m] [0m[0m  Load.loadUnit(file:/root/Diagnosify/Prozy/, ...) took 4206.983763ms[0m
-[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: load took 4244.835664ms[0m
-[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: resolveProjects took 0.152448ms[0m
-[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: finalTransforms took 16.720231ms[0m
-[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: config.delegates took 0.550734ms[0m
-[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: Def.make(settings)... took 264.255954ms[0m
-[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: structureIndex took 86.09252ms[0m
-[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: mkStreams took 0.003978ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Load.loadUnit: loadedProjectsRaw took 219.843441ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m    Load.loadUnit: cleanEvalClasses took 3.696439ms[0m
+[0m[[0m[0mdebug[0m] [0m[0m  Load.loadUnit(file:/root/Diagnosify/Prozy/, ...) took 3149.720953ms[0m
+[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: load took 3170.059344ms[0m
+[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: resolveProjects took 0.142109ms[0m
+[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: finalTransforms took 15.079716ms[0m
+[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: config.delegates took 2.965478ms[0m
+[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: Def.make(settings)... took 155.188143ms[0m
+[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: structureIndex took 56.839686ms[0m
+[0m[[0m[0mdebug[0m] [0m[0mLoad.apply: mkStreams took 0.003149ms[0m
 [0m[[0m[0minfo[0m] [0m[0mset current project to ReverseProzy (in build file:/root/Diagnosify/Prozy/)[0m
 [0m[[0m[0mdebug[0m] [0m[0m> Exec(sbtPopOnFailure, None, None)[0m
 [0m[[0m[0mdebug[0m] [0m[0m> Exec(resumeFromFailure, None, None)[0m
@@ -86,8 +86,8 @@
 [0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / run[0m
 [0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
 [0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /root/Diagnosify/Prozy/target/scala-3.3.4/classes ...[0m
-[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /root/Diagnosify/Prozy/src/main/scala/main.scala:67:0 --------------[0m[0m[0m
-[0m[[0m[33mwarn[0m] [0m[0m[33m67 |[0m.withResolver { req =>[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /root/Diagnosify/Prozy/src/main/scala/main.scala:71:0 --------------[0m[0m[0m
+[0m[[0m[33mwarn[0m] [0m[0m[33m71 |[0m.withResolver { req =>[0m
 [0m[[0m[33mwarn[0m] [0m[0m[33m[33m   |[0m^[0m[0m
 [0m[[0m[33mwarn[0m] [0m[0m[33m   |[0mLine is indented too far to the left, or a `}` is missing[0m
 [0m[[0m[33mwarn[0m] [0m[0mone warning found[0m

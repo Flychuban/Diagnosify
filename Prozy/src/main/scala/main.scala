@@ -10,12 +10,14 @@ import cats.data.OptionT
 import cats.effect.IO
 import org.http4s._
 import org.http4s.headers._
+import org.typelevel.ci.CIString
 
 
 enum Service(val name: String, val url: String):
   case AUTH extends Service("auth", "http://localhost:8080")
   case PREDICTION extends Service("prediction","http://localhost:5000")
-  case UPLOAD extends Service("upload", "http://localhost:4001")
+  case UPLOAD extends Service("data", "http://localhost:4001")
+  case DATA extends Service("upload", "http://localhost:4001")
   case UNKNOWN extends Service("unknown", "http://unknown-service")
   case ML extends Service("ml", "http://localhost:5000")
   case DIAG extends Service("diag", "http://localhost:3003")
@@ -37,20 +39,22 @@ class CorsMiddleware extends IMiddleware {
     HttpRoutes { request =>
       routes(request).map { response =>
         response.putHeaders(
-          "Access-Control-Allow-Origin" -> "*",
-          "Access-Control-Allow-Methods" -> "GET, POST, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers" -> "Content-Type, Authorization",
-          "Access-Control-Allow-Credentials" -> "true"
+          Header.Raw(CIString("Access-Control-Allow-Origin"), "*"),
+          Header.Raw(CIString("Access-Control-Allow-Methods"), "GET, POST, PUT, DELETE, OPTIONS"),
+          Header.Raw(CIString("Access-Control-Allow-Headers"), "Content-Type, Authorization"),
+          Header.Raw(CIString("Access-Control-Allow-Credentials"), "true")
         )
       }.orElse {
         // Handle OPTIONS requests directly
         if (request.method == Method.OPTIONS) {
-          OptionT.some(Response[IO](status = org.http4s.Status.Ok).putHeaders(
-            "Access-Control-Allow-Origin" -> "*",
-            "Access-Control-Allow-Methods" -> "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers" -> "Content-Type, Authorization",
-            "Access-Control-Allow-Credentials" -> "true"
-          ))
+          OptionT.some(
+            Response[IO](status = Status.Ok).putHeaders(
+              Header.Raw(CIString("Access-Control-Allow-Origin"), "*"),
+              Header.Raw(CIString("Access-Control-Allow-Methods"), "GET, POST, PUT, DELETE, OPTIONS"),
+              Header.Raw(CIString("Access-Control-Allow-Headers"), "Content-Type, Authorization"),
+              Header.Raw(CIString("Access-Control-Allow-Credentials"), "true")
+            )
+          )
         } else {
           OptionT.none
         }
@@ -74,8 +78,13 @@ object Main extends IOApp.Simple:
   val segments = req.uri.path.segments
   
   // Remove "ml" segment if present
-  val newPathSegments = segments.filterNot(_.decoded() == "ml")
-  
+
+          val newPathSegments = segments.filterNot(_.decoded() == "ml").filterNot(_.decoded() == "upload")
+
+
+
+
+
   // Create a new path from the filtered segments
   val newPath = org.http4s.Uri.Path(newPathSegments)
   
@@ -83,7 +92,7 @@ object Main extends IOApp.Simple:
   println(s"New path: $newPath")
   
   // Use the new path without "ml"
-  Uri.unsafeFromString(baseUrl).withPath(newPath)
+          Uri.unsafeFromString(baseUrl).withPath(newPath).copy(query = req.uri.query)
 }
         .withSSL(
           keystorePath = "/root/flask-reverse-2/keystore.p12",
