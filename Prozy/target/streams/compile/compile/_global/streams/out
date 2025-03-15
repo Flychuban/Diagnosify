@@ -1,5 +1,0 @@
-[0m[[0m[33mwarn[0m] [0m[0m[33m[33m-- Warning: /root/Diagnosify/Prozy/src/main/scala/main.scala:71:0 --------------[0m[0m[0m
-[0m[[0m[33mwarn[0m] [0m[0m[33m71 |[0m.withResolver { req =>[0m
-[0m[[0m[33mwarn[0m] [0m[0m[33m[33m   |[0m^[0m[0m
-[0m[[0m[33mwarn[0m] [0m[0m[33m   |[0mLine is indented too far to the left, or a `}` is missing[0m
-[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m
