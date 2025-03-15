@@ -28,14 +28,21 @@ export const PneumoniaPredictionForm: React.FC = () => {
         vote: boolean,
         description: string,
       ) => {
-        return await saveImageDataTextResponse(
+	try {
+	return await saveImageDataTextResponse(
           "pneumonia",
           data,
           directVoteWhichSkipsVoting,
           vote,
           description,
         );
-      }}
+      }
+	}catch(err){
+
+
+	}
+
+      }
     />
   );
 };
