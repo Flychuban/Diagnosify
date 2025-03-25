@@ -45,11 +45,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       setShouldGlobalLoadingShow(state);
     };
 
-    globalEventEmitter.on("setLoading", handleLoadingEvent);
 
     // Cleanup listener on unmount
     return () => {
-      globalEventEmitter.off("setLoading", handleLoadingEvent);
     };
   }, []);
 
